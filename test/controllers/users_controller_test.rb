@@ -43,14 +43,16 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should destroy user" do
-    # Create a user without associations to avoid FK violation
+    # Create a user with associations to test cascading delete
     temp_user = User.create!(
-      email: "temp@example.com",
+      email: "temp_with_assoc@example.com",
       password: "password123",
       first_name: "Temp",
-      last_name: "User",
+      last_name: "Assoc",
       role: :normal
     )
+    # Create a client associated with this user
+    Client.create!(user: temp_user, name: "Test Client", rut: "123456785")
 
     assert_difference("User.count", -1) do
       delete user_url(temp_user)

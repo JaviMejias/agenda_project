@@ -40,9 +40,8 @@ class PropertiesTest < ApplicationSystemTestCase
   test "should destroy Property" do
     visit property_url(@property)
 
-    # Check for the button or visit the destroy action if it's a simple link
-    # In this app, it's a button. Rack_test can click it.
-    # But wait, destroy usually requires a DELETE request which might need JS for the confirmation or method: :delete
-    # Rack_test handles data-method=:delete if we use the right helpers.
+    click_on "Eliminar Propiedad"
+
+    assert_text "Propiedad eliminada correctamente."
   end
 end

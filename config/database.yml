@@ -5,14 +5,14 @@ default: &default
 
 development:
   <<: *default
-  database: my_app_name_development
+  database: agenda_project_development
 
 test:
   <<: *default
-  database: my_app_name_test
+  database: agenda_project_test
 
 production:
   <<: *default
-  database: my_app_name_production
-  username: my_app_name
-  password: <%= ENV["MY_APP_NAME_DATABASE_PASSWORD"] %>
+  database: agenda_project_production
+  username: agenda_project
+  password: <%= ENV["AGENDA_PROJECT_DATABASE_PASSWORD"] %>
