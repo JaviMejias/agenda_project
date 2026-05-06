@@ -35,7 +35,7 @@ class UsersController < ApplicationController
 
   def update
     authorize @user
-    
+
     if @user.update(user_params_for_update)
       redirect_to users_path, notice: "Usuario actualizado exitosamente."
     else
@@ -60,7 +60,9 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :role, :first_name, :last_name)
+    permitted = [ :email, :password, :password_confirmation, :first_name, :last_name ]
+    permitted << :role if current_user.admin?
+    params.require(:user).permit(permitted)
   end
 
   def user_params_for_update

@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  get 'reports', to: 'reports#index', as: :reports
+  get "reports", to: "reports#index", as: :reports
   resources :clients do
     collection do
       get :list
@@ -13,32 +13,32 @@ Rails.application.routes.draw do
 
   resources :properties do
     get :list, on: :collection
-    resources :reservations, only: [:new, :create]
+    resources :reservations, only: [ :new, :create ]
     member do
       get :gallery
-      delete 'images/:image_id', to: 'properties#destroy_image', as: :image
+      delete "images/:image_id", to: "properties#destroy_image", as: :image
     end
   end
-  resources :reservations, except: [:new, :create] do
+  resources :reservations, except: [ :new, :create ] do
     collection do
       get :list
       get :calendar_list
     end
   end
-  
-  get 'dashboard', to: 'dashboard#index', as: :dashboard
+
+  get "dashboard", to: "dashboard#index", as: :dashboard
 
   authenticated :user, ->(u) { u.admin? } do
-    root 'dashboard#index', as: :admin_root
+    root "dashboard#index", as: :admin_root
   end
 
   authenticated :user, ->(u) { u.normal? } do
-    root 'properties#index', as: :user_root
+    root "properties#index", as: :user_root
   end
 
   root to: redirect("/users/sign_in")
-  
-  resources :public_reservations, only: [], param: :token, path: 'r' do
+
+  resources :public_reservations, only: [], param: :token, path: "r" do
     member do
       get :confirm
       get :reject

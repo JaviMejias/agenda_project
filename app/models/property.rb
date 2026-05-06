@@ -20,14 +20,14 @@ class Property < ApplicationRecord
   end
 
   def thumbnail(image)
-    image.variant(resize_to_limit: [200, 200])
+    image.variant(resize_to_limit: [ 200, 200 ])
   end
 
   def gallery_variant(image)
-    image.variant(resize_to_limit: [800, 600])
+    image.variant(resize_to_limit: [ 800, 600 ])
   end
 
   def carousel_variant(image)
-    image.variant(resize_to_limit: [400, 300])
+    image.variant(resize_to_limit: [ 400, 300 ])
   end
 end

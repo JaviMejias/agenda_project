@@ -4,10 +4,10 @@ class ReportStatsService
     @end_date = end_date
     @company_id = company_id
     @range = @start_date.beginning_of_day..@end_date.end_of_day
-    
+
     @reservations_in_range = Reservation.in_range(@range)
     @properties = Property.all
-    
+
     if @company_id.present?
       @reservations_in_range = @reservations_in_range.joins(:property).where(properties: { company_id: @company_id })
       @properties = @properties.where(company_id: @company_id)
@@ -29,10 +29,10 @@ class ReportStatsService
   def properties_data
     @properties.map do |property|
       res = property.reservations.in_range(@range)
-      
+
       income = res.confirmed.sum(:total_price)
       loss = res.blocked.sum(:total_price)
-      
+
       {
         name: property.name,
         income: income,
@@ -49,12 +49,12 @@ class ReportStatsService
 
     occupied_days = 0
     reservations.active.each do |r|
-      r_start = [r.start_time.to_date, @start_date].max
-      r_end = [r.end_time.to_date, @end_date].min
+      r_start = [ r.start_time.to_date, @start_date ].max
+      r_end = [ r.end_time.to_date, @end_date ].min
       days = (r_end - r_start).to_i
-      occupied_days += [days, 0].max
+      occupied_days += [ days, 0 ].max
     end
-    
+
     (occupied_days.to_f / total_days_in_range * 100).round(1)
   end
 
@@ -64,7 +64,7 @@ class ReportStatsService
       month_end = i.months.ago.end_of_month
       range = month_start.beginning_of_day..month_end.end_of_day
       {
-        month: I18n.l(month_start, format: '%B'),
+        month: I18n.l(month_start, format: "%B"),
         income: Reservation.confirmed.in_range(range).yield_self { |scope| @company_id.present? ? scope.joins(:property).where(properties: { company_id: @company_id }) : scope }.sum(:total_price)
       }
     end

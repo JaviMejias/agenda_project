@@ -1,11 +1,11 @@
 class ClientsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_client, only: %i[ show edit update ]
+  before_action :set_client, only: %i[ show edit update destroy ]
 
   def index
     @clients = Client.all.search(params[:q]).order(name: :asc)
     @pagy, @clients = pagy(@clients, limit: 15)
-    
+
     respond_to do |format|
       format.html
       format.turbo_stream
@@ -59,6 +59,12 @@ class ClientsController < ApplicationController
   def list
     @clients = Client.all.search(params[:q]).limit(20)
     render json: @clients.map { |c| { id: c.id, name: c.name, rut: c.rut } }
+  end
+
+  def destroy
+    authorize @client
+    @client.destroy
+    redirect_to clients_path, notice: "Cliente eliminado exitosamente.", status: :see_other
   end
 
   private

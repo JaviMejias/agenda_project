@@ -12,9 +12,9 @@ class PropertiesController < ApplicationController
     authorize Property
     @properties = current_user.admin? ? Property.all : current_user.properties
     @properties = @properties.where("name ILIKE ?", "%#{params[:q]}%")
-                             .where(company_id: [nil, ""])
+                             .where(company_id: [ nil, "" ])
                              .limit(20)
-    render json: @properties.as_json(only: [:id, :name])
+    render json: @properties.as_json(only: [ :id, :name ])
   end
 
   def show
@@ -95,16 +95,16 @@ class PropertiesController < ApplicationController
   def destroy_image
     authorize @property
     @image = @property.images.find(params[:image_id])
-    
+
     respond_to do |format|
       begin
         @image.purge
-        format.html { redirect_to edit_property_path(@property), notice: 'Imagen eliminada correctamente.' }
+        format.html { redirect_to edit_property_path(@property), notice: "Imagen eliminada correctamente." }
       rescue => e
         format.turbo_stream do
           render turbo_stream: turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "alert", message: "No se pudo eliminar la imagen." })
         end
-        format.html { redirect_to edit_property_path(@property), alert: 'No se pudo eliminar la imagen.' }
+        format.html { redirect_to edit_property_path(@property), alert: "No se pudo eliminar la imagen." }
       end
     end
   end

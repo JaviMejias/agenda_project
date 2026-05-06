@@ -5,7 +5,7 @@ class DashboardController < ApplicationController
     @end_date = params[:end_date].present? ? Date.parse(params[:end_date]) : Time.zone.now.end_of_month.to_date
     @range = @start_date.beginning_of_day..@end_date.end_of_day
     @company_id = params[:company_id]
-    
+
     stats_service = DashboardStatsService.new(current_user, @range, company_id: @company_id)
     @stats = stats_service.stats
 
@@ -18,7 +18,7 @@ class DashboardController < ApplicationController
     @chart_datasets = @stats[:chart_data][:datasets]
     @revenue_by_property = @stats[:revenue_by_property]
     @upcoming_arrivals = @stats[:upcoming_arrivals]
-    
+
     respond_to do |format|
       format.html
       format.turbo_stream

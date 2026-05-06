@@ -3,10 +3,10 @@ class DashboardStatsService
     @user = user
     @range = range
     @company_id = company_id
-    
+
     @reservations = user.reservations.in_range(range)
     @properties = user.properties
-    
+
     if @company_id.present?
       @reservations = @reservations.joins(:property).where(properties: { company_id: @company_id })
       @properties = @properties.where(company_id: @company_id)
@@ -35,14 +35,14 @@ class DashboardStatsService
                                 .sort
 
     labels = active_dates.map { |d| d.to_date.strftime("%d %b") }
-    
+
     datasets = @properties.map do |property|
       daily_revenue = property.reservations
                               .confirmed
                               .in_range(@range)
                               .group("DATE(start_time)")
                               .sum(:total_price)
-      
+
       data_points = active_dates.map { |date| daily_revenue[date] || 0 }
 
       {

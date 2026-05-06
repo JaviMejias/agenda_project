@@ -10,6 +10,22 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
+    include Devise::Test::IntegrationHelpers
+    include Warden::Test::Helpers
+    Warden.test_mode!
+
     # Add more helper methods to be used by all tests here...
+  end
+end
+
+module ViteRails::TagHelpers
+  def vite_stylesheet_tag(*args)
+    nil
+  end
+  def vite_javascript_tag(*args)
+    nil
+  end
+  def vite_client_tag
+    nil
   end
 end

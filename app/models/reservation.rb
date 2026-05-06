@@ -2,16 +2,16 @@ class Reservation < ApplicationRecord
   belongs_to :property
   belongs_to :user
   belongs_to :client, optional: true
-  
+
   attr_accessor :skip_notifications
 
   enum :status, { pending: 0, confirmed: 1, cancelled: 2, blocked: 3 }
-  
+
   has_secure_token :token
   def self.selectable_statuses
-    statuses.keys.reject { |s| s == 'blocked' }
+    statuses.keys.reject { |s| s == "blocked" }
   end
-  
+
   scope :in_range, ->(range) { where(start_time: range) }
   scope :completed, -> { confirmed.where("end_time <= ?", Time.zone.now) }
   scope :projected, -> { confirmed.where("end_time > ?", Time.zone.now) }
@@ -26,7 +26,7 @@ class Reservation < ApplicationRecord
   validate :no_overlapping_reservations
   validate :cannot_change_if_already_cancelled, on: :update
 
-  scope :search, ->(query) { 
+  scope :search, ->(query) {
     if query.present?
       joins(:property).where("client_name ILIKE ? OR properties.name ILIKE ?", "%#{query}%", "%#{query}%")
     else
@@ -44,37 +44,37 @@ class Reservation < ApplicationRecord
   before_validation :sync_client_name
   before_validation :handle_blocked_reservation
   before_save :calculate_total_price
-  after_commit :send_status_notifications, on: [:create, :update]
-  after_commit :schedule_reminder_job, on: [:create, :update]
-  
+  after_commit :send_status_notifications, on: [ :create, :update ]
+  after_commit :schedule_reminder_job, on: [ :create, :update ]
+
   def destroyable?
     blocked?
   end
 
   def status_text
     case status
-    when 'pending' then 'Pendiente'
-    when 'confirmed' then 'Confirmada'
-    when 'cancelled' then 'Cancelada'
-    when 'blocked' then 'Bloqueado / No Disponible'
+    when "pending" then "Pendiente"
+    when "confirmed" then "Confirmada"
+    when "cancelled" then "Cancelada"
+    when "blocked" then "Bloqueado / No Disponible"
     else status.humanize
     end
   end
 
   def status_color_classes
     case status
-    when 'pending' then 'bg-amber-50 text-amber-600 border-amber-100'
-    when 'confirmed' then 'bg-emerald-50 text-emerald-600 border-emerald-100'
-    when 'cancelled' then 'bg-rose-50 text-rose-600 border-rose-100'
-    when 'blocked' then 'bg-slate-700 text-white border-slate-800 shadow-sm'
-    else 'bg-gray-50 text-gray-600 border-gray-100'
+    when "pending" then "bg-amber-50 text-amber-600 border-amber-100"
+    when "confirmed" then "bg-emerald-50 text-emerald-600 border-emerald-100"
+    when "cancelled" then "bg-rose-50 text-rose-600 border-rose-100"
+    when "blocked" then "bg-slate-700 text-white border-slate-800 shadow-sm"
+    else "bg-gray-50 text-gray-600 border-gray-100"
     end
   end
 
   def self.for_calendar(property_id: nil, start_date_str: nil, end_date_str: nil, exclude_id: nil)
     query = Reservation.joins(:property).includes(:property)
     query = query.where(property_id: property_id) if property_id.present?
-    
+
     if start_date_str.present? && end_date_str.present?
       start_date = Time.zone.parse(start_date_str) rescue nil
       end_date = Time.zone.parse(end_date_str) rescue nil
@@ -82,7 +82,7 @@ class Reservation < ApplicationRecord
         query = query.where("start_time < ? AND end_time > ?", end_date, start_date)
       end
     end
-    
+
     query = query.where.not(id: exclude_id) if exclude_id.present?
     query.order(start_time: :asc)
   end
@@ -117,7 +117,7 @@ class Reservation < ApplicationRecord
   end
 
   def cannot_change_if_already_cancelled
-    if status_was == 'cancelled'
+    if status_was == "cancelled"
       errors.add(:base, "Esta reserva ya está cancelada y no puede ser modificada.")
     end
   end
@@ -130,16 +130,16 @@ class Reservation < ApplicationRecord
     scope = property.reservations.where.not(id: id).where.not(status: :cancelled)
 
     if property.per_day?
-      overlapping = scope.where("CAST(start_time AS DATE) < CAST(? AS DATE) AND CAST(end_time AS DATE) > CAST(? AS DATE)", 
+      overlapping = scope.where("CAST(start_time AS DATE) < CAST(? AS DATE) AND CAST(end_time AS DATE) > CAST(? AS DATE)",
                                 end_time, start_time).first
     else
       overlapping = scope.where("start_time < ? AND end_time > ?", end_time, start_time).first
     end
 
     if overlapping
-      format = property.per_hour? ? '%d-%m-%Y %H:%M' : '%d-%m-%Y'
+      format = property.per_hour? ? "%d-%m-%Y %H:%M" : "%d-%m-%Y"
       client_display = overlapping.blocked? ? "<b>BLOQUEO DE FECHA</b>" : "<b>#{overlapping.client_name}</b>"
-      
+
       message = "La propiedad ya está #{overlapping.blocked? ? 'bloqueada' : 'reservada'} en estas fechas por " \
                 "#{client_display}, desde el " \
                 "#{overlapping.start_time.strftime(format)} al " \

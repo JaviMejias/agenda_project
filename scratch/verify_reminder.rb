@@ -1,11 +1,11 @@
 p = Property.first
 u = User.first
 r = Reservation.new(
-  property: p, 
-  user: u, 
-  client_name: "Test Reminder", 
-  start_time: 48.hours.from_now, 
-  end_time: 50.hours.from_now, 
+  property: p,
+  user: u,
+  client_name: "Test Reminder",
+  start_time: 48.hours.from_now,
+  end_time: 50.hours.from_now,
   status: :confirmed
 )
 

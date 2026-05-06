@@ -2,16 +2,33 @@
 
 one:
   property: one
-  client_name: MyString
-  start_date: 2026-05-02
-  end_date: 2026-05-02
+  user: one
+  client: one
+  client_name: Diego Sanchez
+  start_time: <%= 1.day.from_now.change(hour: 10) %>
+  end_time: <%= 2.days.from_now.change(hour: 10) %>
   status: 1
-  total_price: 9.99
+  total_price: 50000
+  token: <%= SecureRandom.hex(10) %>
 
 two:
   property: two
-  client_name: MyString
-  start_date: 2026-05-02
-  end_date: 2026-05-02
-  status: 1
-  total_price: 9.99
+  user: one
+  client: two
+  client_name: Maria Lopez
+  start_time: <%= 3.days.from_now.change(hour: 14) %>
+  end_time: <%= 3.days.from_now.change(hour: 16) %>
+  status: 0
+  total_price: 30000
+  token: <%= SecureRandom.hex(10) %>
+
+three:
+  property: one
+  user: one
+  client: one
+  client_name: Diego Sanchez
+  start_time: <%= 1.day.ago.change(hour: 10) %>
+  end_time: <%= 1.day.ago.change(hour: 18) %>
+  status: 2
+  total_price: 50000
+  token: <%= SecureRandom.hex(10) %>

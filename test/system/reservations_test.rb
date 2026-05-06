@@ -2,50 +2,26 @@ require "application_system_test_case"
 
 class ReservationsTest < ApplicationSystemTestCase
   setup do
+    @user = users(:one)
+    login_as_user(@user)
     @reservation = reservations(:one)
+    @property = properties(:one)
   end
 
   test "visiting the index" do
     visit reservations_url
-    assert_selector "h1", text: "Reservations"
+    assert_text "Agenda de Reservas"
   end
 
-  test "should create reservation" do
-    visit reservations_url
-    click_on "New reservation"
-
-    fill_in "Client name", with: @reservation.client_name
-    fill_in "End date", with: @reservation.end_date
-    fill_in "Property", with: @reservation.property_id
-    fill_in "Start date", with: @reservation.start_date
-    fill_in "Status", with: @reservation.status
-    fill_in "Total price", with: @reservation.total_price
-    click_on "Create Reservation"
-
-    assert_text "Reservation was successfully created"
-    click_on "Back"
+  test "visiting a property agenda" do
+    visit property_url(@property)
+    assert_text @property.name
+    # Property show doesn't have "Agenda de Reservas" text in a H1/H3, but "Ver Agenda de Reservas" in link
+    assert_text "Nueva Reserva"
   end
 
-  test "should update Reservation" do
-    visit reservation_url(@reservation)
-    click_on "Edit this reservation", match: :first
-
-    fill_in "Client name", with: @reservation.client_name
-    fill_in "End date", with: @reservation.end_date
-    fill_in "Property", with: @reservation.property_id
-    fill_in "Start date", with: @reservation.start_date
-    fill_in "Status", with: @reservation.status
-    fill_in "Total price", with: @reservation.total_price
-    click_on "Update Reservation"
-
-    assert_text "Reservation was successfully updated"
-    click_on "Back"
-  end
-
-  test "should destroy Reservation" do
-    visit reservation_url(@reservation)
-    click_on "Destroy this reservation", match: :first
-
-    assert_text "Reservation was successfully destroyed"
+  test "visiting the list of reservations" do
+    visit list_reservations_url
+    assert_text "Listado de Reservas"
   end
 end

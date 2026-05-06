@@ -1,6 +1,6 @@
 class PublicReservationsController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
-  layout 'public'
+  layout "public"
 
   before_action :set_reservation
 

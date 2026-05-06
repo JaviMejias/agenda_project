@@ -1,0 +1,13 @@
+one:
+  name: Empresa Uno
+  rut: "111111111"
+  address: "Calle 1"
+  business_type: "Servicios"
+  user: one
+
+two:
+  name: Empresa Dos
+  rut: "222222222"
+  address: "Calle 2"
+  business_type: "Comercio"
+  user: admin

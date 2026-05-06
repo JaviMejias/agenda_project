@@ -10,7 +10,7 @@ puts "Creating extra clients..."
 10.times do
   Client.create(
     name: Faker::Name.name,
-    rut: "#{rand(10000000..25000000)}-#{['0','1','2','3','4','5','6','7','8','9','K'].sample}",
+    rut: "#{rand(10000000..25000000)}-#{[ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'K' ].sample}",
     phone: Faker::PhoneNumber.cell_phone_in_e164,
     email: Faker::Internet.email,
     user: user
@@ -23,19 +23,19 @@ properties = Property.all.to_a
 30.times do |i|
   prop = properties.sample
   # Distribute dates: some past, some future
-  offset_days = i - 15 
+  offset_days = i - 15
   start_time = (Time.current + offset_days.days).beginning_of_day + rand(8..18).hours
-  
+
   if prop.per_day?
     end_time = start_time + rand(1..5).days
   else
     end_time = start_time + rand(1..6).hours
   end
-  
+
   status = if start_time < Time.current
-    [:confirmed, :cancelled].sample
+    [ :confirmed, :cancelled ].sample
   else
-    [:pending, :confirmed].sample
+    [ :pending, :confirmed ].sample
   end
 
   # Calculate a dummy price
@@ -52,7 +52,7 @@ properties = Property.all.to_a
     status: status,
     total_price: total_price
   )
-  
+
   if res.save
     print "."
   else

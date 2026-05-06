@@ -21,19 +21,19 @@ class ReservationsController < ApplicationController
     authorize Reservation
     @reservations = Reservation.all.for_list(query: params[:q], status: params[:status])
     @filename = "reservas_#{Time.current.strftime('%Y%m%d_%H%M')}"
-    
+
     respond_to do |format|
       format.html do
         @pagy, @reservations = pagy(@reservations, limit: 10)
       end
       format.xlsx do
-        response.headers['Content-Disposition'] = "attachment; filename=\"#{@filename}.xlsx\""
+        response.headers["Content-Disposition"] = "attachment; filename=\"#{@filename}.xlsx\""
       end
       format.pdf do
         render pdf: @filename,
                template: "reservations/list_export",
                layout: "pdf",
-               formats: [:html],
+               formats: [ :html ],
                disposition: "attachment"
       end
     end
@@ -43,16 +43,16 @@ class ReservationsController < ApplicationController
     authorize Reservation
     start_date = Time.zone.parse(params[:start]) rescue nil
     end_date = Time.zone.parse(params[:end]) rescue nil
-    
+
     @reservations = Reservation.includes(:property).order(start_time: :asc)
     if start_date && end_date
       @reservations = @reservations.where("start_time < ? AND end_time > ?", end_date, start_date)
     end
-    
+
     @pagy, @reservations = pagy(@reservations, limit: 5)
-    
-    render partial: "reservations/calendar_list", locals: { 
-      reservations: @reservations, 
+
+    render partial: "reservations/calendar_list", locals: {
+      reservations: @reservations,
       pagy: @pagy,
       view_type: params[:view_type]
     }
@@ -84,7 +84,7 @@ class ReservationsController < ApplicationController
       if @reservation.save
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.replace("calendar-view", partial: "shared/calendar_container", locals: { property: @property, mode: 'booking', omit_controller: true, omit_inputs: true }),
+            turbo_stream.replace("calendar-view", partial: "shared/calendar_container", locals: { property: @property, mode: "booking", omit_controller: true, omit_inputs: true }),
             turbo_stream.replace("reservation_form_container", partial: "reservations/booking_form", locals: { property: @property, reservation: @property.reservations.build }),
             turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "notice", message: "Reserva creada exitosamente." })
           ]
@@ -108,7 +108,7 @@ class ReservationsController < ApplicationController
     authorize @reservation
     respond_to do |format|
       if @reservation.update(reservation_params)
-        path = params[:from] == 'list' ? list_reservations_path : reservations_path
+        path = params[:from] == "list" ? list_reservations_path : reservations_path
         format.html { redirect_to path, notice: "Reserva actualizada.", status: :see_other }
         format.json { render :show, status: :ok, location: @reservation }
       else

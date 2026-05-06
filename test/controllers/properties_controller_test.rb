@@ -2,6 +2,8 @@ require "test_helper"
 
 class PropertiesControllerTest < ActionDispatch::IntegrationTest
   setup do
+    @admin = users(:admin)
+    sign_in @admin
     @property = properties(:one)
   end
 
@@ -17,10 +19,15 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create property" do
     assert_difference("Property.count") do
-      post properties_url, params: { property: { description: @property.description, name: @property.name, price_per_day: @property.price_per_day, user_id: @property.user_id } }
+      post properties_url, params: { property: {
+        description: @property.description,
+        name: @property.name,
+        base_price: @property.base_price,
+        user_id: @admin.id
+      } }
     end
 
-    assert_redirected_to property_url(Property.last)
+    assert_redirected_to properties_url
   end
 
   test "should show property" do
@@ -34,8 +41,12 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update property" do
-    patch property_url(@property), params: { property: { description: @property.description, name: @property.name, price_per_day: @property.price_per_day, user_id: @property.user_id } }
-    assert_redirected_to property_url(@property)
+    patch property_url(@property), params: { property: {
+      description: @property.description,
+      name: @property.name,
+      base_price: @property.base_price
+    } }
+    assert_redirected_to properties_url
   end
 
   test "should destroy property" do

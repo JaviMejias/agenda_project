@@ -7,7 +7,7 @@ class ReservationReminderJob < ApplicationJob
 
     window_start = reservation.start_time - 24.hours - 5.minutes
     window_end = reservation.start_time - 24.hours + 5.minutes
-    
+
     if Time.zone.now.between?(window_start, window_end)
       ReservationMailer.reminder(reservation).deliver_now
     end

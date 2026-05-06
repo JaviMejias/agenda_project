@@ -5,30 +5,30 @@ wb.styles do |s|
   border_header = { style: :thin, color: "4338CA" }
 
   header_style = s.add_style(
-    bg_color: "4F46E5", 
-    fg_color: "FFFFFF", 
-    b: true, 
-    sz: 12, 
+    bg_color: "4F46E5",
+    fg_color: "FFFFFF",
+    b: true,
+    sz: 12,
     alignment: { horizontal: :center, vertical: :center },
     border: border_header
   )
-  
+
   row_style = s.add_style(
-    alignment: { horizontal: :left }, 
+    alignment: { horizontal: :left },
     sz: 10,
     border: border_thin
   )
-  
+
   money_style = s.add_style(
-    format_code: "$ #,##0", 
+    format_code: "$ #,##0",
     sz: 10,
     border: border_thin,
     b: true,
     fg_color: "4F46E5"
   )
-  
+
   date_style = s.add_style(
-    format_code: "dd/mm/yyyy hh:mm", 
+    format_code: "dd/mm/yyyy hh:mm",
     sz: 10,
     border: border_thin
   )
@@ -52,8 +52,8 @@ wb.styles do |s|
   )
 
   wb.add_worksheet(name: "Reservas") do |sheet|
-    sheet.add_row ["Vendedor", "Propiedad", "Inicio", "Fin", "Estado", "Precio Total"], style: header_style
-    
+    sheet.add_row [ "Vendedor", "Propiedad", "Inicio", "Fin", "Estado", "Precio Total" ], style: header_style
+
     @reservations.each do |reservation|
       sheet.add_row [
         reservation.user&.full_name,
@@ -62,18 +62,18 @@ wb.styles do |s|
         reservation.end_time,
         reservation.status_text,
         reservation.total_price
-      ], style: [row_style, row_style, date_style, date_style, row_style, money_style]
+      ], style: [ row_style, row_style, date_style, date_style, row_style, money_style ]
     end
 
     # Espacio en blanco
     sheet.add_row []
-    
+
     # Fila de Total
     sheet.add_row [
-      "TOTAL GENERAL", 
-      "", "", "", "", 
+      "TOTAL GENERAL",
+      "", "", "", "",
       @reservations.sum(:total_price)
-    ], style: [total_label_style, total_label_style, total_label_style, total_label_style, total_label_style, total_value_style]
+    ], style: [ total_label_style, total_label_style, total_label_style, total_label_style, total_label_style, total_value_style ]
 
     sheet.column_widths 30, 25, 20, 20, 15, 15
   end
