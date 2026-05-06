@@ -1,0 +1,81 @@
+<% 
+  reservation = local_assigns[:reservation] || property.reservations.build
+%>
+
+<div id="reservation_form_container" class="space-y-6">
+  <%= render "reservations/selection_summary" %>
+  
+  <div class="bg-gray-50 dark:bg-slate-800/50 rounded-3xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800 shadow-inner">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg">
+        <i class="fa-solid fa-file-signature"></i>
+      </div>
+      <h3 class="text-lg font-black text-gray-900 dark:text-white">Nueva Reserva</h3>
+    </div>
+
+    <%= form_with(model: [property, reservation], class: "space-y-5", id: "booking-form", data: { controller: "booking-toggle" }) do |f| %>
+      <% if reservation.errors.any? %>
+        <div class="p-4 mb-4 text-sm text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 animate-shake">
+          <h2 class="font-black uppercase tracking-widest text-[10px] mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-circle-exclamation"></i> Error al guardar
+          </h2>
+          <ul class="list-disc pl-5 space-y-1 font-bold text-xs">
+            <% reservation.errors.full_messages.each do |message| %>
+              <li><%= sanitize(message, tags: %w(a b), attributes: %w(href target class)) %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <!-- Toggle Tipo -->
+      <div class="grid grid-cols-2 gap-2 p-1.5 bg-gray-100 dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-inner">
+        <label class="cursor-pointer">
+          <%= f.radio_button :status, "pending", checked: true, class: "peer hidden", data: { action: "change->booking-toggle#toggle" } %>
+          <div class="py-2.5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest transition-all
+                      peer-checked:bg-white dark:peer-checked:bg-indigo-600 peer-checked:text-indigo-600 dark:peer-checked:text-white peer-checked:shadow-sm
+                      text-gray-400 dark:text-slate-500">
+            Reserva
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <%= f.radio_button :status, "blocked", class: "peer hidden", data: { action: "change->booking-toggle#toggle" } %>
+          <div class="py-2.5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest transition-all
+                      peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-slate-900 dark:peer-checked:text-white peer-checked:shadow-sm
+                      text-gray-400 dark:text-slate-500">
+            No Disponible
+          </div>
+        </label>
+      </div>
+
+      <div data-booking-toggle-target="clientSection" data-controller="client-select" data-client-select-url-value="<%= list_clients_path %>">
+        <div class="flex items-center justify-between mb-2">
+          <%= f.label :client_id, "Cliente", class: "text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" %>
+          <%= link_to new_client_path, class: "text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline flex items-center gap-1", target: "_blank" do %>
+            <i class="fa-solid fa-plus-circle text-[8px]"></i> Nuevo
+          <% end %>
+        </div>
+        <%= f.select :client_id, 
+            (reservation.client ? [[reservation.client.name, reservation.client.id]] : []), 
+            { include_blank: "Buscar cliente..." }, 
+            { data: { client_select_target: "select" }, class: "w-full px-4 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" } %>
+      </div>
+
+      <%= f.hidden_field :start_time, data: { fullcalendar_target: "startInput" } %>
+      <%= f.hidden_field :end_time, data: { fullcalendar_target: "endInput" } %>
+
+      <div class="pt-2">
+        <%= f.submit "Crear Reserva", 
+            class: "w-full py-4 bg-gray-900 dark:bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black dark:hover:bg-indigo-500 transition-all shadow-xl shadow-gray-200 dark:shadow-none hover:-translate-y-1 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+            disabled: true,
+            data: { 
+              fullcalendar_target: "submitButton", 
+              booking_toggle_target: "submitButton",
+              disable_with: "Procesando..." 
+            } %>
+        <p class="mt-4 text-[10px] text-gray-400 dark:text-slate-500 text-center font-medium">
+          <i class="fa-solid fa-circle-info mr-1"></i> Selecciona las fechas en el calendario para habilitar el botón
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+<div data-fullcalendar-target="preview" class="hidden animate-fade-in">
+  <div class="mt-8 p-6 bg-white dark:bg-slate-900 rounded-3xl border-2 border-indigo-100 dark:border-slate-800 shadow-xl shadow-indigo-100/50 dark:shadow-none">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      
+      <!-- Status Card -->
+      <div class="flex items-center justify-center md:justify-start gap-3 p-4 bg-gray-50 dark:bg-slate-800 rounded-2xl border border-dashed border-gray-200 dark:border-slate-700">
+        <div data-comparison-icon class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-none transition-colors duration-500">
+          <i class="fa-solid fa-calendar-check text-white"></i>
+        </div>
+        <div class="text-left">
+          <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-tighter">Estado</p>
+          <p data-comparison-label class="text-sm font-black text-gray-700 dark:text-slate-200 uppercase tracking-tight transition-colors duration-500">Tu Selección</p>
+        </div>
+      </div>
+      
+      <!-- Start Date Card -->
+      <div class="flex items-center justify-center md:justify-start gap-3 p-4 bg-gray-50 dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700">
+        <div class="w-10 h-10 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center border border-indigo-100 dark:border-slate-700 shadow-sm text-indigo-500 dark:text-indigo-400">
+          <i class="fa-solid fa-calendar-plus"></i>
+        </div>
+        <div class="text-left">
+          <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-tighter text-left">Desde el</p>
+          <p data-fullcalendar-target="inicio" class="text-sm font-bold text-indigo-900 dark:text-indigo-300 leading-tight">---</p>
+        </div>
+      </div>
+
+      <!-- End Date Card -->
+      <div class="flex items-center justify-center md:justify-start gap-3 p-4 bg-gray-50 dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700">
+        <div class="w-10 h-10 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center border border-rose-100 dark:border-slate-700 shadow-sm text-rose-500 dark:text-rose-400">
+          <i class="fa-solid fa-calendar-minus"></i>
+        </div>
+        <div class="text-left">
+          <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-tighter text-left">Hasta el</p>
+          <p data-fullcalendar-target="fin" class="text-sm font-bold text-indigo-900 dark:text-indigo-300 leading-tight">---</p>
+        </div>
+      </div>
+
+      <!-- Total Card -->
+      <div class="flex items-center justify-center md:justify-start gap-3 p-4 bg-indigo-600 dark:bg-indigo-700 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white">
+          <i class="fa-solid fa-money-bill-wave"></i>
+        </div>
+        <div class="text-left">
+          <p data-booking-toggle-target="totalLabel" class="text-[10px] font-bold text-indigo-200 dark:text-indigo-300 uppercase tracking-tighter">Total Estimado</p>
+          <p data-fullcalendar-target="precioTotal" class="text-lg font-black text-white leading-tight">$ 0</p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>

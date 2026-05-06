@@ -1,58 +1,66 @@
-<div class="mx-auto w-full max-w-sm rounded-3xl border border-gray-400 bg-white/10 p-8 shadow-2xl backdrop-blur-md transition-all duration-500 hover:shadow-purple-500/50">
-  <h2 class="mb-8 text-center text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent drop-shadow-lg animate-fade-in">
-    <i class="fas fa-user-plus mr-2"></i> Crear cuenta
-  </h2>
-
-  <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-    <%= render "devise/shared/error_messages", resource: resource %>
-
-    <div class="space-y-6">
-      <!-- Campo Email -->
-      <div class="field animate-slide-in-left">
-        <%= f.label :email, "Correo electrónico", class: "mb-2 block text-sm font-medium text-gray-200" %>
-        <div class="relative">
-          <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
-          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "Tu correo electrónico",
-            class: "w-full rounded-full border border-gray-400 bg-white/20 pl-10 p-3 text-white placeholder-gray-300 transition-colors duration-300 focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-300 transform-gpu hover:scale-105" %>
-        </div>
+<div class="w-full max-w-md mx-4 bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
+  <div class="px-6 py-8 sm:px-10 sm:py-12">
+    
+    <div class="text-center mb-8">
+      <div class="mx-auto h-16 w-16 bg-gradient-to-tr from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
+        <i class="fa-solid fa-user-plus text-3xl text-indigo-600"></i>
       </div>
-
-      <!-- Campo Password -->
-      <div class="field animate-slide-in-right">
-        <%= f.label :password, "Contraseña", class: "mb-2 block text-sm font-medium text-gray-200" %>
-        <% if @minimum_password_length %>
-          <em class="text-sm text-gray-400">(<%= @minimum_password_length %> caracteres mínimo)</em>
-        <% end %><br />
-        <div class="relative">
-          <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
-          <%= f.password_field :password, autocomplete: "new-password", placeholder: "Crea tu contraseña",
-            class: "w-full rounded-full border border-gray-400 bg-white/20 pl-10 p-3 text-white placeholder-gray-300 transition-colors duration-300 focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-300 transform-gpu hover:scale-105" %>
-        </div>
-      </div>
-
-      <!-- Campo Confirmación -->
-      <div class="field animate-slide-in-left">
-        <%= f.label :password_confirmation, "Confirma tu contraseña", class: "mb-2 block text-sm font-medium text-gray-200" %>
-        <div class="relative">
-          <i class="fas fa-check-circle absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
-          <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Confirma tu contraseña",
-            class: "w-full rounded-full border border-gray-400 bg-white/20 pl-10 p-3 text-white placeholder-gray-300 transition-colors duration-300 focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-300 transform-gpu hover:scale-105" %>
-        </div>
-      </div>
-
-      <!-- Botón -->
-      <div class="actions animate-fade-in-up">
-        <%= f.submit " Crear cuenta", class: "w-full cursor-pointer rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 p-3 text-lg font-bold text-white shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-indigo-500/50" %>
-      </div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Crea tu cuenta</h2>
+      <p class="mt-2 text-sm text-gray-500">Únete para empezar a gestionar tus propiedades</p>
     </div>
-  <% end %>
 
-  <br>
-  <hr class="border-t border-gray-600">
-  <br>
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6" }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+      
+      <div>
+        <%= f.label :email, "Correo electrónico", class: "block text-sm font-bold text-gray-700 mb-1" %>
+        <div class="relative rounded-xl shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="fa-regular fa-envelope text-gray-400"></i>
+          </div>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "tu@correo.com",
+            class: "block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50 focus:bg-white text-gray-900 transition-colors" %>
+        </div>
+      </div>
 
-  <div class="text-center text-sm text-gray-200 animate-fade-in">
-    <i class="fas fa-sign-in-alt mr-1"></i>
-    <%= link_to "Volver a iniciar sesión", new_session_path(resource_name), class: "transition-colors duration-300 hover:text-purple-300" %>
+      <div>
+        <%= f.label :password, class: "block text-sm font-bold text-gray-700 mb-1" do %>
+          Contraseña
+          <% if @minimum_password_length %>
+            <span class="text-xs font-normal text-gray-400 ml-1">(mín. <%= @minimum_password_length %> caracteres)</span>
+          <% end %>
+        <% end %>
+        <div class="relative rounded-xl shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="fa-solid fa-lock text-gray-400"></i>
+          </div>
+          <%= f.password_field :password, autocomplete: "new-password", placeholder: "Crea tu contraseña",
+            class: "block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50 focus:bg-white text-gray-900 transition-colors" %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :password_confirmation, "Confirma tu contraseña", class: "block text-sm font-bold text-gray-700 mb-1" %>
+        <div class="relative rounded-xl shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i class="fa-solid fa-check-circle text-gray-400"></i>
+          </div>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Repite tu contraseña",
+            class: "block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-50 focus:bg-white text-gray-900 transition-colors" %>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <%= f.submit "Crear Cuenta", class: "w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transform hover:-translate-y-0.5 transition-all duration-200" %>
+      </div>
+    <% end %>
+
+  </div>
+  
+  <div class="px-6 py-6 bg-gray-50 border-t border-gray-100 sm:px-10 text-center">
+    <p class="text-sm text-gray-600">
+      ¿Ya tienes una cuenta? 
+      <%= link_to "Inicia sesión", new_session_path(resource_name), class: "font-bold text-indigo-600 hover:text-indigo-500 transition-colors" %>
+    </p>
   </div>
 </div>

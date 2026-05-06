@@ -1,0 +1,69 @@
+<% view_type = local_assigns.fetch(:view_type, 'dayGridMonth') %>
+<%= turbo_frame_tag "reservations_list_frame" do %>
+  <div class="space-y-3">
+    <% if reservations.any? %>
+      <% reservations.each do |res| %>
+        <div class="group relative flex items-stretch rounded-2xl bg-gray-50/50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 overflow-hidden">
+          <!-- Barra de Color de Propiedad -->
+          <div class="w-1.5 shrink-0" style="background-color: <%= res.property.color || '#4f46e5' %>"></div>
+          
+          <div class="p-3 flex-grow">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md <%= res.status_color_classes %>">
+                <%= I18n.t("enums.reservation.status.#{res.status}") %>
+              </span>
+              <div class="flex items-center gap-1">
+                <%= link_to reservation_path(res), data: { turbo_frame: "_top" }, class: "w-6 h-6 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center text-gray-400 hover:text-indigo-600 transition-colors shadow-sm border border-gray-100 dark:border-slate-600" do %>
+                  <i class="fa-solid fa-eye text-[10px]"></i>
+                <% end %>
+                <% unless res.cancelled? %>
+                  <%= link_to edit_reservation_path(res), data: { turbo_frame: "_top" }, class: "w-6 h-6 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center text-gray-400 hover:text-amber-600 transition-colors shadow-sm border border-gray-100 dark:border-slate-600" do %>
+                    <i class="fa-solid fa-pen text-[10px]"></i>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+            
+            <h4 class="text-xs font-black text-gray-900 dark:text-white truncate mb-1">
+              <%= res.client_name %>
+            </h4>
+            
+            <p class="text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-tighter mb-2">
+              <%= res.property.name %>
+            </p>
+            
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5 text-[9px] font-bold text-gray-500 dark:text-slate-400">
+                <i class="fa-regular fa-calendar-days text-[8px]"></i>
+                <% 
+                  show_hours = (view_type != 'dayGridMonth') || res.property.per_hour?
+                %>
+                <% if show_hours %>
+                  <%= res.start_time.strftime("%d/%m %H:%M") %> - <%= res.end_time.strftime("%H:%M") %>
+                <% else %>
+                  <%= l(res.start_time.to_date, format: :short) %> - <%= l((res.end_time - 1.day).to_date, format: :short) %>
+                <% end %>
+              </div>
+              <div class="text-[9px] font-black text-indigo-600 dark:text-indigo-400">
+                $<%= number_to_currency(res.total_price, unit: "", separator: ",", delimiter: ".") %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <% if pagy.pages > 1 %>
+        <div class="pt-4 flex justify-center scale-90 origin-center">
+          <%== pagy.series_nav %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="py-10 text-center">
+        <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3 text-gray-300 dark:text-slate-700">
+          <i class="fa-solid fa-calendar-xmark text-lg"></i>
+        </div>
+        <p class="text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">No hay reservas en este periodo</p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

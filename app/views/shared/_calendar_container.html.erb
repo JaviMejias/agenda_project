@@ -1,0 +1,47 @@
+<% 
+  property = local_assigns.fetch(:property, nil)
+  mode = local_assigns.fetch(:mode, 'booking')
+  events_url = local_assigns.fetch(:events_url, '')
+  initial_start = local_assigns.fetch(:initial_start, nil)
+  initial_end = local_assigns.fetch(:initial_end, nil)
+
+  is_per_hour = property&.per_hour? || false
+
+  default_view = if mode == 'dashboard'
+    'dayGridMonth'
+  elsif is_per_hour
+    'timeGridWeek'
+  else
+    'dayGridMonth'
+  end
+%>
+
+<% content = capture do %>
+  <div id="calendar-view" class="bg-white dark:bg-slate-900 rounded-3xl sm:rounded-[3rem] shadow-2xl shadow-indigo-100 dark:shadow-none border border-gray-100 dark:border-slate-800 p-3 sm:p-10 animate-fade-in-up">
+    <%= render "shared/calendar_header", property: property, mode: mode %>
+    <div data-fullcalendar-target="calendar" class="min-h-[600px] sm:min-h-[700px]"></div>
+  </div>
+
+  <% if mode == 'booking' && !local_assigns[:omit_inputs] %>
+    <input type="hidden" name="reservation[start_time]" value="<%= initial_start %>" data-fullcalendar-target="startInput" required>
+    <input type="hidden" name="reservation[end_time]" value="<%= initial_end %>" data-fullcalendar-target="endInput" required>
+  <% end %>
+  
+  <%= yield %>
+<% end %>
+
+<% if local_assigns[:omit_controller] %>
+  <%= content %>
+<% else %>
+  <div data-controller="fullcalendar" 
+       data-fullcalendar-mode-value="<%= mode %>" 
+       data-fullcalendar-per-hour-value="<%= is_per_hour %>" 
+       data-fullcalendar-base-price-value="<%= property&.base_price || 0 %>"
+       data-fullcalendar-events-url-value="<%= events_url %>"
+       data-fullcalendar-initial-start-value="<%= initial_start %>"
+       data-fullcalendar-initial-end-value="<%= initial_end %>"
+       data-fullcalendar-default-view-value="<%= default_view %>"
+       class="w-full">
+    <%= content %>
+  </div>
+<% end %>

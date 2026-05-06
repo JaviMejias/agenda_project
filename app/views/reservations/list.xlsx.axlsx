@@ -1,0 +1,80 @@
+wb = xlsx_package.workbook
+wb.styles do |s|
+  # Definición de bordes
+  border_thin = { style: :thin, color: "E5E7EB" }
+  border_header = { style: :thin, color: "4338CA" }
+
+  header_style = s.add_style(
+    bg_color: "4F46E5", 
+    fg_color: "FFFFFF", 
+    b: true, 
+    sz: 12, 
+    alignment: { horizontal: :center, vertical: :center },
+    border: border_header
+  )
+  
+  row_style = s.add_style(
+    alignment: { horizontal: :left }, 
+    sz: 10,
+    border: border_thin
+  )
+  
+  money_style = s.add_style(
+    format_code: "$ #,##0", 
+    sz: 10,
+    border: border_thin,
+    b: true,
+    fg_color: "4F46E5"
+  )
+  
+  date_style = s.add_style(
+    format_code: "dd/mm/yyyy hh:mm", 
+    sz: 10,
+    border: border_thin
+  )
+
+  total_label_style = s.add_style(
+    bg_color: "F3F4F6",
+    b: true,
+    sz: 11,
+    alignment: { horizontal: :right },
+    border: border_thin
+  )
+
+  total_value_style = s.add_style(
+    bg_color: "EEF2FF",
+    b: true,
+    sz: 12,
+    format_code: "$ #,##0",
+    fg_color: "4F46E5",
+    alignment: { horizontal: :left },
+    border: border_thin
+  )
+
+  wb.add_worksheet(name: "Reservas") do |sheet|
+    sheet.add_row ["Vendedor", "Propiedad", "Inicio", "Fin", "Estado", "Precio Total"], style: header_style
+    
+    @reservations.each do |reservation|
+      sheet.add_row [
+        reservation.user&.full_name,
+        reservation.property.name,
+        reservation.start_time,
+        reservation.end_time,
+        reservation.status_text,
+        reservation.total_price
+      ], style: [row_style, row_style, date_style, date_style, row_style, money_style]
+    end
+
+    # Espacio en blanco
+    sheet.add_row []
+    
+    # Fila de Total
+    sheet.add_row [
+      "TOTAL GENERAL", 
+      "", "", "", "", 
+      @reservations.sum(:total_price)
+    ], style: [total_label_style, total_label_style, total_label_style, total_label_style, total_label_style, total_value_style]
+
+    sheet.column_widths 30, 25, 20, 20, 15, 15
+  end
+end

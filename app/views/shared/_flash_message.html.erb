@@ -1,0 +1,33 @@
+<% 
+  is_alert = type.to_s == 'alert'
+  bg_color = is_alert ? 'bg-red-50/90' : 'bg-white/90'
+  icon_color = is_alert ? 'text-red-500' : 'text-indigo-500'
+  bar_color = is_alert ? 'bg-red-500' : 'bg-indigo-500'
+  
+  message_content = message.to_s
+%>
+<div data-controller="toast" 
+     data-action="click->toast#close"
+     class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl ring-1 ring-black/5 cursor-pointer relative transition-all transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] opacity-0 translate-y-4 sm:translate-y-0 translate-x-full backdrop-blur-xl <%= bg_color %>">
+  <div class="p-5">
+    <div class="flex items-center">
+      <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center <%= is_alert ? 'bg-red-100' : 'bg-indigo-50' %>">
+        <% if is_alert %>
+          <i class="fa-solid fa-circle-exclamation <%= icon_color %> text-lg"></i>
+        <% else %>
+          <i class="fa-solid fa-circle-check <%= icon_color %> text-lg"></i>
+        <% end %>
+      </div>
+      <div class="ml-4 w-0 flex-1">
+        <p class="text-sm font-black text-gray-900 tracking-tight"><%= message_content %></p>
+      </div>
+      <div class="ml-4 flex flex-shrink-0">
+        <button type="button" data-action="click->toast#close" class="inline-flex rounded-lg text-gray-400 hover:text-gray-900 transition-colors focus:outline-none">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="absolute bottom-0 left-0 h-1 <%= bar_color %> w-full opacity-30" data-toast-target="progressBar"></div>
+</div>

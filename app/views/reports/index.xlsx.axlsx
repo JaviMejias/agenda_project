@@ -1,0 +1,83 @@
+wb = xlsx_package.workbook
+
+wb.styles do |style|
+  project_color = "4F46E5"
+  emerald_color = "059669"
+  border = { style: :thin, color: "E5E7EB" }
+
+  title_style = style.add_style(sz: 20, b: true, fg_color: project_color, alignment: { vertical: :center })
+  header_style = style.add_style(bg_color: project_color, fg_color: "FFFFFF", b: true, sz: 12, alignment: { horizontal: :center, vertical: :center }, border: border)
+  sub_header_style = style.add_style(bg_color: "F8FAFC", b: true, sz: 10, alignment: { horizontal: :center }, border: border, fg_color: "475569")
+
+  cell_style = style.add_style(alignment: { horizontal: :left, vertical: :center }, border: border, sz: 10)
+  money_style = style.add_style(format_code: "$#,##0", alignment: { horizontal: :right }, border: border, sz: 10, b: true, fg_color: emerald_color)
+  money_loss_style = style.add_style(format_code: "$#,##0", alignment: { horizontal: :right }, border: border, sz: 10, fg_color: "DC2626")
+  percent_style = style.add_style(format_code: "0.0%", alignment: { horizontal: :center }, border: border, sz: 10)
+  date_style = style.add_style(alignment: { horizontal: :left }, b: true, sz: 10)
+
+  wb.add_worksheet(name: "Reporte de Gestión", tab_color: project_color) do |sheet|
+    sheet.page_setup.orientation = :landscape
+
+    sheet.add_row ["REPORTE DE GESTIÓN INMOBILIARIA"], style: title_style
+    sheet.add_row ["Generado por Agenda Propietario"], style: style.add_style(sz: 10, i: true, fg_color: "6B7280")
+
+    if @company_id.present?
+      company = Company.find_by(id: @company_id)
+      sheet.add_row ["Empresa:", company&.name || "N/A"], style: [date_style, date_style]
+    end
+
+    sheet.add_row ["Periodo de Análisis:", "#{@start_date} al #{@end_date}"], style: [date_style, date_style]
+    sheet.add_row []
+
+    sheet.add_row ["RESUMEN EJECUTIVO"], style: header_style
+    sheet.add_row ["Métrica", "Valor Actual", "Estado"], style: sub_header_style
+    sheet.add_row ["Ingresos Totales", @total_income, "CONFIRMADO"], style: [cell_style, money_style, style.add_style(fg_color: "059669", b: true, alignment: {horizontal: :center}, border: border)]
+    sheet.add_row ["Reservas Realizadas", @reservations_count, "ACTIVO"], style: [cell_style, cell_style, style.add_style(fg_color: "4F46E5", b: true, alignment: {horizontal: :center}, border: border)]
+    sheet.add_row ["Pérdida por Bloqueo", @total_loss, "PROYECTADO"], style: [cell_style, money_loss_style, style.add_style(fg_color: "DC2626", b: true, alignment: {horizontal: :center}, border: border)]
+    sheet.add_row []
+
+    sheet.add_row ["ANÁLISIS DETALLADO POR PROPIEDAD"], style: header_style
+    sheet.add_row ["Propiedad", "Ingresos Reales", "Pérdida Bloqueo", "Tasa Ocupación"], style: sub_header_style
+
+    start_row_table = sheet.rows.size + 1
+    @properties_data.select { |d| d[:income] > 0 }.each do |data|
+      sheet.add_row [
+        data[:name],
+        data[:income],
+        data[:loss],
+        data[:occupancy_rate] / 100.0
+      ], style: [cell_style, money_style, money_loss_style, percent_style]
+    end
+    end_row_table = sheet.rows.size
+
+    sheet.auto_filter = "A#{start_row_table-1}:D#{end_row_table}"
+
+    sheet.add_row []
+
+    sheet.add_row ["TENDENCIA MENSUAL"], style: header_style
+    sheet.add_row ["Mes", "Ingresos Mensuales"], style: sub_header_style
+    @monthly_trend.each do |trend|
+      sheet.add_row [trend[:month], trend[:income]], style: [cell_style, money_style]
+    end
+
+    sheet.column_widths 35, 20, 20, 20
+    sheet.merge_cells "A1:D1"
+    sheet.merge_cells "A2:D2"
+    sheet.merge_cells "A5:C5"
+    sheet.merge_cells "A11:D11"
+
+    sheet.sheet_view.pane do |pane|
+      pane.top_left_cell = "A5"
+      pane.state = :frozen
+      pane.y_split = 4
+    end
+
+    sheet.add_chart(Axlsx::Bar3DChart, start_at: "F5", end_at: "L20", title: "Ingresos por Propiedad") do |chart|
+      chart.add_series data: sheet["B#{start_row_table}:B#{end_row_table}"],
+                       labels: sheet["A#{start_row_table}:A#{end_row_table}"],
+                       title: "Ingresos ($)",
+                       colors: [emerald_color.gsub("#", "")]
+    end
+
+  end
+end

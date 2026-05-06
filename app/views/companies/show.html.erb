@@ -1,0 +1,185 @@
+<% content_for :title, @company.name %>
+
+<div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+  
+  <div class="relative mb-8 p-6 sm:p-10 rounded-[2.5rem] bg-gradient-to-br from-indigo-600 to-purple-700 shadow-2xl shadow-indigo-200 dark:shadow-none overflow-hidden text-white">
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-black/10 rounded-full blur-3xl"></div>
+    
+    <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+      <div class="flex items-center gap-6">
+        <div class="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white text-3xl shadow-lg">
+          <i class="fa-solid fa-building"></i>
+        </div>
+        <div>
+          <h1 class="text-3xl sm:text-4xl font-black tracking-tight leading-none mb-2">
+            <%= @company.name %>
+          </h1>
+          <div class="flex flex-wrap items-center gap-4">
+            <span class="flex items-center gap-2 text-xs font-bold bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
+              <i class="fa-solid fa-id-card opacity-70"></i> <%= @company.rut %>
+            </span>
+            <span class="flex items-center gap-2 text-xs font-bold bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
+              <i class="fa-solid fa-tag opacity-70"></i> <%= @company.business_type %>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 w-full md:w-auto">
+        <%= link_to edit_company_path(@company), class: "flex-1 md:flex-none flex items-center justify-center gap-3 px-6 py-4 bg-white text-indigo-700 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-50 transition-all shadow-lg active:scale-95" do %>
+          <i class="fa-solid fa-pen-nib"></i>
+          Editar Datos
+        <% end %>
+        <%= link_to companies_path, class: "flex items-center justify-center w-14 h-14 bg-white/20 backdrop-blur-md text-white rounded-2xl border border-white/30 hover:bg-white/30 transition-all shadow-lg" do %>
+          <i class="fa-solid fa-arrow-left"></i>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 pt-10 border-t border-white/10">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">Dirección Comercial</p>
+          <p class="text-sm font-bold leading-tight"><%= @company.address %></p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-hotel"></i>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">Propiedades Asociadas</p>
+          <p class="text-sm font-bold leading-tight"><%= @properties.count %> unidades registradas</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">Estado de Cuenta</p>
+          <p class="text-sm font-bold leading-tight">Activa y verificada</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-12">
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Gestionar Propiedades Existentes -->
+      <div class="lg:w-7/12">
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 p-6 sm:p-8 shadow-sm h-full flex flex-col">
+          <div class="mb-6">
+            <h3 class="text-xl font-black text-gray-900 dark:text-white tracking-tight mb-1 flex items-center gap-3">
+              <i class="fa-solid fa-link text-indigo-600 dark:text-indigo-400"></i>
+              Vincular Propiedades Existentes
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-slate-400 font-medium">Busca y selecciona propiedades para asignarlas a esta empresa.</p>
+          </div>
+
+          <%= form_with url: associate_properties_company_path(@company), method: :post, id: "associate_properties_form", class: "space-y-4 mt-auto" do |f| %>
+            <div id="property_select_container" class="relative">
+              <%= select_tag :property_ids, 
+                  nil, 
+                  multiple: true, 
+                  data: { 
+                    controller: "select", 
+                    select_url_value: list_properties_path,
+                    select_placeholder_value: "Escribe para buscar propiedades sin asignar..." 
+                  },
+                  class: "w-full" %>
+            </div>
+            <%= f.button type: "submit", class: "w-full flex justify-center items-center py-3.5 px-6 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500 transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:pointer-events-none" do %>
+              <i class="fa-solid fa-plus-circle mr-2"></i> Vincular Propiedades Seleccionadas
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Crear Nueva Propiedad -->
+      <div class="lg:w-5/12">
+        <div class="bg-gradient-to-br from-indigo-50 to-white dark:from-slate-800/50 dark:to-slate-900 rounded-[2rem] border border-indigo-100 dark:border-slate-800 p-6 sm:p-8 shadow-sm h-full flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl mb-6 shadow-lg shadow-indigo-200 dark:shadow-none">
+              <i class="fa-solid fa-house-chimney-medical"></i>
+            </div>
+            <h3 class="text-xl font-black text-gray-900 dark:text-white tracking-tight mb-2">¿No encuentras la propiedad?</h3>
+            <p class="text-xs text-gray-500 dark:text-slate-400 font-medium leading-relaxed mb-6">Si la propiedad que buscas aún no ha sido creada, puedes registrarla ahora mismo y quedará vinculada automáticamente a esta empresa.</p>
+          </div>
+          
+          <%= link_to new_property_path(company_id: @company.id), class: "w-full flex items-center justify-center gap-3 px-6 py-4 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 rounded-xl border border-indigo-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest hover:bg-indigo-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95" do %>
+            <i class="fa-solid fa-plus"></i>
+            Crear Nueva Propiedad
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <turbo-frame id="company_properties_frame" class="block w-full">
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
+            Propiedades Actuales
+            <span class="px-2.5 py-0.5 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 text-xs font-black rounded-lg">
+              <%= @properties.count %>
+            </span>
+          </h2>
+          <p class="text-xs text-gray-500 dark:text-slate-400 font-medium">Listado de propiedades bajo el RUT <%= @company.rut %>.</p>
+        </div>
+      </div>
+
+      <% if @properties.any? %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+          <% @properties.each do |property| %>
+            <div class="group bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden flex flex-col">
+              <div class="relative h-40 overflow-hidden">
+                <% if property.images.attached? %>
+                  <%= image_tag property.carousel_variant(property.images.first), class: "w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" %>
+                <% else %>
+                  <div class="w-full h-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-300 dark:text-slate-600">
+                    <i class="fa-solid fa-image text-3xl opacity-20"></i>
+                  </div>
+                <% end %>
+                <div class="absolute bottom-0 left-0 w-full h-1" style="background-color: <%= property.color || '#4f46e5' %>"></div>
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <h3 class="text-base font-black text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mb-1 truncate">
+                  <%= property.name %>
+                </h3>
+                <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5 mb-4">
+                  <i class="fa-solid fa-location-dot"></i> <%= property.address.presence || "Sin dirección" %>
+                </p>
+                <div class="mt-auto flex items-center justify-between">
+                  <span class="text-sm font-black text-indigo-600 dark:text-indigo-400"><%= number_to_currency(property.base_price, unit: "$", precision: 0) %></span>
+                  <%= link_to property_path(property), data: { turbo: false }, class: "w-8 h-8 rounded-lg bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-all shadow-sm" do %>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <% if @pagy.pages > 1 %>
+          <div class="flex justify-center pb-8 pt-4">
+            <%== @pagy.series_nav %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="flex flex-col items-center justify-center py-16 text-center bg-white dark:bg-slate-900 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm border-dashed border-2">
+          <div class="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-4 text-gray-200 dark:text-slate-700">
+            <i class="fa-solid fa-house-chimney-crack text-2xl"></i>
+          </div>
+          <h3 class="text-lg font-black text-gray-900 dark:text-white">Sin propiedades</h3>
+          <p class="text-xs text-gray-500 dark:text-slate-400 font-medium mb-6">Esta empresa no tiene propiedades asignadas aún. Utiliza el panel superior para <strong>vincular propiedades existentes</strong> o <strong>crear una nueva</strong>.</p>
+        </div>
+      <% end %>
+    </div>
+  </turbo-frame>
+</div>

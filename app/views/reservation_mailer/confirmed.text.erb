@@ -1,0 +1,24 @@
+Reserva Confirmada
+
+Hola <%= @client.name %>,
+
+Te confirmamos que tu reserva ha sido procesada con éxito.
+
+Detalles:
+- Propiedad: <%= @property.name %>
+<% if @property.per_day? %>
+- Desde: <%= l(@reservation.start_time.to_date, format: :long) %>
+- Hasta: <%= l((@reservation.end_time - 1.day).to_date, format: :long) %>
+<% else %>
+- Desde: <%= l(@reservation.start_time, format: :long) %>
+- Hasta: <%= l(@reservation.end_time, format: :long) %>
+<% end %>
+- Estado: Confirmada
+
+--------------------------------------------------
+Este es un mensaje automático generado por el sistema. 
+Por favor, no respondas a este correo.
+--------------------------------------------------
+
+Gracias por preferir nuestro sistema.
+<%= @property.company&.name || "Agenda Pro" %>

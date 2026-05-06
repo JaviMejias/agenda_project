@@ -1,0 +1,177 @@
+<%= form_with(model: property, class: "space-y-6") do |form| %>
+  <% if property.errors.any? %>
+    <div class="p-4 mb-4 text-sm text-red-800 dark:text-red-400 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900">
+      <h2 class="font-bold"><%= pluralize(property.errors.count, "error") %> impidieron guardar:</h2>
+      <ul class="list-disc pl-5 mt-2">
+        <% property.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <%= form.label :name, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
+        <i class="fa-solid fa-signature text-gray-400 dark:text-slate-500 mr-1"></i> Nombre de la Propiedad
+      <% end %>
+      <%= form.text_field :name, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white", placeholder: "Ej: Casa de la Playa" %>
+    </div>
+
+    <div class="sm:col-span-2">
+      <%= form.label :description, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
+        <i class="fa-solid fa-align-left text-gray-400 dark:text-slate-500 mr-1"></i> Descripción
+      <% end %>
+      <%= form.text_area :description, rows: 2, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white", placeholder: "Detalles adicionales..." %>
+    </div>
+
+    <div class="sm:col-span-2">
+      <%= form.label :address, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
+        <i class="fa-solid fa-location-dot text-gray-400 dark:text-slate-500 mr-1"></i> Dirección de la Propiedad
+      <% end %>
+      <%= form.text_field :address, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white", placeholder: "Ej: Av. Principal 456, Sector Norte" %>
+    </div>
+
+    <% if current_user.admin? %>
+      <div class="sm:col-span-2">
+        <%= form.label :company_id, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
+          <i class="fa-solid fa-building text-gray-400 dark:text-slate-500 mr-1"></i> Empresa / Entidad Responsable
+        <% end %>
+        <%= form.collection_select :company_id, Company.all, :id, :name, { include_blank: "Ninguna (Independiente)", selected: params[:company_id] || property.company_id }, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white" %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= form.label :pricing_model, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
+        <i class="fa-solid fa-file-invoice text-gray-400 dark:text-slate-500 mr-1"></i> Modelo de Cobro
+      <% end %>
+      <%= form.select :pricing_model, [["Por Día", "per_day"], ["Por Hora", "per_hour"]], {}, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white" %>
+    </div>
+    
+    <div>
+      <%= form.label :base_price, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
+        <i class="fa-solid fa-tag text-gray-400 dark:text-slate-500 mr-1"></i> Precio Base
+      <% end %>
+      <div class="relative mt-1 rounded-xl shadow-sm">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+          <span class="text-gray-500 dark:text-slate-400 sm:text-sm font-bold">$</span>
+        </div>
+        <%= form.text_field :base_price, value: property.base_price&.to_i, data: { controller: "currency", action: "input->currency#format" }, class: "block w-full rounded-xl border-gray-300 dark:border-slate-700 pl-8 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white", placeholder: "0" %>
+      </div>
+    </div>
+  </div>
+
+  <div data-controller="color-picker">
+    <%= form.label :color, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
+      <i class="fa-solid fa-palette text-gray-400 dark:text-slate-500 mr-1"></i> Color en el Calendario
+    <% end %>
+    
+    <div class="mt-1 bg-white dark:bg-slate-900 p-4 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-sm">
+      <div class="flex items-center justify-between mb-4 px-1 border-b border-gray-50 dark:border-slate-800 pb-3">
+        <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none">Paleta de Colores</p>
+        <div class="flex items-center gap-3">
+          <p class="text-[9px] font-black text-indigo-500 uppercase tracking-widest leading-none opacity-60">Personalizar</p>
+          <div class="pickr-custom-trigger">
+            <div data-color-picker-target="picker"></div>
+          </div>
+        </div>
+      </div>
+      
+      <%= form.hidden_field :color, data: { color_picker_target: "input" } %>
+      
+      <div class="flex flex-wrap gap-3">
+        <% [
+          { bg: 'bg-indigo-600', hex: '#4f46e5' },
+          { bg: 'bg-blue-600', hex: '#2563eb' },
+          { bg: 'bg-sky-500', hex: '#0ea5e9' },
+          { bg: 'bg-cyan-500', hex: '#06b6d4' },
+          { bg: 'bg-teal-500', hex: '#14b8a6' },
+          { bg: 'bg-emerald-600', hex: '#059669' },
+          { bg: 'bg-green-600', hex: '#16a34a' },
+          { bg: 'bg-lime-500', hex: '#84cc16' },
+          { bg: 'bg-yellow-400', hex: '#facc15' },
+          { bg: 'bg-amber-500', hex: '#f59e0b' },
+          { bg: 'bg-orange-500', hex: '#f97316' },
+          { bg: 'bg-orange-700', hex: '#c2410c' },
+          { bg: 'bg-red-600', hex: '#dc2626' },
+          { bg: 'bg-rose-600', hex: '#e11d48' },
+          { bg: 'bg-pink-500', hex: '#ec4899' },
+          { bg: 'bg-fuchsia-600', hex: '#c026d3' },
+          { bg: 'bg-purple-600', hex: '#9333ea' },
+          { bg: 'bg-violet-600', hex: '#7c3aed' },
+          { bg: 'bg-slate-700', hex: '#334155' },
+          { bg: 'bg-gray-400', hex: '#9ca3af' }
+        ].each do |color| %>
+          <button type="button" 
+                  data-color-picker-target="swatch"
+                  data-color="<%= color[:hex] %>"
+                  data-action="click->color-picker#selectColor"
+                  class="w-9 h-9 sm:w-8 sm:h-8 rounded-full <%= color[:bg] %> shadow-sm cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 focus:outline-none">
+          </button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div data-controller="image-preview" class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6">
+    <%= form.label :images, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-4" do %>
+      <i class="fa-solid fa-images text-indigo-500 mr-1"></i> Galería de Fotos
+    <% end %>
+    
+    <% if property.images.attached? && property.images.any?(&:persisted?) %>
+      <div class="mt-2 mb-6 bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
+        <p class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">Imágenes guardadas:</p>
+        <div class="grid grid-cols-3 sm:flex sm:flex-wrap gap-3 sm:gap-4" data-controller="lightbox">
+          <% property.images.each do |image| %>
+            <% next unless image.persisted? %>
+            <div id="<%= dom_id(image) %>" class="relative group" data-controller="image-loader">
+              <div data-image-loader-target="placeholder" class="absolute inset-0 bg-gray-100 dark:bg-slate-700 animate-pulse rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-circle-notch fa-spin text-gray-300 dark:text-slate-500"></i>
+              </div>
+              <%= image_tag property.thumbnail(image), 
+                  class: "w-full sm:w-32 h-28 sm:h-32 object-cover rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm transition-all duration-300 group-hover:scale-105 cursor-zoom-in opacity-0",
+                  data: { 
+                    image_loader_target: "image",
+                    action: "load->image-loader#load click->lightbox#open",
+                    url: url_for(property.gallery_variant(image))
+                  } %>
+              <% if property.persisted? %>
+                <%= link_to image_property_path(property, image), data: { turbo_method: :delete, turbo_confirm: "¿Borrar imagen?" }, class: "absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs shadow-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all cursor-pointer z-10 hover:bg-red-600 active:scale-95 sm:hover:scale-110" do %>
+                  <i class="fa-solid fa-xmark"></i>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="mt-2 mb-4">
+      <div data-image-preview-target="previewContainer" class="grid grid-cols-3 sm:flex sm:flex-wrap gap-3 sm:gap-4"></div>
+    </div>
+
+    <div class="relative flex items-center justify-center w-full">
+      <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-indigo-300 dark:border-indigo-900 border-dashed rounded-xl cursor-pointer bg-indigo-50 dark:bg-indigo-950/20 hover:bg-indigo-100 dark:hover:bg-indigo-950/40 transition-colors">
+        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+          <i class="fa-solid fa-cloud-arrow-up text-3xl text-indigo-500 mb-2"></i>
+          <p class="mb-1 text-sm text-gray-600 dark:text-slate-400 text-center"><span class="font-bold text-indigo-600 dark:text-indigo-400">Toca para subir</span> <span class="hidden sm:inline">o arrastra tus fotos aquí</span></p>
+          <p class="text-xs text-gray-500 dark:text-slate-500">PNG, JPG o GIF</p>
+        </div>
+        <%= form.file_field :images, multiple: true, accept: "image/*", data: { image_preview_target: "input", action: "change->image-preview#previewImages" }, class: "hidden" %>
+      </label>
+    </div>
+  </div>
+
+  <div class="pt-6 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-start gap-8">
+    <%= link_to properties_path, class: "group inline-flex items-center text-sm font-bold text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all" do %>
+      <div class="w-9 h-9 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center mr-3 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:border-indigo-200 transition-all group-hover:-translate-x-1">
+        <i class="fa-solid fa-arrow-left text-xs"></i>
+      </div>
+      Volver al listado
+    <% end %>
+
+    <%= form.button type: "submit", class: "w-full sm:w-auto sm:min-w-[200px] flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transform hover:-translate-y-1 transition-all duration-300" do %>
+      <i class="fa-solid fa-floppy-disk mr-2"></i> Guardar Propiedad
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,30 @@
+<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+  <h2 style="color: #d97706; border-bottom: 2px solid #d97706; padding-bottom: 10px;">Recordatorio de Reserva</h2>
+  
+  <p>Hola <strong><%= @client.name %></strong>,</p>
+  
+  <p>Este es un recordatorio de que tu reserva está programada para comenzar en las próximas 24 horas. Aquí tienes los detalles:</p>
+  
+  <div style="background-color: #fffbeb; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #fef3c7;">
+    <p style="margin: 5px 0;"><strong>Propiedad:</strong> <%= @property.name %></p>
+    <% if @property.per_day? %>
+      <p style="margin: 5px 0;"><strong>Desde:</strong> <%= l(@reservation.start_time.to_date, format: :long) %></p>
+      <p style="margin: 5px 0;"><strong>Hasta:</strong> <%= l((@reservation.end_time - 1.day).to_date, format: :long) %></p>
+    <% else %>
+      <p style="margin: 5px 0;"><strong>Desde:</strong> <%= l(@reservation.start_time, format: :long) %></p>
+      <p style="margin: 5px 0;"><strong>Hasta:</strong> <%= l(@reservation.end_time, format: :long) %></p>
+    <% end %>
+    <p style="margin: 5px 0;"><strong>Estado:</strong> <span style="color: #d97706; font-weight: bold;">Confirmada</span></p>
+  </div>
+
+  <p>Si tienes alguna duda o necesitas realizar cambios, por favor contáctanos lo antes posible.</p>
+  
+  <p style="font-size: 13px; color: #64748b; margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
+    <em>Este es un mensaje automático generado por el sistema. Por favor, no respondas a este correo.</em>
+  </p>
+  
+  <p style="margin-top: 20px; font-size: 14px; color: #64748b;">
+    ¡Te esperamos!<br>
+    <em>Atentamente, el equipo de <%= @property.company&.name || "Agenda Pro" %></em>
+  </p>
+</div>

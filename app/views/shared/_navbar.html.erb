@@ -1,0 +1,155 @@
+<%
+  admin_items = [
+    { name: 'Dashboard', path: dashboard_path, icon: 'fa-chart-pie', controller: 'dashboard' },
+    { name: 'Empresas', path: companies_path, icon: 'fa-building', controller: 'companies' },
+    { name: 'Usuarios', path: users_path, icon: 'fa-users-gear', controller: 'users' },
+    { name: 'Reportes', path: reports_path, icon: 'fa-chart-line', controller: 'reports' }
+  ]
+
+  operational_items = [
+    { name: 'Propiedades', path: properties_path, icon: 'fa-house-chimney', controller: 'properties' },
+    { name: 'Agenda Global', path: reservations_path, icon: 'fa-book-open', controller: 'reservations' },
+    { name: 'Clientes', path: clients_path, icon: 'fa-users', controller: 'clients' }
+  ]
+%>
+
+<nav data-controller="mobile-menu" class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-slate-800 shadow-sm">
+  <div class="mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 justify-between items-center">
+      <div class="flex items-center gap-8">
+        <%= link_to root_path, class: "flex flex-shrink-0 items-center text-indigo-600 dark:text-indigo-400 font-black text-2xl tracking-tighter drop-shadow-sm hover:opacity-80 transition-opacity" do %>
+          <i class="fa-solid fa-calendar-days mr-2 text-indigo-500 animate-pulse"></i> Agenda
+        <% end %>
+        
+        <div class="hidden sm:flex sm:items-center sm:space-x-1">
+          <%# Administrativo Dropdown %>
+          <% if current_user.admin? %>
+            <div class="relative mr-2" data-controller="dropdown" data-action="click@window->dropdown#hide">
+              <button data-action="click->dropdown#toggle" class="group inline-flex items-center rounded-xl px-4 py-2 text-sm font-bold text-gray-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-all duration-300">
+                <i class="fa-solid fa-screwdriver-wrench mr-2.5 text-gray-400 group-hover:text-indigo-500 transition-colors"></i>
+                <span>Administración</span>
+                <i class="fa-solid fa-chevron-down ml-2 text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
+              </button>
+
+              <div data-dropdown-target="menu" class="hidden absolute left-0 mt-2 w-56 origin-top-left rounded-2xl bg-white dark:bg-slate-800 shadow-2xl shadow-indigo-100/50 dark:shadow-none ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden z-50 border border-gray-100 dark:border-slate-700 animate-in fade-in zoom-in duration-200">
+                <div class="py-2">
+                  <div class="px-4 py-2 border-b border-gray-50 dark:border-slate-700/50 mb-1">
+                    <span class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Panel de Control</span>
+                  </div>
+                  <% admin_items.each do |item| %>
+                    <% is_active = controller_name == item[:controller] %>
+                    <%= link_to item[:path], class: "flex items-center px-4 py-2.5 text-sm font-bold #{is_active ? 'text-indigo-600 bg-indigo-50/50 dark:text-indigo-400 dark:bg-indigo-900/20' : 'text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'} transition-all" do %>
+                      <i class="fa-solid <%= item[:icon] %> w-5 mr-3 text-center <%= is_active ? 'text-indigo-500' : 'text-gray-400' %>"></i>
+                      <%= item[:name] %>
+                    <% end %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <%# Operativo %>
+          <% operational_items.each do |item| %>
+            <% is_active = controller_name == item[:controller] %>
+            <%= link_to item[:path], class: "group relative inline-flex items-center rounded-xl px-4 py-2 text-sm font-bold transition-all duration-300 #{is_active ? 'text-indigo-600 bg-indigo-50/50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
+              <i class="fa-solid <%= item[:icon] %> mr-2.5 transition-colors <%= is_active ? 'text-indigo-500' : 'text-gray-400 group-hover:text-indigo-500' %>"></i> 
+              <span><%= item[:name] %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <!-- Theme Toggle Switch -->
+        <div data-controller="theme" class="flex items-center">
+          <button data-action="click->theme#toggle" class="group relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-100 dark:bg-slate-800 transition-colors duration-300 ease-in-out focus:outline-none ring-offset-2 dark:ring-offset-slate-900 focus:ring-2 focus:ring-indigo-500 shadow-inner">
+            <span class="sr-only">Cambiar tema</span>
+            
+            <!-- Sliding Ball -->
+            <span aria-hidden="true" class="pointer-events-none relative inline-block h-6 w-6 transform rounded-full bg-white dark:bg-indigo-600 shadow-lg ring-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] translate-x-0 dark:translate-x-7 flex items-center justify-center">
+              
+              <!-- Sun Icon (Light Mode) -->
+              <span class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity duration-300 opacity-100 dark:opacity-0" aria-hidden="true">
+                <i class="fa-solid fa-sun text-[10px] text-amber-500"></i>
+              </span>
+              
+              <!-- Moon Icon (Dark Mode) -->
+              <span class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity duration-300 opacity-0 dark:opacity-100" aria-hidden="true">
+                <i class="fa-solid fa-moon text-[10px] text-white"></i>
+              </span>
+              
+            </span>
+          </button>
+        </div>
+
+        <div class="hidden md:flex items-center gap-3 pr-4 border-r border-gray-100 dark:border-slate-800">
+          <div class="flex flex-col items-end">
+            <span class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none">Usuario</span>
+            <span class="text-xs font-bold text-gray-700 dark:text-slate-200 truncate max-w-[150px]"><%= current_user.email.split('@').first %></span>
+          </div>
+          <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white font-black text-sm shadow-lg shadow-indigo-100/30 dark:shadow-none ring-2 ring-white dark:ring-slate-800">
+            <%= current_user.email[0].upcase %>
+          </div>
+        </div>
+        
+        <div class="hidden sm:block">
+          <%= link_to destroy_user_session_path, data: { turbo: false }, class: "group inline-flex items-center justify-center rounded-xl text-xs font-black uppercase tracking-widest text-gray-400 hover:text-red-600 hover:bg-red-50 px-4 py-2.5 transition-all duration-300 border border-transparent hover:border-red-100" do %>
+            <i class="fa-solid fa-power-off mr-2 group-hover:rotate-90 transition-transform"></i> Salir
+          <% end %>
+        </div>
+
+        <button data-action="click->mobile-menu#toggle" class="sm:hidden inline-flex items-center justify-center rounded-xl p-2.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 focus:outline-none transition-all border border-gray-100">
+          <span data-mobile-menu-target="iconOpen">
+            <i class="fa-solid fa-bars-staggered text-xl"></i>
+          </span>
+          <span data-mobile-menu-target="iconClose" class="hidden">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div data-mobile-menu-target="menu" class="sm:hidden hidden border-t border-gray-100/50 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+    <div class="space-y-1.5 px-4 py-6">
+      <% if current_user.admin? %>
+        <div class="px-5 mb-2">
+          <span class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Administración</span>
+        </div>
+        <% admin_items.each do |item| %>
+          <% is_active = controller_name == item[:controller] %>
+          <%= link_to item[:path], class: "flex items-center rounded-2xl px-5 py-4 text-base font-black transition-all #{is_active ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
+            <i class="fa-solid <%= item[:icon] %> mr-4 w-6 text-center <%= is_active ? 'text-indigo-500' : 'text-gray-400' %>"></i> <%= item[:name] %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <div class="px-5 <%= current_user.admin? ? 'mt-6' : '' %> mb-2">
+        <span class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Gestión Operativa</span>
+      </div>
+      <% operational_items.each do |item| %>
+        <% is_active = controller_name == item[:controller] %>
+        <%= link_to item[:path], class: "flex items-center rounded-2xl px-5 py-4 text-base font-black transition-all #{is_active ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
+          <i class="fa-solid <%= item[:icon] %> mr-4 w-6 text-center <%= is_active ? 'text-indigo-500' : 'text-gray-400' %>"></i> <%= item[:name] %>
+        <% end %>
+      <% end %>
+      
+      <div class="pt-6 mt-6 border-t border-gray-100">
+        <div class="flex items-center justify-between px-2">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white font-black shadow-md">
+              <%= current_user.email[0].upcase %>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Mi Cuenta</span>
+              <span class="text-sm font-bold text-gray-700 truncate max-w-[180px]"><%= current_user.email %></span>
+            </div>
+          </div>
+          <%= link_to destroy_user_session_path, data: { turbo: false }, class: "flex items-center justify-center w-10 h-10 rounded-2xl bg-red-50 text-red-500 hover:bg-red-100 transition-all" do %>
+            <i class="fa-solid fa-power-off"></i>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

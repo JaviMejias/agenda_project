@@ -1,0 +1,21 @@
+<% content_for :title, "Nueva Empresa" %>
+
+<div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+  <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-indigo-50 dark:border-slate-800 shadow-2xl shadow-indigo-100/20 dark:shadow-none overflow-hidden">
+    <div class="relative p-8 sm:p-12">
+      <div class="absolute top-0 right-0 p-8">
+        <div class="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-slate-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 rotate-12 group-hover:rotate-0 transition-transform duration-500">
+          <i class="fa-solid fa-building-circle-plus text-2xl"></i>
+        </div>
+      </div>
+
+      <div class="mb-10">
+        <h1 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-2">Crear Empresa</h1>
+        <p class="text-gray-500 dark:text-slate-400 font-medium">Registra una nueva entidad legal para gestionar tus propiedades.</p>
+        <div class="w-20 h-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full mt-4"></div>
+      </div>
+
+      <%= render "form", company: @company %>
+    </div>
+  </div>
+</div>

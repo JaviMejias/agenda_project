@@ -1,25 +1,46 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Pyme Stock" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%= content_for(:title) || "Agenda Pro" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link rel="manifest" href="<%= pwa_manifest_path %>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("<%= pwa_service_worker_path %>");
+        });
+      }
+    </script>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
+    <meta name="turbo-refresh-method" content="morph">
+    <meta name="turbo-refresh-scroll" content="preserve">
+    <meta name="turbo-prefetch" content="true">
 
     <%= yield :head %>
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <%= stylesheet_link_tag :app %>
-    <%= vite_stylesheet_tag "application.css" %>
-    <%= vite_javascript_tag 'application' %>
-  </head>
+    <%= vite_client_tag %>
+    <%= vite_stylesheet_tag "application.css", "data-turbo-track": "reload" %>
+    <%= vite_javascript_tag "theme", "data-turbo-track": "reload" %>
+    <%= vite_javascript_tag "application", "data-turbo-track": "reload" %>
+    
+  <body class="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white transition-colors duration-500">
+    <%= render "shared/navbar" if user_signed_in? %>
 
-  <body class="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-800 to-purple-900 font-sans text-white">
-    <%= yield %>
+    <main class="<%= user_signed_in? ? '' : 'flex min-h-screen items-center justify-center px-4' %>">
+      <%= render "shared/flash" %>
+      <%= yield %>
+    </main>
   </body>
 </html>

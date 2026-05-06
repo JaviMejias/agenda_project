@@ -1,0 +1,79 @@
+services:
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: agenda_project_development
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      args:
+        RUBY_VERSION: 3.4.6
+        RAILS_ENV: development
+        BUNDLE_WITHOUT: ""
+    command: bin/rails server -b 0.0.0.0
+    volumes:
+      - .:/rails
+      - bundle_data:/usr/local/bundle
+      - /rails/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db:5432/agenda_project_development
+      - RAILS_ENV=development
+      - NODE_ENV=development
+    depends_on:
+      db:
+        condition: service_healthy
+
+  vite:
+    build:
+      context: .
+      args:
+        RUBY_VERSION: 3.4.6
+        RAILS_ENV: development
+        BUNDLE_WITHOUT: ""
+    command: bin/vite dev
+    volumes:
+      - .:/rails
+      - bundle_data:/usr/local/bundle
+      - /rails/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - RAILS_ENV=development
+      - NODE_ENV=development
+    depends_on:
+      - web
+
+  worker:
+    build:
+      context: .
+      args:
+        RUBY_VERSION: 3.4.6
+        RAILS_ENV: development
+        BUNDLE_WITHOUT: ""
+    command: bin/rails solid_queue:start
+    volumes:
+      - .:/rails
+      - bundle_data:/usr/local/bundle
+      - /rails/node_modules
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db:5432/agenda_project_development
+      - RAILS_ENV=development
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  bundle_data:

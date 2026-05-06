@@ -6,8 +6,6 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     ViteRails({
-      envVars: { RAILS_ENV: "development" },
-      envOptions: { defineOn: "import.meta.env" },
       fullReload: {
         additionalPaths: [
           "config/routes.rb",

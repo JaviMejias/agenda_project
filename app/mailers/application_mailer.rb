@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
+  default from: "Agenda Pro <no-reply@agendapro.cl>"
   layout "mailer"
 end

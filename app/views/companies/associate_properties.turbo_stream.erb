@@ -1,0 +1,80 @@
+<%= turbo_stream.prepend "flash-container", partial: "shared/flash_message", locals: { type: "notice", message: @notice } %>
+
+<%= turbo_stream.replace "company_properties_frame" do %>
+  <turbo-frame id="company_properties_frame" class="block w-full">
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
+            Propiedades Actuales
+            <span class="px-2.5 py-0.5 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 text-xs font-black rounded-lg">
+              <%= @properties.count %>
+            </span>
+          </h2>
+          <p class="text-xs text-gray-500 dark:text-slate-400 font-medium">Listado de propiedades bajo el RUT <%= @company.rut %>.</p>
+        </div>
+      </div>
+
+      <% if @properties.any? %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+          <% @properties.each do |property| %>
+            <div class="group bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden flex flex-col">
+              <div class="relative h-40 overflow-hidden">
+                <% if property.images.attached? %>
+                  <%= image_tag property.carousel_variant(property.images.first), class: "w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" %>
+                <% else %>
+                  <div class="w-full h-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-300 dark:text-slate-600">
+                    <i class="fa-solid fa-image text-3xl opacity-20"></i>
+                  </div>
+                <% end %>
+                <div class="absolute bottom-0 left-0 w-full h-1" style="background-color: <%= property.color || '#4f46e5' %>"></div>
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <h3 class="text-base font-black text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mb-1 truncate">
+                  <%= property.name %>
+                </h3>
+                <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5 mb-4">
+                  <i class="fa-solid fa-location-dot"></i> <%= property.address.presence || "Sin dirección" %>
+                </p>
+                <div class="mt-auto flex items-center justify-between">
+                  <span class="text-sm font-black text-indigo-600 dark:text-indigo-400"><%= number_to_currency(property.base_price, unit: "$", precision: 0) %></span>
+                  <%= link_to property_path(property), data: { turbo: false }, class: "w-8 h-8 rounded-lg bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-400 hover:bg-indigo-600 hover:text-white transition-all shadow-sm" do %>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <% if @pagy.pages > 1 %>
+          <div class="flex justify-center pb-8 pt-4">
+            <%== @pagy.series_nav %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="flex flex-col items-center justify-center py-16 text-center bg-white dark:bg-slate-900 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm border-dashed border-2">
+          <div class="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-4 text-gray-200 dark:text-slate-700">
+            <i class="fa-solid fa-house-chimney-crack text-2xl"></i>
+          </div>
+          <h3 class="text-lg font-black text-gray-900 dark:text-white">Sin propiedades</h3>
+          <p class="text-xs text-gray-500 dark:text-slate-400 font-medium mb-6">Esta empresa no tiene propiedades asignadas aún. Utiliza el panel superior para <strong>vincular propiedades existentes</strong> o <strong>crear una nueva</strong>.</p>
+        </div>
+      <% end %>
+    </div>
+  </turbo-frame>
+<% end %>
+
+<%= turbo_stream.replace "property_select_container" do %>
+  <div id="property_select_container" class="relative">
+    <%= select_tag :property_ids, 
+        nil, 
+        multiple: true, 
+        data: { 
+          controller: "select", 
+          select_url_value: list_properties_path,
+          select_placeholder_value: "Escribe para buscar propiedades sin asignar..." 
+        },
+        class: "w-full" %>
+  </div>
+<% end %>

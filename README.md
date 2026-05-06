@@ -1,86 +1,108 @@
-# 🚀 PymeStock Base: Rails + Vite + Turbo + Stimulus + TailwindCSS
+# 📅 Agenda Project: Sistema de Gestión de Reservas
 
-Este repositorio es una **base sólida para proyectos Ruby on Rails modernos**, lista para usar con:
+[![Ruby Version](https://img.shields.io/badge/Ruby-3.4.6-red.svg)](https://www.ruby-lang.org/)
+[![Rails Version](https://img.shields.io/badge/Rails-8.1.3-red.svg)](https://rubyonrails.org/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-38B2AC.svg)](https://tailwindcss.com/)
 
-- **Ruby:** 3.4.6
-- **Rails:** 8.0.3
-- **PostgreSQL** como base de datos
-- **Vite** como asset pipeline
-- **Turbo & Stimulus** para interactividad SPA-like
-- **TailwindCSS v4** para estilos
+Una solución integral y moderna para la gestión de propiedades y reservas, diseñada con un enfoque en la experiencia del usuario (UX) premium y rendimiento excepcional. Este proyecto ha evolucionado de una base técnica a una **PWA (Progressive Web App)** completa.
 
-Es ideal para iniciar proyectos nuevos sin configurar todo desde cero.
+---
 
-## 📦 Requerimientos
+## ✨ Características Principales
 
-Asegúrate de tener instalados:
+### 📱 Experiencia PWA & Mobile-First
+- **Instalación Nativa:** Listo para instalar en dispositivos móviles y escritorio.
+- **Modo Offline (Consulta):** Gracias a Service Workers, las secciones visitadas permanecen disponibles para consulta rápida incluso sin conexión.
+- **Rendimiento Instantáneo:** Estrategia de caché que elimina los tiempos de espera al navegar por la interfaz principal.
 
-- **Ruby 3.4.6**
-- **Rails 8.0.3**
-- **PostgreSQL**
-- **Node.js y Yarn o npm**
+### 🗓️ Agenda Profesional
+- **Dashboard Dual:** Vista dividida con calendario dinámico y lista lateral reactiva.
+- **Turbo-Powered:** Actualizaciones instantáneas sin recargar la página usando Turbo Frames y Streams.
+- **Lógica de Negocio Avanzada:** Protección contra reservas pasadas y gestión estricta de estados (Pendiente, Confirmada, Cancelada).
 
-Verifica las versiones:
+### 💬 Notificaciones Interactivas (Smart Flow)
+- **Gestión vía Email:** Los clientes pueden confirmar o rechazar reservas directamente desde su correo electrónico con un solo clic.
+- **Tokens de Seguridad:** Enlaces temporales y seguros (`has_secure_token`) con expiración de 24 horas.
+- **Automatización:** Recordatorios automáticos programados 24 horas antes mediante **Solid Queue**.
 
-ruby -v
-rails -v
+### 📊 Reportes & Gestión
+- **Exportación Premium:** Generación de reportes detallados en **PDF** y **Excel**.
+- **Estadísticas en Tiempo Real:** Gráficos de ocupación e ingresos integrados.
+- **Gestión de Propiedades:** Sistema CRUD completo con galería de imágenes (Active Storage).
 
-## ⚙️ Instalación
+---
 
-1. Clona el repositorio:
+## 🚀 Stack Tecnológico
 
-git clone git@github.com:JaviMejias/rails-base-vite-tailwind.git
-cd rails-base-vite-tailwind
+- **Core:** Ruby 3.4.6 | Rails 8.1.3
+- **Base de Datos:** PostgreSQL
+- **Asset Pipeline:** Vite Ruby
+- **Estilos:** TailwindCSS v4
+- **Interactividad:** Hotwire (Turbo & Stimulus)
+- **Background Jobs:** Solid Queue
+- **Autenticación:** Devise + Pundit (Roles: Admin / Usuario)
 
-2. Instala dependencias de Ruby:
+---
 
+## 🛠️ Instalación y Configuración
+
+Puedes elegir entre una instalación local tradicional o utilizar Docker para un entorno aislado y rápido.
+
+### Opción A: Instalación con Docker (Recomendado)
+Ideal para empezar rápidamente sin preocuparse por las versiones de Ruby o Node.
+
+```bash
+# 1. Construir las imágenes
+docker compose build
+
+# 2. Levantar los servicios
+docker compose up -d
+
+# 3. Preparar la base de datos (solo la primera vez)
+docker compose exec web bin/rails db:prepare db:seed
+```
+La aplicación estará disponible en `http://localhost:3000`.
+
+### Opción B: Instalación Local
+Requiere tener instalados los lenguajes y servicios en tu máquina.
+
+**Requisitos:**
+- Ruby 3.4.6
+- PostgreSQL 16+
+- Node.js (v20+) & Yarn/npm
+
+**Pasos:**
+```bash
+# Instalar dependencias
 bundle install
+npm install
 
-3. Instala dependencias de Node:
+# Preparar base de datos
+bin/rails db:prepare db:seed
 
-yarn install
-# o npm install
-
-4. Configura la base de datos:
-
-rails db:create
-rails db:migrate
-
-## ▶️ Ejecución en desarrollo
-
-Levanta Rails y Vite con hot reload:
-
+# Ejecutar el entorno de desarrollo (Rails + Vite + Solid Queue)
 npm run dev
+```
 
-Rails estará en [http://localhost:3000](http://localhost:3000)
+---
 
-## ▶️ Alternativa: correr por separado cada uno debe ir en una consola y correr al mismo tiempo:
+## 📁 Estructura del Proyecto
 
-bin/rails s
-bin/vite dev
-
-## 📁 Estructura destacada
-
-
+El frontend moderno se organiza en `app/frontend`:
+```text
 app/frontend
-├── entrypoints
-│   ├── application.css
-│   └── application.js
-├── javascript
-│   ├── application.js
-│   └── controllers
-│       ├── application.js
-│       ├── hello_controller.js
-│       └── index.js
-└── stylesheets
-    └── application.tailwind.css
+├── entrypoints     # Puntos de entrada para Vite
+├── javascript      # Controladores Stimulus y lógica JS
+└── stylesheets     # TailwindCSS v4 y estilos globales
+```
 
+---
 
-## 🛠 Características incluidas
+## 🗺️ Hoja de Ruta (Roadmap)
+Para conocer los próximos pasos y el progreso detallado, consulta el archivo [ROADMAP.md](ROADMAP.md).
 
-- Devise (login/registro)
-- Formularios con TailwindCSS y animaciones
-- Font Awesome Free
-- Hot reload Vite para CSS y JS
-- Preparado para PostgreSQL y Ruby 3.4+
+---
+
+## 📄 Licencia
+Este proyecto es de uso privado. Todos los derechos reservados.
 

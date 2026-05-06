@@ -1,0 +1,119 @@
+<% content_for :title, "Reserva ##{@reservation.id}" %>
+
+<div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+  
+  <div class="mb-8">
+    <% back_path = params[:from] == 'list' ? list_reservations_path : reservations_path %>
+    <%= link_to back_path, class: "group inline-flex items-center text-sm font-bold text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" do %>
+      <div class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-md border border-gray-100 dark:border-slate-700 flex items-center justify-center mr-3 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:border-indigo-200 transition-all group-hover:-translate-x-1">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+      </div>
+      Volver <%= params[:from] == 'list' ? 'al listado' : 'a la agenda' %>
+    <% end %>
+  </div>
+
+  <div class="bg-white dark:bg-slate-900 shadow-2xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 animate-fade-in-up">
+    
+    <!-- Light Header Style -->
+    <div class="relative p-6 sm:p-10 bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border-b border-indigo-100 dark:border-slate-800 overflow-hidden">
+      <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-3xl">
+            <i class="fa-solid fa-receipt"></i>
+          </div>
+          <div>
+            <h3 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">Reserva #<%= @reservation.id %></h3>
+            <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest opacity-80">
+              Propiedad: <span class="font-bold"><%= @reservation.property.name %></span>
+            </p>
+          </div>
+        </div>
+
+        <div class="relative z-10">
+          <% 
+            badge_classes = case @reservation.status
+              when 'confirmed' then 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900'
+              when 'pending' then 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900'
+              else 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900'
+            end
+          %>
+          <span class="inline-flex items-center rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest border shadow-sm <%= badge_classes %>">
+            <div class="w-2 h-2 rounded-full bg-current animate-pulse mr-2"></div>
+            <%= I18n.t("enums.reservation.status.#{@reservation.status}") %>
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="px-6 py-10 sm:px-10">
+      <dl class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+        <div class="sm:col-span-1 p-5 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+          <dt class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2"><%= @reservation.blocked? ? 'Motivo / Estado' : 'Cliente' %></dt>
+          <dd class="text-base font-bold text-gray-900 dark:text-slate-100 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center border border-gray-200 dark:border-slate-600 text-gray-500 dark:text-slate-400 shadow-sm">
+              <i class="fa-solid <%= @reservation.blocked? ? 'fa-lock' : 'fa-user' %>"></i>
+            </div>
+            <%= @reservation.blocked? ? 'BLOQUEO DE MANTENCIÓN / NO DISPONIBLE' : @reservation.client_name %>
+          </dd>
+        </div>
+
+        <div class="sm:col-span-1 p-5 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+          <dt class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2">Registrado por</dt>
+          <dd class="text-sm font-bold text-gray-700 dark:text-slate-300 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-900">
+              <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <%= @reservation.user.email %>
+          </dd>
+        </div>
+
+        <div class="sm:col-span-1 p-5 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+          <dt class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2"><%= @reservation.blocked? ? 'Pérdida Estimada' : 'Precio Total' %></dt>
+          <dd class="text-3xl font-black <%= @reservation.blocked? ? 'text-gray-400' : 'text-indigo-600 dark:text-indigo-400' %>">
+            $<%= number_to_currency(@reservation.total_price, unit: "", separator: ",", delimiter: ".") %>
+          </dd>
+        </div>
+
+        <div class="sm:col-span-1 p-5 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+          <dt class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2"><%= @reservation.blocked? ? 'Horario del Bloqueo' : 'Horario de la Reserva' %></dt>
+          <dd class="space-y-3">
+            <div class="flex items-center gap-3 text-sm font-bold text-gray-900 dark:text-slate-200">
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50">
+                <i class="fa-solid fa-calendar-plus text-xs"></i>
+              </div>
+              <div>
+                <p class="text-[9px] font-black uppercase text-gray-400 leading-none mb-1">Entrada / Inicio</p>
+                <% format = @reservation.property.per_hour? ? "%d %b, %Y — %H:%M" : "%d %b, %Y" %>
+                <p class="text-gray-900 dark:text-slate-200"><%= @reservation.start_time.strftime(format) %></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 text-sm font-bold text-gray-900 dark:text-slate-200">
+              <div class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/30 flex items-center justify-center text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/50">
+                <i class="fa-solid fa-calendar-minus text-xs"></i>
+              </div>
+              <div>
+                <p class="text-[9px] font-black uppercase text-gray-400 leading-none mb-1">Salida / Fin</p>
+                <% display_end_time = @reservation.property.per_day? ? @reservation.end_time - 1.day : @reservation.end_time %>
+                <p class="text-gray-900 dark:text-slate-200"><%= display_end_time.strftime(format) %></p>
+              </div>
+            </div>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 px-6 py-6 sm:px-10 flex justify-end gap-3">
+      <% if @reservation.blocked? %>
+        <%= button_to reservation_path(@reservation), method: :delete, data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este bloqueo de fecha? La propiedad volverá a estar disponible." }, class: "inline-flex items-center justify-center rounded-xl bg-rose-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg hover:bg-rose-500 transition-all duration-200" do %>
+          <i class="fa-solid fa-unlock mr-2"></i> Eliminar Bloqueo
+        <% end %>
+      <% else %>
+        <%= link_to edit_reservation_path(@reservation, from: params[:from]), class: "inline-flex items-center justify-center rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 py-3 text-xs font-black uppercase tracking-widest text-gray-700 dark:text-slate-200 shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200" do %>
+          <i class="fa-solid fa-pen-to-square mr-2"></i> Editar Reserva
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

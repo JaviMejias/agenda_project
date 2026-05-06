@@ -1,6 +1,312 @@
 @import "tailwindcss";
+@import "./pagy.tailwind.css";
 
 @source "../../../app/views/**/*.html.erb";
 @source "../../../app/helpers/**/*.rb";
 @source "../../../app/javascript/**/*.js";
 @source "../../../app/frontend/javascript/**/*.js";
+
+@variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --fc-border-color: #e5e7eb;
+    --fc-button-bg-color: #4f46e5;
+    --fc-button-border-color: #4f46e5;
+    --fc-button-hover-bg-color: #4338ca;
+    --fc-button-hover-border-color: #4338ca;
+    --fc-button-active-bg-color: #3730a3;
+    --fc-button-active-border-color: #3730a3;
+    --fc-today-bg-color: #eef2ff;
+    --fc-event-border-color: transparent;
+  }
+
+  html.dark {
+    --fc-border-color: #3f3f46; /* zinc-700 - slightly lighter/warmer than slate-700 */
+    --fc-today-bg-color: #1e1b4b;
+    --fc-page-bg-color: #020617;
+    --fc-neutral-bg-color: #0f172a;
+  }
+
+  /* Flatpickr Dark Mode */
+  html.dark .flatpickr-calendar {
+    background: #0f172a !important;
+    border-color: #1e293b !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  }
+  html.dark .flatpickr-day {
+    color: #e2e8f0 !important;
+  }
+  html.dark .flatpickr-day.today {
+    border-color: #6366f1 !important;
+  }
+  html.dark .flatpickr-day:hover {
+    background: #1e293b !important;
+  }
+  html.dark .flatpickr-day.selected {
+    background: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    color: white !important;
+  }
+  html.dark .flatpickr-months .flatpickr-month {
+    background: #0f172a !important;
+    color: white !important;
+  }
+  html.dark .flatpickr-weekday {
+    color: #64748b !important;
+  }
+  html.dark .flatpickr-current-month .flatpickr-monthDropdown-months {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    outline: none !important;
+  }
+  html.dark .flatpickr-current-month .flatpickr-monthDropdown-months option {
+    background: #0f172a !important;
+    color: #ffffff !important;
+  }
+  html.dark .numInputWrapper span.arrowUp:after {
+    border-bottom-color: #ffffff !important;
+  }
+  html.dark .numInputWrapper span.arrowDown:after {
+    border-top-color: #ffffff !important;
+  }
+  html.dark .flatpickr-calendar.arrowTop:before,
+  html.dark .flatpickr-calendar.arrowTop:after {
+    border-bottom-color: #1e293b !important;
+  }
+
+  /* SweetAlert Dark Mode */
+  html.dark .swal2-popup {
+    background: #0f172a !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #1e293b !important;
+    border-radius: 2rem !important;
+  }
+  html.dark .swal2-title {
+    color: #ffffff !important;
+  }
+  html.dark .swal2-html-container {
+    color: #94a3b8 !important;
+  }
+  html.dark .swal2-confirm {
+    background-color: #4f46e5 !important;
+  }
+  html.dark .swal2-cancel {
+    background-color: #334155 !important;
+  }
+
+  /* TomSelect Dark Mode */
+  html.dark .ts-wrapper .ts-control {
+    background-color: #1e293b !important; /* slate-800 */
+    border-color: #334155 !important; /* slate-700 */
+    color: #f8fafc !important;
+  }
+  html.dark .ts-wrapper .ts-control input::placeholder {
+    color: #64748b !important; /* slate-500 */
+    opacity: 1 !important;
+  }
+  html.dark .ts-control > .placeholder {
+    color: #64748b !important;
+    opacity: 1 !important;
+  }
+  html.dark .ts-wrapper .ts-control input {
+    color: #f8fafc !important;
+  }
+  html.dark .ts-dropdown {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+  }
+  html.dark .ts-dropdown .active {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+  }
+  html.dark .ts-dropdown .option {
+    color: #cbd5e1 !important;
+  }
+  html.dark .ts-dropdown .option .text-gray-900 {
+    color: #f8fafc !important;
+  }
+  html.dark .ts-dropdown .option .text-gray-500 {
+    color: #64748b !important;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+@layer components {
+  .fc-theme-standard th {
+    @apply py-3 bg-gray-50 dark:bg-slate-800 text-sm font-semibold text-gray-700 dark:text-slate-300 border-gray-200 dark:border-slate-700 uppercase tracking-wider;
+  }
+  .fc-header-toolbar h2 {
+    @apply text-xl font-bold text-gray-900 dark:text-white capitalize;
+  }
+  .fc-view-harness {
+    @apply bg-white dark:bg-slate-950;
+    min-height: 70vh !important;
+  }
+  html.dark .fc-timegrid-slot, 
+  html.dark .fc-timegrid-slot-minor,
+  html.dark .fc-theme-standard td, 
+  html.dark .fc-theme-standard th {
+    border-color: #3f3f46 !important; /* zinc-700 */
+  }
+  html.dark .fc-col-header-cell {
+    background: #18181b !important; /* zinc-900 */
+  }
+  html.dark .fc-day-other {
+    @apply bg-transparent;
+  }
+  html.dark .fc-list-day-cushion {
+    @apply bg-slate-800;
+  }
+  html.dark .fc-list-event:hover td {
+    @apply bg-slate-800;
+  }
+  /* Taller slots globally for week/day views */
+  .fc .fc-timegrid-slot {
+    height: 3.5rem !important;
+  }
+  .fc-event {
+    @apply rounded shadow-sm font-medium text-xs;
+  }
+  .fc-button-primary:focus {
+    @apply ring-2 ring-offset-2 ring-indigo-500 !shadow-none;
+  }
+
+  /* ── Mobile responsive overrides ── */
+  @media (max-width: 640px) {
+    /* Stack the header toolbar vertically */
+    .fc-header-toolbar {
+      flex-direction: column !important;
+      gap: 0.5rem;
+      align-items: stretch !important;
+    }
+    .fc-header-toolbar .fc-toolbar-chunk {
+      display: flex;
+      justify-content: center;
+    }
+    /* Smaller title on mobile */
+    .fc-header-toolbar h2 {
+      font-size: 1rem !important;
+      text-align: center;
+    }
+    /* More touch-friendly buttons */
+    .fc .fc-button {
+      padding: 0.4rem 0.6rem !important;
+      font-size: 0.75rem !important;
+    }
+    /* Tall view on mobile */
+    .fc-view-harness {
+      min-height: 60vh !important;
+      touch-action: none; /* Prevent scroll interference during selection */
+    }
+    /* Slightly smaller slots on mobile but still generous */
+    .fc .fc-timegrid-slot {
+      height: 3rem !important;
+    }
+    /* Narrower time label column */
+    .fc .fc-timegrid-axis {
+      width: 45px !important;
+    }
+    .fc .fc-timegrid-slot-label {
+      font-size: 0.65rem !important;
+    }
+    /* Compact day headers */
+    .fc-theme-standard th {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      font-size: 0.65rem;
+    }
+    /* Better event text on mobile */
+    .fc-event {
+      font-size: 0.6rem !important;
+    }
+  }
+}
+
+/* ── Global Styles ── */
+body { font-family: 'Inter', sans-serif; }
+
+.turbo-progress-bar {
+  background-color: #4f46e5;
+  height: 3px;
+}
+
+.turbo-loading {
+  opacity: 0.95;
+}
+
+.flatpickr-calendar {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ── Pickr Custom Styling ── */
+.pickr .pcr-button {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.2s ease-in-out !important;
+  position: relative;
+  overflow: hidden;
+  background: #4f46e5 !important; /* Forced brand color */
+}
+
+/* Pickr uses ::before to show the selected color, we must hide it */
+.pickr .pcr-button::before {
+  display: none !important;
+  content: none !important;
+}
+
+.pickr .pcr-button::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='white' d='M512 256c0 .9 0 1.8 0 2.7c-.4 36.5-24.5 68.3-58.4 81.2c-12.1 4.6-22.6 15.1-27.2 27.2c-12.9 33.9-44.7 58-81.2 58.4c-.9 0-1.8 0-2.7 0c-1.5 0-3 0-4.5-.1c-42.2-1.2-76.1-35.1-77.3-77.3c-.1-1.5-.1-3-.1-4.5c0-.9 0-1.8 0-2.7c.4-36.5 24.5-68.3 58.4-81.2c12.1-4.6 22.6-15.1 27.2-27.2c12.9-33.9 44.7-58 81.2-58.4c.9 0 1.8 0 2.7 0c1.5 0 3 0 4.5 .1c42.2 1.2 76.1 35.1 77.3 77.3c.1 1.5 .1 3 .1 4.5zM160 384c-88.4 0-160-71.6-160-160S71.6 64 160 64c21.5 0 42 4.2 60.8 11.9c15 6.1 23.3 22.3 19.4 37.8c-10.7 42.9-1.3 88.5 24.6 123.6c25.9 35.1 65.1 58.3 108.3 64.1c15.7 2.1 26.6 16.5 24.1 32.2C382.4 430.7 301.9 496 208 496c-16.3 0-32.1-2.1-47.3-6c-16-4.1-25-21-20-36.6c4.3-13.3 6.7-27.4 6.7-42.1c0-15.2-2.6-29.8-7.4-43.3zM96 224a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM224 160a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z'/%3E%3C/svg%3E") !important;
+  background-size: 16px !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2)) !important;
+  pointer-events: none;
+}
+
+.pickr .pcr-button:hover {
+  transform: scale(1.1) !important;
+}
+
+.pcr-app {
+  border-radius: 1.5rem !important;
+  padding: 1rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  z-index: 9999 !important;
+}

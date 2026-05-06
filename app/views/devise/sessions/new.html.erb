@@ -1,51 +1,63 @@
-<div class="mx-auto w-full max-w-sm rounded-3xl border border-gray-400 bg-white/10 p-8 shadow-2xl backdrop-blur-md transition-all duration-500 hover:shadow-purple-500/50">
-  <h2 class="mb-8 text-center text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent drop-shadow-lg animate-fade-in">
-    <i class="fas fa-sign-in-alt mr-2"></i> Iniciar sesión
-  </h2>
-
-  <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-    <div class="space-y-6">
-      <!-- Campo Email -->
-      <div class="field animate-slide-in-left">
-        <%= f.label :email, "Correo electrónico", class: "mb-2 block text-sm font-medium text-gray-200" %>
-        <div class="relative">
-          <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
-          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "Tu correo electrónico",
-            class: "w-full rounded-full border border-gray-400 bg-white/20 pl-10 p-3 text-white placeholder-gray-300 transition-colors duration-300 focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-300 transform-gpu hover:scale-105" %>
-        </div>
+<div class="w-full max-w-md mx-auto bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 dark:border-slate-800 animate-fade-in-up">
+  <div class="px-6 py-8 sm:px-10 sm:py-12">
+    
+    <div class="text-center mb-10">
+      <div class="mx-auto h-20 w-20 bg-indigo-50 dark:bg-indigo-950/30 rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-indigo-100 dark:border-indigo-900/50 transform -rotate-3 group hover:rotate-0 transition-transform duration-500">
+        <i class="fa-solid fa-calendar-days text-4xl text-indigo-600 dark:text-indigo-400"></i>
       </div>
-
-      <!-- Campo Password -->
-      <div class="field animate-slide-in-right">
-        <%= f.label :password, "Contraseña", class: "mb-2 block text-sm font-medium text-gray-200" %>
-        <div class="relative">
-          <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
-          <%= f.password_field :password, autocomplete: "current-password", placeholder: "Tu contraseña",
-            class: "w-full rounded-full border border-gray-400 bg-white/20 pl-10 p-3 text-white placeholder-gray-300 transition-colors duration-300 focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-300 transform-gpu hover:scale-105" %>
-        </div>
-      </div>
-
-      <!-- Recordarme -->
-      <% if devise_mapping.rememberable? %>
-        <div class="field flex items-center animate-slide-in-bottom">
-          <%= f.check_box :remember_me, class: "mr-2 h-4 w-4 rounded border-gray-400 bg-white/20 text-purple-400 transition-colors duration-300 focus:ring-2 focus:ring-purple-400" %>
-          <%= f.label :remember_me, "Recordarme", class: "text-sm text-gray-200" %>
-        </div>
-      <% end %>
-
-      <!-- Botón Login -->
-      <div class="actions animate-fade-in-up">
-        <%= f.submit " Iniciar sesión", class: "w-full cursor-pointer rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 p-3 text-lg font-bold text-white shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-indigo-500/50" %>
-      </div>
+      <h2 class="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Bienvenido</h2>
+      <p class="mt-3 text-sm font-medium text-gray-500 dark:text-slate-400">Gestiona tus reservas con eficiencia</p>
     </div>
-  <% end %>
 
-  <br>
-  <hr class="border-t border-gray-600">
-  <br>
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-6" }) do |f| %>
+      
+      <div class="space-y-2">
+        <%= f.label :email, class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" do %>
+          Correo electrónico
+        <% end %>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600">
+            <i class="fa-regular fa-envelope text-gray-400 dark:text-slate-600"></i>
+          </div>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "tu@correo.com",
+            class: "block w-full pl-11 pr-4 py-4 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm" %>
+        </div>
+      </div>
 
-  <div class="text-center text-sm text-gray-200 animate-fade-in">
-    <i class="far fa-user mr-1"></i>
-    <%= link_to "¿No tienes una cuenta? Crea una aquí", new_registration_path(resource_name), class: "transition-colors duration-300 hover:text-purple-300" %><br />
+      <div class="space-y-2">
+        <div class="flex items-center justify-between ml-1">
+          <%= f.label :password, class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest" do %>
+            Contraseña
+          <% end %>
+          <% if devise_mapping.recoverable? %>
+            <%= link_to "Olvidé mi clave", new_password_path(resource_name), class: "text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline" %>
+          <% end %>
+        </div>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600">
+            <i class="fa-solid fa-lock text-gray-400 dark:text-slate-600"></i>
+          </div>
+          <%= f.password_field :password, autocomplete: "current-password", placeholder: "••••••••",
+            class: "block w-full pl-11 pr-4 py-4 border border-gray-100 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm" %>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <% if devise_mapping.rememberable? %>
+          <div class="flex items-center">
+            <%= f.check_box :remember_me, class: "h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded cursor-pointer transition-colors" %>
+            <%= f.label :remember_me, "Recordarme", class: "ml-2 block text-xs font-bold text-gray-600 dark:text-slate-400 cursor-pointer" %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="pt-2">
+        <%= button_tag type: "submit", class: "w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl shadow-xl text-sm font-black text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transform hover:-translate-y-1 transition-all duration-300" do %>
+          <span>Iniciar Sesión</span>
+          <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
+        <% end %>
+      </div>
+    <% end %>
+
   </div>
 </div>

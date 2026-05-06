@@ -1,0 +1,44 @@
+<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+  <h2 style="color: #d97706; border-bottom: 2px solid #d97706; padding-bottom: 10px;">Solicitud de Reserva</h2>
+  
+  <p>Hola <strong><%= @client.name %></strong>,</p>
+  
+  <p>Se ha generado una solicitud de reserva para la propiedad <strong><%= @property.name %></strong>. Para asegurar tu lugar, por favor confirma tu asistencia:</p>
+  
+  <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0;">
+    <p style="margin: 5px 0;"><strong>Propiedad:</strong> <%= @property.name %></p>
+    <% if @property.per_day? %>
+      <p style="margin: 5px 0;"><strong>Desde:</strong> <%= l(@reservation.start_time.to_date, format: :long) %></p>
+      <p style="margin: 5px 0;"><strong>Hasta:</strong> <%= l((@reservation.end_time - 1.day).to_date, format: :long) %></p>
+    <% else %>
+      <p style="margin: 5px 0;"><strong>Desde:</strong> <%= l(@reservation.start_time, format: :long) %></p>
+      <p style="margin: 5px 0;"><strong>Hasta:</strong> <%= l(@reservation.end_time, format: :long) %></p>
+    <% end %>
+    <p style="margin: 5px 0;"><strong>Estado:</strong> <span style="color: #d97706; font-weight: bold;">Pendiente de Confirmación</span></p>
+    <p style="margin: 5px 0;"><strong>Responsable:</strong> <%= @user.first_name %> <%= @user.last_name %></p>
+  </div>
+
+  <p style="color: #e11d48; font-size: 14px; text-align: center; font-weight: bold; margin-bottom: 20px;">
+    ⚠️ Este enlace expirará en 24 horas por motivos de seguridad.
+  </p>
+
+  <div style="text-align: center; margin: 30px 0;">
+    <a href="<%= confirm_public_reservation_url(@reservation.token) %>" 
+       style="background-color: #059669; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 10px; display: inline-block;">
+      Confirmar Reserva
+    </a>
+    <a href="<%= reject_public_reservation_url(@reservation.token) %>" 
+       style="background-color: #e11d48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+      Rechazar
+    </a>
+  </div>
+  
+  <p style="font-size: 13px; color: #64748b; margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
+    <em>Si no realizaste esta solicitud, puedes ignorar este correo o rechazar la reserva.</em>
+  </p>
+  
+  <p style="margin-top: 20px; font-size: 14px; color: #64748b;">
+    Gracias por preferir nuestro sistema.<br>
+    <em>Atentamente, el equipo de <%= @property.company&.name || "Agenda Pro" %></em>
+  </p>
+</div>
