@@ -131,13 +131,13 @@
                   </div>
                   <% if current_user.admin? %>
                     <div class="flex gap-2">
-                      <%= link_to edit_property_path(property), data: { turbo: false }, class: "w-9 h-9 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all border border-gray-100 dark:border-slate-700" do %>
+                      <%= link_to edit_property_path(property), data: { turbo_frame: "_top" }, class: "w-9 h-9 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all border border-gray-100 dark:border-slate-700" do %>
                         <i class="fa-solid fa-pen-to-square text-sm"></i>
                       <% end %>
                     </div>
                   <% end %>
                 </div>
-                <%= link_to property_path(property), data: { turbo: false }, class: "w-full flex items-center justify-center gap-2 py-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white transition-all shadow-sm" do %>
+                <%= link_to property_path(property), data: { turbo_frame: "_top" }, class: "w-full flex items-center justify-center gap-2 py-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white transition-all shadow-sm" do %>
                   <i class="fa-solid fa-calendar-days text-sm"></i>
                   <span>Ver Agenda de Reservas</span>
                 <% end %>

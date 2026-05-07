@@ -5,11 +5,6 @@ class ClientsController < ApplicationController
   def index
     @clients = Client.all.search(params[:q]).order(name: :asc)
     @pagy, @clients = pagy(@clients, limit: 15)
-
-    respond_to do |format|
-      format.html
-      format.turbo_stream
-    end
   end
 
   def show
@@ -34,7 +29,7 @@ class ClientsController < ApplicationController
 
     respond_to do |format|
       if @client.save
-        format.html { redirect_to clients_path, notice: "Cliente creado exitosamente.", status: :see_other }
+        format.html { redirect_to clients_path, notice: "Cliente creado exitosamente." }
         format.json { render :show, status: :created, location: @client }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -47,7 +42,7 @@ class ClientsController < ApplicationController
     authorize @client
     respond_to do |format|
       if @client.update(client_params)
-        format.html { redirect_to clients_path, notice: "Cliente actualizado.", status: :see_other }
+        format.html { redirect_to clients_path, notice: "Cliente actualizado." }
         format.json { render :show, status: :ok, location: @client }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -64,7 +59,7 @@ class ClientsController < ApplicationController
   def destroy
     authorize @client
     @client.destroy
-    redirect_to clients_path, notice: "Cliente eliminado exitosamente.", status: :see_other
+    redirect_to clients_path, notice: "Cliente eliminado exitosamente."
   end
 
   private

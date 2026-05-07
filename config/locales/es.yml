@@ -22,6 +22,8 @@ es:
   activerecord:
     models:
       client: "Cliente"
+      reservation: "Reservas"
+      property: "Propiedad"
     attributes:
       client:
         name: "Nombre completo"
@@ -41,3 +43,6 @@ es:
       blank: "es obligatorio/a"
       invalid: "no es válido/a"
       taken: "ya está en uso"
+      restrict_dependent_destroy:
+        has_many: "No se puede eliminar porque tiene %{record} asociadas"
+        has_one: "No se puede eliminar porque tiene un %{record} asociado"

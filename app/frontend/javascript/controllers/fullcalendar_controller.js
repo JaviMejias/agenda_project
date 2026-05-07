@@ -85,7 +85,16 @@ export default class extends Controller {
       eventClick: function (info) {
         if (info.event.url) {
           info.jsEvent.preventDefault()
-          window.location.href = info.event.url
+          const Turbo = window.Turbo
+          if (Turbo) {
+            // Determine origin for back navigation
+            const from = this.modeValue === 'booking' ? 'property' : (new URL(window.location).pathname.includes('list') ? 'list' : 'calendar')
+            const url = new URL(info.event.url, window.location.origin)
+            url.searchParams.set('from', from)
+            Turbo.visit(url.toString())
+          } else {
+            window.location.href = info.event.url
+          }
         }
       }
     })
@@ -163,6 +172,19 @@ export default class extends Controller {
             }
             successCallback(data)
           })
+      },
+      eventClick: (info) => {
+        if (info.event.url) {
+          info.jsEvent.preventDefault()
+          const Turbo = window.Turbo
+          if (Turbo) {
+            const url = new URL(info.event.url, window.location.origin)
+            url.searchParams.set('from', 'property')
+            Turbo.visit(url.toString())
+          } else {
+            window.location.href = info.event.url
+          }
+        }
       },
       select: (info) => {
         let startStr = info.startStr

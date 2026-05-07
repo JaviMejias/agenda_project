@@ -79,15 +79,15 @@ class PropertiesController < ApplicationController
   def destroy
     authorize @property
     respond_to do |format|
-      begin
-        @property.destroy!
+      if @property.destroy
         format.html { redirect_to properties_path, notice: "Propiedad eliminada correctamente.", status: :see_other }
         format.json { head :no_content }
-      rescue => e
+      else
+        message = @property.errors.full_messages.to_sentence.presence || "No se pudo eliminar la propiedad."
         format.turbo_stream do
-          render turbo_stream: turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "alert", message: "No se pudo eliminar la propiedad." })
+          render turbo_stream: turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "alert", message: message })
         end
-        format.html { redirect_to properties_path, alert: "No se pudo eliminar la propiedad.", status: :see_other }
+        format.html { redirect_to properties_path, alert: message, status: :see_other }
       end
     end
   end

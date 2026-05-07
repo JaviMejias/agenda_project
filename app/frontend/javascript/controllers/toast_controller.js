@@ -1,9 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
+import { SoundManager } from "../sound_manager"
 
 export default class extends Controller {
   static targets = ["progressBar"]
+  static values = { type: String }
 
   connect() {
+    const soundType = this.typeValue === "alert" ? "error" : "success"
+    SoundManager.play(soundType)
     requestAnimationFrame(() => {
       this.element.classList.remove("opacity-0", "translate-y-4", "translate-x-full")
       this.element.classList.add("opacity-100", "translate-y-0", "translate-x-0")

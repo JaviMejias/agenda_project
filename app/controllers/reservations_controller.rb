@@ -108,8 +108,12 @@ class ReservationsController < ApplicationController
     authorize @reservation
     respond_to do |format|
       if @reservation.update(reservation_params)
-        path = params[:from] == "list" ? list_reservations_path : reservations_path
-        format.html { redirect_to path, notice: "Reserva actualizada.", status: :see_other }
+        path = case params[:from]
+               when "list" then list_reservations_path
+               when "property" then property_path(@reservation.property_id)
+               else reservations_path
+               end
+        format.html { redirect_to path, notice: "Reserva actualizada." }
         format.json { render :show, status: :ok, location: @reservation }
       else
         format.turbo_stream do
@@ -126,12 +130,12 @@ class ReservationsController < ApplicationController
     if @reservation.destroyable?
       @reservation.destroy
       respond_to do |format|
-        format.html { redirect_to reservations_path, notice: "Bloqueo eliminado correctamente.", status: :see_other }
+        format.html { redirect_to reservations_path, notice: "Bloqueo eliminado correctamente." }
         format.json { head :no_content }
       end
     else
       respond_to do |format|
-        format.html { redirect_to reservations_path, alert: "No se permite eliminar reservas reales, solo cancelarlas cambiando su estado.", status: :see_other }
+        format.html { redirect_to reservations_path, alert: "No se permite eliminar reservas reales, solo cancelarlas cambiando su estado." }
         format.json { render json: { error: "No se permite eliminar reservas" }, status: :forbidden }
       end
     end
