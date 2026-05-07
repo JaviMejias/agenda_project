@@ -130,9 +130,11 @@ class Reservation < ApplicationRecord
     scope = property.reservations.where.not(id: id).where.not(status: :cancelled)
 
     if property.per_day?
-      overlapping = scope.where("CAST(start_time AS DATE) < CAST(? AS DATE) AND CAST(end_time AS DATE) > CAST(? AS DATE)",
+      # Para reservas por día, cualquier solapamiento de fechas (mismo día) debe ser bloqueado
+      overlapping = scope.where("CAST(start_time AS DATE) <= CAST(? AS DATE) AND CAST(end_time AS DATE) >= CAST(? AS DATE)",
                                 end_time, start_time).first
     else
+      # Para reservas por hora, el final de una puede ser el inicio de otra (no solapadas)
       overlapping = scope.where("start_time < ? AND end_time > ?", end_time, start_time).first
     end
 

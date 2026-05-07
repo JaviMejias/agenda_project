@@ -4,46 +4,36 @@ Este documento detalla el progreso actual del proyecto y los próximos pasos.
 
 ## 🟢 Completado
 
-### 🚀 Infraestructura & Versiones (¡NUEVO!)
+### 🚀 Infraestructura & Estabilización (¡NUEVO!)
 - **Salto Tecnológico:** Actualización a **Ruby 3.4.6** (Prism/JIT) y **Rails 8.1.3** (Soporte nativo PWA).
+- **Turbo Morphing:** Implementación de refrescos por morphing global (`refreshes_with method: :morph`) para transiciones ultra fluidas sin parpadeos.
+- **Navegación Inteligente:** Sistema de memoria de origen que permite volver automáticamente a la ficha de propiedad, agenda global o listado según de dónde venga el usuario.
 - **PWA (Progressive Web App):** Instalable en móviles y escritorio con manifiesto personalizado e iconos.
 - **Modo Offline:** Implementación de Service Worker con estrategia *Network-First* para carga instantánea y soporte sin señal.
+
+### 🔍 Productividad & Búsqueda (¡NUEVO!)
+- **Omnibar (Cmd+K):** Buscador global inteligente estilo "Command Palette" para acceso instantáneo a Clientes, Propiedades, Reservas y Usuarios.
+- **Filtros de Seguridad:** Búsqueda de usuarios restringida exclusivamente a administradores dentro de la Omnibar.
+- **Navegación por Teclado:** Control total del buscador mediante flechas y Enter para máxima velocidad operativa.
+
+### 🎨 Experiencia de Usuario & Aesthetica (¡NUEVO!)
+- **Temas de 3 Estados:** Selector dinámico (Claro, Oscuro o Sistema) con detección en tiempo real de las preferencias del sistema operativo.
+- **Feedback Auditivo:** Sistema de sonidos sintetizados diferenciados (Éxito vs Alerta) que mejora la percepción de las acciones del usuario.
 - **App Feel:** Optimización de Viewport para móviles (bloqueo de zoom y scroll horizontal) para sensación de app nativa.
+- **Micro-interacciones:** Animaciones suaves en modales, transiciones de temas y barras de progreso de Turbo.
 
 ### 📅 Agenda Profesional (Dashboard Rediseñado)
 - **Split-Screen Layout:** Diseño de dos columnas (Calendario + Lista lateral) para una visión 360°.
 - **Lista Lateral Inteligente:** Actualización reactiva mediante Turbo Frames sincronizada con el movimiento del calendario.
 - **Filtrado Lógico:** Eliminación de "días fantasma" (solo se ven reservas del periodo actual: mes, semana o día).
-- **Visualización Adaptativa:** Muestra de horas automática en vistas de semana/día para mayor precisión operativa.
 - **Integridad de Datos:** Bloqueo de reservas pasadas y protección total de reservas canceladas (inamovibles).
-- **Recordatorios Automáticos (¡NUEVO!):** Sistema de alertas programadas 24h antes del inicio de la reserva mediante **Solid Queue** y correos electrónicos automáticos.
+- **Recordatorios Automáticos:** Sistema de alertas programadas 24h antes del inicio de la reserva mediante **Solid Queue**.
 
 ### 📊 Dashboard & Reportes
 - Resumen de estadísticas (Reservas, ingresos, propiedades).
 - Gráfico dinámico de ocupación mensual (Chart.js).
-- Listado de actividad reciente.
 - Reporte detallado de "Pérdidas por Bloqueo" (mantenimiento).
 - Generación de reportes en Excel y PDF con filtros dinámicos.
-
-### 🏠 Gestión de Propiedades
-- CRUD completo con Active Storage y galería de imágenes.
-- Buscador instantáneo con overlay de carga.
-- Selector de colores avanzado para personalización visual del calendario.
-
-### 🔐 Usuarios & Seguridad
-- Sistema de autenticación Devise con rediseño Premium.
-- Autorización basada en roles (Admin / Normal) con Pundit.
-- Trazabilidad total (quién creó/editó cada reserva).
-
-### 👥 Gestión de Clientes
-- Base de datos centralizada con validación automática de RUT chileno.
-- Historial de reservas paginado con Turbo Frames.
-
-### 💬 Notificaciones Interactivas (¡NUEVO!)
-- **Confirmación Vía Email:** Botones "Aceptar" y "Rechazar" en el correo de reserva que permiten al cliente gestionar su estado sin iniciar sesión.
-- **Seguridad por Token:** Implementación de tokens únicos (`has_secure_token`) con expiración de 24 horas para acciones públicas seguras.
-- **Feedback Estético:** Páginas de aterrizaje con diseño premium y optimizado para móviles para confirmar/rechazar reservas.
-- **Flujo Inteligente:** Supresión de correos redundantes tras la interacción del cliente para una experiencia más limpia.
 
 ---
 
@@ -67,4 +57,4 @@ Este documento detalla el progreso actual del proyecto y los próximos pasos.
    - Gestión de bloqueos recurrentes para mantenimientos preventivos.
 
 ---
-*Última actualización: 05 de Mayo, 2026 - 18:25*
+*Última actualización: 07 de Mayo, 2026 - 13:00 (Sesión de Estabilización y UX)*

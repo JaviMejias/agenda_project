@@ -80,47 +80,55 @@ class ReservationsController < ApplicationController
     @reservation.user = current_user
     @reservation.status ||= :pending
 
-    respond_to do |format|
-      if @reservation.save
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace("calendar-view", partial: "shared/calendar_container", locals: { property: @property, mode: "booking", omit_controller: true, omit_inputs: true }),
-            turbo_stream.replace("reservation_form_container", partial: "reservations/booking_form", locals: { property: @property, reservation: @property.reservations.build }),
-            turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "notice", message: "Reserva creada exitosamente." })
-          ]
+    # Blindaje contra concurrencia: Bloqueamos la propiedad durante la transacción
+    Property.transaction do
+      @property.lock! # Bloqueo pesimista a nivel de base de datos
+      
+      respond_to do |format|
+        if @reservation.save
+          format.turbo_stream do
+            render turbo_stream: [
+              turbo_stream.replace("calendar-view", partial: "shared/calendar_container", locals: { property: @property, mode: "booking", omit_controller: true, omit_inputs: true }),
+              turbo_stream.replace("reservation_form_container", partial: "reservations/booking_form", locals: { property: @property, reservation: @property.reservations.build }),
+              turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "notice", message: "Reserva creada exitosamente." })
+            ]
+          end
+          format.html { redirect_to property_path(@property), notice: "Reserva creada exitosamente." }
+          format.json { render :show, status: :created, location: @reservation }
+        else
+          format.turbo_stream do
+            render turbo_stream: [
+              turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "alert", message: "No se pudo crear la reserva. Revisa los errores del formulario." }),
+              turbo_stream.replace("reservation_form_container", partial: "reservations/booking_form", locals: { property: @property, reservation: @reservation })
+            ]
+          end
+          format.html { render template: "properties/show", status: :unprocessable_entity }
+          format.json { render json: @reservation.errors, status: :unprocessable_entity }
         end
-        format.html { redirect_to property_path(@property), notice: "Reserva creada exitosamente." }
-        format.json { render :show, status: :created, location: @reservation }
-      else
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "alert", message: "No se pudo crear la reserva. Revisa los errores del formulario." }),
-            turbo_stream.replace("reservation_form_container", partial: "reservations/booking_form", locals: { property: @property, reservation: @reservation })
-          ]
-        end
-        format.html { render template: "properties/show", status: :unprocessable_entity }
-        format.json { render json: @reservation.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def update
     authorize @reservation
-    respond_to do |format|
-      if @reservation.update(reservation_params)
-        path = case params[:from]
-               when "list" then list_reservations_path
-               when "property" then property_path(@reservation.property_id)
-               else reservations_path
-               end
-        format.html { redirect_to path, notice: "Reserva actualizada." }
-        format.json { render :show, status: :ok, location: @reservation }
-      else
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "alert", message: "No se pudo actualizar la reserva. Revisa los errores del formulario." })
+    Property.transaction do
+      @property.lock!
+      respond_to do |format|
+        if @reservation.update(reservation_params)
+          path = case params[:from]
+                 when "list" then list_reservations_path
+                 when "property" then property_path(@reservation.property_id)
+                 else reservations_path
+                 end
+          format.html { redirect_to path, notice: "Reserva actualizada." }
+          format.json { render :show, status: :ok, location: @reservation }
+        else
+          format.turbo_stream do
+            render turbo_stream: turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "alert", message: "No se pudo actualizar la reserva. Revisa los errores del formulario." })
+          end
+          format.html { render :edit, status: :unprocessable_entity }
+          format.json { render json: @reservation.errors, status: :unprocessable_entity }
         end
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @reservation.errors, status: :unprocessable_entity }
       end
     end
   end
