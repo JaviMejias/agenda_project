@@ -35,12 +35,13 @@
     <%= vite_javascript_tag "theme", "data-turbo-track": "reload" %>
     <%= vite_javascript_tag "application", "data-turbo-track": "reload" %>
     
-  <body class="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white transition-colors duration-500">
+  <body class="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white transition-colors duration-500" data-controller="omnibar">
     <%= render "shared/navbar" if user_signed_in? %>
 
     <main class="<%= user_signed_in? ? '' : 'flex min-h-screen items-center justify-center px-4' %>">
       <%= render "shared/flash" %>
       <%= yield %>
     </main>
+    <%= render "shared/omnibar" %>
   </body>
 </html>

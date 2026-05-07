@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   get "reports", to: "reports#index", as: :reports
+  get "search", to: "search#global"
   resources :clients do
     collection do
       get :list
