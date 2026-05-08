@@ -50,8 +50,9 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should destroy property" do
+    property = Property.create!(name: "To be destroyed", base_price: 100, user: @admin)
     assert_difference("Property.count", -1) do
-      delete property_url(@property)
+      delete property_url(property)
     end
 
     assert_redirected_to properties_url

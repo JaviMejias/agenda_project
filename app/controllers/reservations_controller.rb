@@ -82,7 +82,7 @@ class ReservationsController < ApplicationController
 
     Property.transaction do
       @property.lock!
-      
+
       respond_to do |format|
         if @reservation.save
           format.turbo_stream do
@@ -116,10 +116,10 @@ class ReservationsController < ApplicationController
       respond_to do |format|
         if @reservation.update(reservation_params)
           path = case params[:from]
-                 when "list" then list_reservations_path
-                 when "property" then property_path(@reservation.property_id)
-                 else reservations_path
-                 end
+          when "list" then list_reservations_path
+          when "property" then property_path(@reservation.property_id)
+          else reservations_path
+          end
           format.html { redirect_to path, notice: "Reserva actualizada." }
           format.json { render :show, status: :ok, location: @reservation }
         else

@@ -38,7 +38,8 @@ class PropertiesTest < ApplicationSystemTestCase
   end
 
   test "should destroy Property" do
-    visit property_url(@property)
+    property = Property.create!(name: "To be destroyed", base_price: 100, user: @admin)
+    visit property_url(property)
 
     click_on "Eliminar Propiedad"
 

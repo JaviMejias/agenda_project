@@ -17,15 +17,3 @@ module ActiveSupport
     # Add more helper methods to be used by all tests here...
   end
 end
-
-module ViteRails::TagHelpers
-  def vite_stylesheet_tag(*args)
-    nil
-  end
-  def vite_javascript_tag(*args)
-    nil
-  end
-  def vite_client_tag
-    nil
-  end
-end

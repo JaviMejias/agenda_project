@@ -10,11 +10,15 @@ class ReservationReminderJobTest < ActiveJob::TestCase
   end
 
   test "should deliver reminder when in window" do
-    start = 24.hours.from_now
-    @reservation.update!(start_time: start, end_time: start + 2.hours)
+    reference_time = Time.zone.parse("2026-06-01 10:00:00")
+    travel_to reference_time do
+      start = 24.hours.from_now
+      @reservation.update!(start_time: start, end_time: start + 2.hours)
+      @reservation.update_column(:status, :confirmed) # Force confirmed status
 
-    assert_emails 1 do
-      ReservationReminderJob.perform_now(@reservation)
+      assert_emails 1 do
+        ReservationReminderJob.perform_now(@reservation)
+      end
     end
   end
 
