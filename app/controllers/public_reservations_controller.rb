@@ -17,6 +17,11 @@ class PublicReservationsController < ApplicationController
     else
       @reservation.skip_notifications = true
       @reservation.update!(status: :confirmed)
+      Notification.create!(
+        user: @reservation.user,
+        notifiable: @reservation,
+        message: "¡Reserva Confirmada! #{@reservation.client_name} ha aceptado la reserva para #{@reservation.property.name}."
+      )
       @message = "¡Gracias! Tu reserva ha sido confirmada exitosamente."
       @status = :success
     end
@@ -32,6 +37,11 @@ class PublicReservationsController < ApplicationController
     else
       @reservation.skip_notifications = true
       @reservation.update!(status: :cancelled)
+      Notification.create!(
+        user: @reservation.user,
+        notifiable: @reservation,
+        message: "Reserva Rechazada: #{@reservation.client_name} ha cancelado la solicitud para #{@reservation.property.name}."
+      )
       @message = "La reserva ha sido rechazada y cancelada."
       @status = :success
     end

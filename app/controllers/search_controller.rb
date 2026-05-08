@@ -7,7 +7,6 @@ class SearchController < ApplicationController
 
     results = []
 
-    # Buscar Clientes
     clients = Client.search(query).limit(5)
     clients.each do |c|
       results << {
@@ -19,7 +18,6 @@ class SearchController < ApplicationController
       }
     end
 
-    # Buscar Propiedades
     properties = Property.search(query).limit(5)
     properties.each do |p|
       results << {
@@ -31,7 +29,6 @@ class SearchController < ApplicationController
       }
     end
 
-    # Buscar Reservas (por nombre de cliente)
     reservations = Reservation.joins(:property).where("client_name ILIKE ?", "%#{query}%").limit(5)
     reservations.each do |r|
       results << {
@@ -43,7 +40,6 @@ class SearchController < ApplicationController
       }
     end
 
-    # Buscar Usuarios (SOLO PARA ADMINS)
     if current_user.admin?
       users = User.where("email ILIKE ?", "%#{query}%").limit(5)
       users.each do |u|
