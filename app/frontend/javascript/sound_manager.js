@@ -28,7 +28,29 @@ export class SoundManager {
       case "click":
         this.#playClick()
         break
+      case "notification":
+        this.#playNotification()
+        break
     }
+  }
+
+  static #playNotification() {
+    const osc = this.ctx.createOscillator()
+    const gain = this.ctx.createGain()
+
+    osc.type = "sine"
+    osc.frequency.setValueAtTime(880, this.ctx.currentTime) // A5
+    osc.frequency.exponentialRampToValueAtTime(1320, this.ctx.currentTime + 0.1) // E6
+
+    gain.gain.setValueAtTime(0, this.ctx.currentTime)
+    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 0.02)
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2)
+
+    osc.connect(gain)
+    gain.connect(this.ctx.destination)
+
+    osc.start()
+    osc.stop(this.ctx.currentTime + 0.2)
   }
 
   static #playSuccess() {
