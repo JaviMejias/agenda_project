@@ -44,6 +44,7 @@ class Reservation < ApplicationRecord
   before_validation :sync_client_name
   before_validation :handle_blocked_reservation
   before_save :calculate_total_price
+  before_save :reset_status_if_details_changed
   after_commit :send_status_notifications, on: [ :create, :update ]
   after_commit :schedule_reminder_job, on: [ :create, :update ]
 
@@ -125,16 +126,12 @@ class Reservation < ApplicationRecord
   def no_overlapping_reservations
     return if property.blank? || start_time.blank? || end_time.blank?
 
-    # Base query: same property, not cancelled, not itself
-    # We include blocked status in the check
     scope = property.reservations.where.not(id: id).where.not(status: :cancelled)
 
     if property.per_day?
-      # Para reservas por día, cualquier solapamiento de fechas (mismo día) debe ser bloqueado
       overlapping = scope.where("CAST(start_time AS DATE) <= CAST(? AS DATE) AND CAST(end_time AS DATE) >= CAST(? AS DATE)",
                                 end_time, start_time).first
     else
-      # Para reservas por hora, el final de una puede ser el inicio de otra (no solapadas)
       overlapping = scope.where("start_time < ? AND end_time > ?", end_time, start_time).first
     end
 
@@ -167,9 +164,18 @@ class Reservation < ApplicationRecord
     end
   end
 
+  def reset_status_if_details_changed
+    return if status_changed?
+    return unless confirmed?
+
+    if start_time_changed? || end_time_changed?
+      self.status = :pending
+    end
+  end
+
   def send_status_notifications
     return if skip_notifications
-    return unless saved_change_to_status? || saved_change_to_id?
+    return unless saved_change_to_status? || saved_change_to_id? || saved_change_to_start_time? || saved_change_to_end_time?
     return if client.blank? || client.email.blank? || blocked?
 
     case status

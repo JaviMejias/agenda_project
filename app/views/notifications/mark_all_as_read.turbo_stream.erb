@@ -1,0 +1,9 @@
+<%= turbo_stream.update "notifications_list", html: render(current_user.notifications.ordered.limit(10)) %>
+<%= turbo_stream.replace "notifications_count" do %>
+  <span id="notifications_count" class="absolute top-1.5 right-1.5 flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-black text-white bg-red-500 rounded-full border-2 border-white dark:border-slate-900 hidden">
+    0
+  </span>
+<% end %>
+<% if controller_name == 'notifications' && action_name == 'mark_all_as_read' %>
+  <%= turbo_stream.update "notifications_full_list", html: render(current_user.notifications.ordered.limit(20)) %>
+<% end %>

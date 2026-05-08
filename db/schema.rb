@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_05_215550) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_08_103000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -62,6 +62,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_05_215550) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_companies_on_user_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "message"
+    t.bigint "notifiable_id", null: false
+    t.string "notifiable_type", null: false
+    t.datetime "read_at"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "properties", force: :cascade do |t|
@@ -241,6 +253,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_05_215550) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "clients", "users"
   add_foreign_key "companies", "users"
+  add_foreign_key "notifications", "users"
   add_foreign_key "properties", "companies"
   add_foreign_key "properties", "users"
   add_foreign_key "reservations", "clients"

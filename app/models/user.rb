@@ -22,6 +22,7 @@ class User < ApplicationRecord
   has_many :companies, dependent: :destroy
   has_many :clients, dependent: :destroy
   has_many :reservations, dependent: :destroy
+  has_many :notifications, dependent: :destroy
   has_many :reservations_through_properties, through: :properties, source: :reservations
 
   before_validation :sync_password_confirmation
