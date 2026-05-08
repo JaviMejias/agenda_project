@@ -9,19 +9,11 @@ export default class extends Controller {
   }
 
   connect() {
-    this.renderCharts()
-  }
-
-  incomeChartTargetConnected() {
-    this.renderIncomeChart()
-  }
-
-  occupancyChartTargetConnected() {
-    this.renderOccupancyChart()
+    setTimeout(() => this.renderCharts(), 100)
   }
 
   propertiesValueChanged() {
-    this.renderCharts()
+    setTimeout(() => this.renderCharts(), 50)
   }
 
   renderCharts() {
@@ -34,9 +26,8 @@ export default class extends Controller {
     if (this.incomeChart) this.incomeChart.destroy()
 
     const activeProperties = this.propertiesValue.filter(p => p.income > 0)
-    
+
     if (activeProperties.length === 0) {
-      // Opcional: Mostrar mensaje de "Sin datos" o limpiar canvas
       return
     }
 
@@ -51,7 +42,7 @@ export default class extends Controller {
         labels: labels,
         datasets: [{
           label: 'Ingresos ($)',
-          data: data,
+          data: data.map(() => 0),
           backgroundColor: colors,
           borderRadius: 8,
           borderWidth: 0,
@@ -61,22 +52,21 @@ export default class extends Controller {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
+        plugins: { legend: { display: false } },
         scales: {
-          y: {
-            beginAtZero: true,
-            grid: { color: 'rgba(156, 163, 175, 0.1)' },
-            ticks: { font: { weight: 'bold' } }
-          },
-          x: {
-            grid: { display: false },
-            ticks: { font: { weight: 'bold' } }
-          }
+          y: { beginAtZero: true }
+        },
+        animation: {
+          duration: 2000,
+          easing: 'easeOutQuart'
         }
       }
     })
+
+    setTimeout(() => {
+      this.incomeChart.data.datasets[0].data = data
+      this.incomeChart.update()
+    }, 150)
   }
 
   renderOccupancyChart() {
@@ -84,7 +74,7 @@ export default class extends Controller {
     if (this.occupancyChart) this.occupancyChart.destroy()
 
     const activeProperties = this.propertiesValue.filter(p => p.occupancy_rate > 0)
-    
+
     if (activeProperties.length === 0) return
 
     const ctx = this.occupancyChartTarget.getContext('2d')
@@ -97,28 +87,28 @@ export default class extends Controller {
       data: {
         labels: labels,
         datasets: [{
-          data: data,
+          data: data.map(() => 0),
           backgroundColor: colors,
-          borderWidth: 0,
-          hoverOffset: 10
+          borderWidth: 0
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: {
-              usePointStyle: true,
-              padding: 20,
-              font: { weight: 'bold', size: 11 }
-            }
-          }
-        },
-        cutout: '70%'
+        cutout: '70%',
+        animation: {
+          animateRotate: true,
+          animateScale: true,
+          duration: 1500,
+          easing: 'easeOutQuart'
+        }
       }
     })
+
+    setTimeout(() => {
+      this.occupancyChart.data.datasets[0].data = data
+      this.occupancyChart.update()
+    }, 150)
   }
 
   disconnect() {

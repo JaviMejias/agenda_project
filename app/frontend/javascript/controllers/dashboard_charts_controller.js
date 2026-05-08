@@ -10,31 +10,15 @@ export default class extends Controller {
   }
 
   connect() {
-    
-    if (this.revenueDatasetsValue.length > 0) {
-      this.renderCharts()
-    }
-  }
-
-  
-  statusChartTargetConnected() {
-    if (Object.keys(this.statusDataValue).length > 0) {
-      this.renderStatusChart()
-    }
-  }
-
-  revenueChartTargetConnected() {
-    if (this.revenueDatasetsValue.length > 0) {
-      this.renderRevenueChart()
-    }
+    setTimeout(() => this.renderCharts(), 100)
   }
 
   statusDataValueChanged() {
-    this.renderStatusChart()
+    setTimeout(() => this.renderStatusChart(), 100)
   }
 
   revenueDatasetsValueChanged() {
-    this.renderRevenueChart()
+    setTimeout(() => this.renderRevenueChart(), 100)
   }
 
   renderCharts() {
@@ -48,44 +32,40 @@ export default class extends Controller {
 
     const ctx = this.statusChartTarget.getContext('2d')
     const data = this.statusDataValue
-    
-    
+
+
     const labels = Object.keys(data).map(k => {
       const translations = { pending: 'Pendiente', confirmed: 'Confirmada', cancelled: 'Cancelada' }
       return translations[k] || k
     })
-    const colors = Object.keys(data).map(k => {
-      const map = { pending: '#f59e0b', confirmed: '#10b981', cancelled: '#ef4444' }
-      return map[k] || '#6366f1'
-    })
+    const map = { pending: '#f59e0b', confirmed: '#10b981', cancelled: '#ef4444' }
+    const colors = Object.keys(data).map(k => map[k] || '#6366f1')
 
     this.statusChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: labels,
         datasets: [{
-          data: Object.values(data),
+          data: Object.values(data).map(() => 0),
           backgroundColor: colors,
-          borderWidth: 0,
-          hoverOffset: 10
+          borderWidth: 0
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              usePointStyle: true,
-              padding: 20,
-              font: { weight: 'bold', size: 10 }
-            }
-          }
-        },
-        cutout: '70%'
+        animation: {
+          duration: 2000,
+          animateRotate: true,
+          animateScale: true
+        }
       }
     })
+
+    setTimeout(() => {
+      this.statusChart.data.datasets[0].data = Object.values(data)
+      this.statusChart.update()
+    }, 100)
   }
 
   renderRevenueChart() {
@@ -97,10 +77,10 @@ export default class extends Controller {
     const datasetsRaw = this.revenueDatasetsValue
 
     const datasets = datasetsRaw.map(ds => {
-      
+
       const gradient = ctx.createLinearGradient(0, 0, 0, 400)
-      gradient.addColorStop(0, `${ds.color}33`) 
-      gradient.addColorStop(1, `${ds.color}00`) 
+      gradient.addColorStop(0, `${ds.color}33`)
+      gradient.addColorStop(1, `${ds.color}00`)
 
       return {
         label: ds.label,
@@ -122,51 +102,27 @@ export default class extends Controller {
       type: 'line',
       data: {
         labels: labels,
-        datasets: datasets
+        datasets: datasets.map(ds => ({ ...ds, data: ds.data.map(() => 0) })) // Empezamos en cero
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: {
-          mode: 'index',
-          intersect: false,
-        },
-        plugins: {
-          legend: {
-            position: 'top',
-            align: 'end',
-            labels: {
-              usePointStyle: true,
-              padding: 15,
-              font: { weight: 'bold', size: 10 }
-            }
-          },
-          tooltip: {
-            backgroundColor: '#1e1b4b',
-            padding: 12,
-            titleFont: { size: 14, weight: 'bold' },
-            bodyFont: { size: 12 },
-            callbacks: {
-              label: (context) => `${context.dataset.label}: $${context.parsed.y.toLocaleString('es-CL')}`
-            }
-          }
+        animation: {
+          duration: 2000,
+          easing: 'easeOutQuart'
         },
         scales: {
-          y: {
-            beginAtZero: true,
-            grid: { color: 'rgba(0, 0, 0, 0.03)' },
-            ticks: {
-              callback: (value) => '$' + value.toLocaleString('es-CL'),
-              font: { size: 10, weight: 'bold' }
-            }
-          },
-          x: {
-            grid: { display: false },
-            ticks: { font: { size: 10, weight: 'bold' } }
-          }
+          y: { beginAtZero: true }
         }
       }
     })
+
+    setTimeout(() => {
+      this.revenueChart.data.datasets.forEach((ds, i) => {
+        ds.data = datasets[i].data
+      })
+      this.revenueChart.update()
+    }, 150)
   }
 
   disconnect() {
