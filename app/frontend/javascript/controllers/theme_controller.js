@@ -20,7 +20,7 @@ export default class extends Controller {
   }
 
   applyTheme() {
-    const theme = localStorage.getItem("theme") || "system"
+    const theme = localStorage.getItem("theme") || "dark"
     const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
 
     if (theme === "dark" || (theme === "system" && systemPrefersDark)) {
