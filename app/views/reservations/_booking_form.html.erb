@@ -13,7 +13,14 @@
       <h3 class="text-lg font-black text-gray-900 dark:text-white">Nueva Reserva</h3>
     </div>
 
-    <%= form_with(model: [property, reservation], class: "space-y-5", id: "booking-form", data: { controller: "booking-toggle" }) do |f| %>
+    <%= form_with(model: [property, reservation], 
+                  class: "space-y-5", 
+                  id: "booking-form", 
+                  data: { 
+                    controller: "booking-toggle",
+                    action: "validation:check->booking-toggle#handleValidationCheck"
+                  }) do |f| %>
+      
       <% if reservation.errors.any? %>
         <div class="p-4 mb-4 text-sm text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 animate-shake">
           <h2 class="font-black uppercase tracking-widest text-[10px] mb-2 flex items-center gap-2">
@@ -55,9 +62,16 @@
           <% end %>
         </div>
         <%= f.select :client_id, 
-            (reservation.client ? [[reservation.client.name, reservation.client.id]] : []), 
+            (reservation.client ? [[reservation.client.name, reservation.client.id, { 'data-rut': reservation.client.rut }]] : []), 
             { include_blank: "Buscar cliente..." }, 
-            { data: { client_select_target: "select" }, class: "w-full px-4 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm" } %>
+            { 
+              data: { 
+                client_select_target: "select",
+                booking_toggle_target: "clientId",
+                action: "change->booking-toggle#checkValidation"
+              }, 
+              class: "w-full" 
+            } %>
       </div>
 
       <%= f.hidden_field :start_time, data: { fullcalendar_target: "startInput" } %>
@@ -72,8 +86,8 @@
               booking_toggle_target: "submitButton",
               disable_with: "Procesando..." 
             } %>
-        <p class="mt-4 text-[10px] text-gray-400 dark:text-slate-500 text-center font-medium">
-          <i class="fa-solid fa-circle-info mr-1"></i> Selecciona las fechas en el calendario para habilitar el botón
+        <p class="mt-4 text-[10px] text-gray-400 dark:text-slate-500 text-center font-medium leading-relaxed">
+          <i class="fa-solid fa-circle-info mr-1"></i> Selecciona fechas <span data-booking-toggle-target="clientSection">y un cliente</span> para habilitar el botón.
         </p>
       </div>
     <% end %>

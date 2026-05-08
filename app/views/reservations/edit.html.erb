@@ -1,91 +1,138 @@
 <% content_for :title, "Editar Reserva" %>
 
-<div class="mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<%
+  property = @reservation.property
+  is_per_hour = property.per_hour?
+  events_url = reservations_path(property_id: property.id, format: :json, exclude_id: @reservation.id)
+  initial_start = @reservation.start_time.iso8601
+  initial_end = @reservation.end_time.iso8601
+  default_view = is_per_hour ? 'timeGridWeek' : 'dayGridMonth'
+%>
+
+<div class="mx-auto px-4 sm:px-6 lg:px-8 py-8"
+     data-controller="fullcalendar" 
+     data-fullcalendar-mode-value="booking" 
+     data-fullcalendar-per-hour-value="<%= is_per_hour %>" 
+     data-fullcalendar-base-price-value="<%= property.base_price %>"
+     data-fullcalendar-events-url-value="<%= events_url %>"
+     data-fullcalendar-initial-start-value="<%= initial_start %>"
+     data-fullcalendar-initial-end-value="<%= initial_end %>"
+     data-fullcalendar-default-view-value="<%= default_view %>">
   
-  <div class="mb-8">
+  <div class="mb-6">
     <% back_path = params[:from] == 'list' ? list_reservations_path : reservations_path %>
     <%= link_to back_path, class: "group inline-flex items-center text-sm font-bold text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" do %>
-      <div class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-md border border-gray-100 dark:border-slate-700 flex items-center justify-center mr-3 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:border-indigo-200 transition-all group-hover:-translate-x-1">
+      <div class="w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center mr-3 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:border-indigo-200 transition-all group-hover:-translate-x-1">
         <i class="fa-solid fa-arrow-left text-[10px]"></i>
       </div>
       Volver <%= params[:from] == 'list' ? 'al listado' : 'a la agenda' %>
     <% end %>
   </div>
 
-  <div class="bg-white dark:bg-slate-900 shadow-2xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 animate-fade-in-up">
+  <div class="bg-white dark:bg-slate-900 shadow-xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 mb-8 animate-fade-in-up">
     
-    <!-- Light Header Style -->
+    <!-- Header -->
     <div class="relative p-6 sm:p-10 bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border-b border-indigo-100 dark:border-slate-800 overflow-hidden">
       <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
       
-      <div class="relative z-10 flex items-center gap-4">
-        <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-3xl">
-          <i class="fa-solid fa-pen-to-square"></i>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-3xl">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </div>
+          <div>
+            <h3 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">Modificar Reserva</h3>
+            <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest opacity-80">Reserva #<%= @reservation.id %> • <%= property.name %></p>
+          </div>
         </div>
-        <div>
-          <h3 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">Modificar Reserva</h3>
-          <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest opacity-80">Reserva #<%= @reservation.id %> • <%= @reservation.property.name %></p>
+
+        <div class="flex items-center gap-3 relative z-10">
+          <span class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest <%= @reservation.status_color_classes %>">
+            Estado Actual: <%= @reservation.status_text %>
+          </span>
         </div>
       </div>
     </div>
 
-    <div class="p-6 py-10 sm:p-12">
-      <%= form_with(model: @reservation, class: "space-y-10") do |form| %>
+    <div class="p-6 sm:p-10">
+      <%= form_with(model: @reservation) do |form| %>
         <%= hidden_field_tag :from, params[:from] %>
+        <%= form.hidden_field :status %>
         
         <% if @reservation.errors.any? %>
-          <div class="p-6 text-sm text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 flex items-start shadow-sm mb-8">
-            <i class="fa-solid fa-circle-exclamation mt-1 mr-4 text-red-500 text-xl"></i>
-            <div>
-              <h2 class="font-black text-lg mb-1">¡Ups! Hay errores:</h2>
-              <ul class="list-disc pl-5 mt-1 space-y-1 font-medium">
-                <% @reservation.errors.full_messages.each do |message| %>
-                  <li><%= message %></li>
-                <% end %>
-              </ul>
-            </div>
+          <div class="p-4 mb-6 text-sm text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 animate-shake">
+            <h2 class="font-black uppercase tracking-widest text-[10px] mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-circle-exclamation"></i> Error al guardar
+            </h2>
+            <ul class="list-disc pl-5 space-y-1 font-bold text-xs">
+              <% @reservation.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
           </div>
         <% end %>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-          <div>
-            <%= form.label :client_name, class: "block text-sm font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4 ml-2" do %>
-              <i class="fa-regular fa-user mr-2"></i> Nombre del Cliente
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- Calendar Column -->
+          <div class="lg:w-7/12">
+            <%= render "shared/calendar_container", 
+                       property: property, 
+                       mode: 'booking', 
+                       omit_controller: true do %>
+              <!-- Inputs ocultos para Stimulus -->
+              <input type="hidden" name="reservation[start_time]" value="<%= initial_start %>" data-fullcalendar-target="startInput" required>
+              <input type="hidden" name="reservation[end_time]" value="<%= initial_end %>" data-fullcalendar-target="endInput" required>
             <% end %>
-            <%= form.text_field :client_name, required: true, class: "block w-full rounded-2xl border-gray-100 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg px-6 py-4 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 dark:text-white transition-all font-bold placeholder-gray-300 dark:placeholder:text-slate-600", placeholder: "Ej. Javier Mejías" %>
           </div>
 
-          <div>
-            <%= form.label :status, class: "block text-sm font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4 ml-2" do %>
-              <i class="fa-solid fa-circle-info mr-2"></i> Estado de la Reserva
-            <% end %>
-            <%= form.select :status, Reservation.selectable_statuses.map { |s| [I18n.t("enums.reservation.status.#{s}"), s] }, {}, class: "block w-full rounded-2xl border-gray-100 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg px-6 py-4 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 dark:text-white transition-all font-bold cursor-pointer" %>
-          </div>
-        </div>
+          <!-- Form Column (Sticky like show properties) -->
+          <div class="lg:w-5/12">
+            <div class="sticky top-6 space-y-6">
+              
+              <!-- Summary of Selection -->
+              <%= render "reservations/selection_summary", previous_reservation: @reservation %>
 
-        <div class="mb-12">
-          <%= render "shared/calendar_container", 
-                     property: @reservation.property, 
-                     mode: 'booking', 
-                     events_url: reservations_path(property_id: @reservation.property.id, format: :json, exclude_id: @reservation.id),
-                     initial_start: @reservation.start_time.iso8601,
-                     initial_end: @reservation.end_time.iso8601 do %>
-            <%= render "reservations/selection_summary" %>
-          <% end %>
-        </div>
+              <!-- Client Section -->
+              <div class="bg-gray-50 dark:bg-slate-800/50 rounded-3xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800 shadow-inner">
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-solid fa-user-edit"></i>
+                  </div>
+                  <h3 class="text-lg font-black text-gray-900 dark:text-white">Datos de la Reserva</h3>
+                </div>
 
-        <div class="pt-8 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-start gap-8">
-          <%= link_to reservation_path(@reservation), class: "group inline-flex items-center text-sm font-bold text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all" do %>
-            <div class="w-9 h-9 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-center mr-3 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:border-indigo-200 transition-all group-hover:-translate-x-1">
-              <i class="fa-solid fa-arrow-left text-xs"></i>
+                <div class="space-y-6" data-controller="client-select" data-client-select-url-value="<%= list_clients_path %>">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <%= form.label :client_id, "Cliente", class: "text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" %>
+                      <%= link_to new_client_path, class: "text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline flex items-center gap-1", target: "_blank" do %>
+                        <i class="fa-solid fa-plus-circle text-[8px]"></i> Nuevo
+                      <% end %>
+                    </div>
+                    <%= form.select :client_id, 
+                        (@reservation.client ? [[@reservation.client.name, @reservation.client.id, { 'data-data': { id: @reservation.client.id, name: @reservation.client.name, rut: @reservation.client.rut }.to_json, 'data-rut': @reservation.client.rut }]] : []), 
+                        { include_blank: "Buscar cliente..." }, 
+                        { data: { client_select_target: "select" }, class: "w-full" } %>
+                  </div>
+
+                  <div class="pt-4">
+                    <%= form.button type: "submit", 
+                        class: "w-full py-4 bg-gray-900 dark:bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black dark:hover:bg-indigo-500 transition-all shadow-xl shadow-gray-200 dark:shadow-none hover:-translate-y-1 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+                        data: { 
+                          fullcalendar_target: "submitButton",
+                          disable_with: "Guardando..." 
+                        } do %>
+                      <i class="fa-solid fa-floppy-disk mr-2"></i> Guardar Cambios
+                    <% end %>
+                    <p class="mt-4 text-[10px] text-gray-400 dark:text-slate-500 text-center font-medium leading-relaxed">
+                      <i class="fa-solid fa-circle-info mr-1"></i> Se enviará una notificación al cliente si hay cambios en las fechas o el estado.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
             </div>
-            Volver sin guardar
-          <% end %>
-
-          <%= form.button type: "submit", class: "w-full sm:w-auto sm:min-w-[200px] flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transform hover:-translate-y-1 transition-all duration-300" do %>
-            <i class="fa-solid fa-floppy-disk mr-2"></i>
-            <span>Guardar Cambios</span>
-          <% end %>
+          </div>
         </div>
       <% end %>
     </div>

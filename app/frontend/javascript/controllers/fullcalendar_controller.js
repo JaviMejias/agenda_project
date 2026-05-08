@@ -232,8 +232,9 @@ export default class extends Controller {
     this.initJumpDatePicker()
 
     if (initialStart && initialEnd) {
-      // Goto the initial date
+      // Goto and select the initial date
       this.calendar.gotoDate(initialStart)
+      this.calendar.select(initialStart, initialEnd)
       
       if (!this.startInputTarget.value) this.startInputTarget.value = initialStart
       if (!this.endInputTarget.value) this.endInputTarget.value = initialEnd
@@ -270,6 +271,9 @@ export default class extends Controller {
   toggleSubmitButton() {
     if (this.hasSubmitButtonTarget) {
       this.submitButtonTarget.disabled = !(this.startInputTarget.value && this.endInputTarget.value)
+      
+      // Notify other controllers that validation might need to be re-run
+      this.submitButtonTarget.dispatchEvent(new CustomEvent("validation:check", { bubbles: true }))
     }
   }
 

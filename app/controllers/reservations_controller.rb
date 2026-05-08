@@ -80,9 +80,8 @@ class ReservationsController < ApplicationController
     @reservation.user = current_user
     @reservation.status ||= :pending
 
-    # Blindaje contra concurrencia: Bloqueamos la propiedad durante la transacción
     Property.transaction do
-      @property.lock! # Bloqueo pesimista a nivel de base de datos
+      @property.lock!
       
       respond_to do |format|
         if @reservation.save
@@ -98,8 +97,8 @@ class ReservationsController < ApplicationController
         else
           format.turbo_stream do
             render turbo_stream: [
-              turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "alert", message: "No se pudo crear la reserva. Revisa los errores del formulario." }),
-              turbo_stream.replace("reservation_form_container", partial: "reservations/booking_form", locals: { property: @property, reservation: @reservation })
+              turbo_stream.replace("calendar_wrapper_#{@property.id}", template: "properties/show"),
+              turbo_stream.prepend("flash-container", partial: "shared/flash_message", locals: { type: "alert", message: "No se pudo crear la reserva. Revisa los errores del formulario." })
             ]
           end
           format.html { render template: "properties/show", status: :unprocessable_entity }
@@ -111,6 +110,7 @@ class ReservationsController < ApplicationController
 
   def update
     authorize @reservation
+    @property = @reservation.property
     Property.transaction do
       @property.lock!
       respond_to do |format|

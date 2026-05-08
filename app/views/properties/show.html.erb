@@ -1,10 +1,12 @@
 <% content_for :title, @property.name %>
 
-<div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in"
+<div id="calendar_wrapper_<%= @property.id %>" class="mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in"
      data-controller="fullcalendar"
      data-fullcalendar-mode-value="booking"
      data-fullcalendar-per-hour-value="<%= @property.per_hour? %>"
      data-fullcalendar-base-price-value="<%= @property.base_price %>"
+     data-fullcalendar-initial-start-value="<%= @reservation&.start_time&.iso8601 %>"
+     data-fullcalendar-initial-end-value="<%= @reservation&.end_time&.iso8601 %>"
      data-fullcalendar-events-url-value="<%= reservations_path(property_id: @property.id, format: :json) %>">
   
   <div class="mb-6">
@@ -17,7 +19,7 @@
   </div>
 
   <div class="bg-white dark:bg-slate-900 shadow-xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 mb-8 animate-fade-in-up">
-    <!-- Light Header Style -->
+    <!-- Header -->
     <div class="relative p-6 sm:p-10 bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border-b border-indigo-100 dark:border-slate-800 overflow-hidden">
       <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
       
@@ -63,14 +65,15 @@
           <% end %>
 
           <div class="flex items-center gap-6 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-4 rounded-2xl border border-indigo-100 dark:border-slate-700 shadow-sm">
-          <div class="text-left sm:text-right">
-            <dt class="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> Modelo</dt>
-            <dd class="text-sm font-black text-gray-900 dark:text-white"><%= @property.per_day? ? "Por Día" : "Por Hora" %></dd>
-          </div>
-          <div class="hidden sm:block w-px h-10 bg-indigo-100 dark:bg-slate-700"></div>
-          <div class="text-left sm:text-right">
-            <dt class="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1"><i class="fa-solid fa-tag mr-1"></i> Precio</dt>
-            <dd class="text-sm font-black text-gray-900 dark:text-white">$<%= number_with_delimiter(@property.base_price.to_i, delimiter: ".") %></dd>
+            <div class="text-left sm:text-right">
+              <dt class="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> Modelo</dt>
+              <dd class="text-sm font-black text-gray-900 dark:text-white"><%= @property.per_day? ? "Por Día" : "Por Hora" %></dd>
+            </div>
+            <div class="hidden sm:block w-px h-10 bg-indigo-100 dark:bg-slate-700"></div>
+            <div class="text-left sm:text-right">
+              <dt class="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1"><i class="fa-solid fa-tag mr-1"></i> Precio</dt>
+              <dd class="text-sm font-black text-gray-900 dark:text-white">$<%= number_with_delimiter(@property.base_price.to_i, delimiter: ".") %></dd>
+            </div>
           </div>
         </div>
       </div>
