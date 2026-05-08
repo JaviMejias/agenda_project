@@ -50,13 +50,13 @@ export default class extends Controller {
 
   initDashboard() {
     const el = this.hasCalendarTarget ? this.calendarTarget : this.element
-    
+
     el.innerHTML = ''
-    
+
     this.calendar = new Calendar(el, {
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
       initialView: this.defaultViewValue || (this.isMobile ? 'timeGridDay' : 'timeGridWeek'),
-      headerToolbar: false, 
+      headerToolbar: false,
       datesSet: (info) => {
         if (this.hasTitleTarget) this.titleTarget.innerText = info.view.title
         this.updateList(info.view.currentStart.toISOString(), info.view.currentEnd.toISOString(), info.view.type)
@@ -99,8 +99,8 @@ export default class extends Controller {
       }
     })
     this.calendar.render()
-    
-    
+
+
     this.updateTabStyles('btn-agenda-header')
     const viewId = this.getViewId(this.calendar.view.type)
     this.updateTabStyles(viewId)
@@ -110,16 +110,16 @@ export default class extends Controller {
 
   initBooking() {
     const el = this.hasCalendarTarget ? this.calendarTarget : this.element
-    
+
     el.innerHTML = ''
-    
+
     const initialStart = this.initialStartValue ? (this.perHourValue ? this.initialStartValue : this.initialStartValue.substring(0, 10)) : null
     const initialEnd = this.initialEndValue ? (this.perHourValue ? this.initialEndValue : this.initialEndValue.substring(0, 10)) : null
 
     this.calendar = new Calendar(el, {
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
       initialView: this.defaultViewValue || (this.perHourValue ? (this.isMobile ? 'timeGridDay' : 'timeGridWeek') : 'dayGridMonth'),
-      headerToolbar: false, 
+      headerToolbar: false,
       datesSet: (info) => {
         if (this.hasTitleTarget) this.titleTarget.innerText = info.view.title
         this.updateList(info.view.currentStart.toISOString(), info.view.currentEnd.toISOString(), info.view.type)
@@ -134,6 +134,7 @@ export default class extends Controller {
       selectable: true,
       selectMirror: true,
       unselectAuto: false,
+      editable: true, // Permitimos mover y redimensionar
       longPressDelay: 100,
       eventOverlap: false,
       slotMinTime: '08:00:00',
@@ -186,13 +187,15 @@ export default class extends Controller {
           }
         }
       },
+      eventDrop: (info) => this.handleEventChange(info),
+      eventResize: (info) => this.handleEventChange(info),
       select: (info) => {
         let startStr = info.startStr
         let endStr = info.endStr
 
-        
-        
-        
+
+
+
         if (startStr.length === 10) startStr += 'T00:00:00'
         if (endStr.length === 10) endStr += 'T00:00:00'
 
@@ -200,13 +203,13 @@ export default class extends Controller {
         this.endInputTarget.value = endStr
         this.updatePreview(startStr, endStr)
 
-        
+
         if (!this.perHourValue) {
-          
+
           const manualEndDate = new Date(endStr.substring(0, 10) + 'T12:00:00')
           manualEndDate.setDate(manualEndDate.getDate() - 1)
           const manualEndStr = manualEndDate.toISOString().substring(0, 10)
-          
+
           if (this.manualStartPicker) this.manualStartPicker.setDate(startStr, false)
           if (this.manualEndPicker) this.manualEndPicker.setDate(manualEndStr, false)
         } else {
@@ -224,8 +227,8 @@ export default class extends Controller {
     })
 
     this.calendar.render()
-    
-    
+
+
     const viewId = this.getViewId(this.calendar.view.type)
     this.updateTabStyles(viewId)
 
@@ -235,7 +238,7 @@ export default class extends Controller {
       // Goto and select the initial date
       this.calendar.gotoDate(initialStart)
       this.calendar.select(initialStart, initialEnd)
-      
+
       if (!this.startInputTarget.value) this.startInputTarget.value = initialStart
       if (!this.endInputTarget.value) this.endInputTarget.value = initialEnd
       this.updatePreview(this.startInputTarget.value, this.endInputTarget.value)
@@ -246,6 +249,19 @@ export default class extends Controller {
     if (this.isMobile) {
       this.injectManualInputs(el)
     }
+  }
+
+  handleEventChange(info) {
+    let startStr = info.event.startStr
+    let endStr = info.event.endStr || startStr
+
+    // Si es por día, FullCalendar a veces no incluye la T00:00:00
+    if (startStr.length === 10) startStr += 'T00:00:00'
+    if (endStr.length === 10) endStr += 'T00:00:00'
+
+    this.startInputTarget.value = startStr
+    this.endInputTarget.value = endStr
+    this.updatePreview(startStr, endStr)
   }
 
   updatePreview(startStr, endStr) {
@@ -271,7 +287,7 @@ export default class extends Controller {
   toggleSubmitButton() {
     if (this.hasSubmitButtonTarget) {
       this.submitButtonTarget.disabled = !(this.startInputTarget.value && this.endInputTarget.value)
-      
+
       // Notify other controllers that validation might need to be re-run
       this.submitButtonTarget.dispatchEvent(new CustomEvent("validation:check", { bubbles: true }))
     }
@@ -294,7 +310,7 @@ export default class extends Controller {
     }
   }
 
-  
+
   injectManualInputs(calendarEl) {
     const container = calendarEl.parentElement
     if (!container) return
@@ -310,25 +326,25 @@ export default class extends Controller {
     const grid = document.createElement('div')
     grid.className = 'grid grid-cols-2 gap-3'
 
-    
+
     const startWrap = document.createElement('div')
     const startLabel = document.createElement('label')
     startLabel.className = 'block text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1'
     startLabel.textContent = 'Desde'
     this.manualStartInput = document.createElement('input')
-    this.manualStartInput.type = 'text' 
+    this.manualStartInput.type = 'text'
     this.manualStartInput.placeholder = 'Seleccionar...'
     this.manualStartInput.className = 'w-full px-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer'
     startWrap.appendChild(startLabel)
     startWrap.appendChild(this.manualStartInput)
 
-    
+
     const endWrap = document.createElement('div')
     const endLabel = document.createElement('label')
     endLabel.className = 'block text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1'
     endLabel.textContent = 'Hasta'
     this.manualEndInput = document.createElement('input')
-    this.manualEndInput.type = 'text' 
+    this.manualEndInput.type = 'text'
     this.manualEndInput.placeholder = 'Seleccionar...'
     this.manualEndInput.className = 'w-full px-3 py-2.5 border border-gray-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer'
     endWrap.appendChild(endLabel)
@@ -337,14 +353,14 @@ export default class extends Controller {
     grid.appendChild(startWrap)
     grid.appendChild(endWrap)
 
-    
+
     Promise.all([
       import('flatpickr'),
       import('flatpickr/dist/l10n/es.js')
     ]).then(([fpModule, locModule]) => {
       const flatpickr = fpModule.default
       const esLocale = locModule.default.es || locModule.Spanish
-      
+
       const config = {
         locale: esLocale,
         enableTime: this.perHourValue,
@@ -361,18 +377,18 @@ export default class extends Controller {
 
           if (startVal && endVal) {
             try {
-              
+
               let finalEndVal = endVal
               if (!this.perHourValue) {
-                
+
                 const cleanEnd = endVal.substring(0, 10)
                 const endDate = new Date(cleanEnd + 'T12:00:00')
-                
+
                 if (!isNaN(endDate.getTime())) {
                   endDate.setDate(endDate.getDate() + 1)
                   finalEndVal = endDate.toISOString().substring(0, 10) + 'T00:00:00'
                 }
-                
+
                 if (startVal.length === 10) startVal += 'T00:00:00'
               }
 
@@ -380,7 +396,7 @@ export default class extends Controller {
               this.endInputTarget.value = finalEndVal
               this.updatePreview(startVal, finalEndVal)
 
-              
+
               this.calendar.gotoDate(startVal)
               this.calendar.select(startVal, finalEndVal)
             } catch (e) {
@@ -394,7 +410,7 @@ export default class extends Controller {
       this.manualEndPicker = flatpickr(this.manualEndInput, config)
     })
 
-    
+
     if (this.hasInitialStartValue && this.initialStartValue) {
       const val = this.initialStartValue.substring(0, 16) || this.initialStartValue.substring(0, 10)
       this.manualStartInput.value = val
@@ -406,27 +422,27 @@ export default class extends Controller {
 
     wrapper.appendChild(title)
     wrapper.appendChild(grid)
-    
+
     container.insertBefore(wrapper, container.firstChild)
   }
 
-  
+
   formatDateDisplay(dateStr, isEnd = false) {
     if (!dateStr) return "---"
-    
-    
+
+
     let date
     if (dateStr.includes('T')) {
       date = new Date(dateStr)
     } else {
-      
+
       const [year, month, day] = dateStr.split('-').map(Number)
       date = new Date(year, month - 1, day)
     }
-    
+
     if (isNaN(date.getTime())) return "Fecha inválida"
 
-    
+
     if (!this.perHourValue && isEnd) {
       date.setDate(date.getDate() - 1)
     }
@@ -477,7 +493,7 @@ export default class extends Controller {
         disableMobile: true,
         monthSelectorType: 'static',
         yearSelectorType: 'static',
-        static: true, 
+        static: true,
         onChange: (selectedDates) => {
           if (selectedDates.length > 0 && this.calendar) {
             this.calendar.gotoDate(selectedDates[0])
@@ -496,24 +512,24 @@ export default class extends Controller {
   changeView(event) {
     const view = event.currentTarget.dataset.view
     this.calendar.changeView(view)
-    
+
     if (this.hasCalendarViewTarget) this.calendarViewTarget.classList.remove('view-hidden')
     if (this.hasListViewTarget) this.listViewTarget.classList.add('view-hidden')
-    
+
     const calHeader = document.getElementById('calendar-header-container')
     if (calHeader) calHeader.classList.remove('hidden')
-    
+
     this.updateTabStyles(event.currentTarget.id)
 
-    
+
     this._setViewParam('')
   }
 
   showList(event) {
-    
+
   }
 
-  
+
   _setViewParam(value) {
     const url = new URL(window.location)
     if (value) {
@@ -525,7 +541,7 @@ export default class extends Controller {
   }
 
   getViewId(viewType) {
-    switch(viewType) {
+    switch (viewType) {
       case 'dayGridMonth': return this.modeValue === 'dashboard' ? 'btn-month' : 'btn-month-cal'
       case 'timeGridWeek': return this.modeValue === 'dashboard' ? 'btn-week' : 'btn-week-cal'
       case 'timeGridDay': return this.modeValue === 'dashboard' ? 'btn-day' : 'btn-day-cal'
@@ -535,11 +551,11 @@ export default class extends Controller {
 
   updateTabStyles(activeId) {
     const ids = [
-      'btn-month', 'btn-week', 'btn-day', 'btn-list', 
+      'btn-month', 'btn-week', 'btn-day', 'btn-list',
       'btn-month-cal', 'btn-week-cal', 'btn-day-cal',
       'btn-agenda-header', 'btn-list-header'
     ]
-    
+
     ids.forEach(id => {
       const btn = document.getElementById(id)
       if (!btn) return
@@ -547,13 +563,13 @@ export default class extends Controller {
       if (id === activeId) {
         btn.classList.add('tab-active')
       } else {
-        
-        
+
+
         const isHeaderBtn = id === 'btn-agenda-header' || id === 'btn-list-header'
         const activatingCalendarView = activeId && (activeId.includes('month') || activeId.includes('week') || activeId.includes('day'))
-        
+
         if (id === 'btn-agenda-header' && activatingCalendarView) {
-          
+
         } else {
           btn.classList.remove('tab-active')
         }
@@ -563,7 +579,7 @@ export default class extends Controller {
 
   updateList(start, end, viewType = '') {
     if (this.modeValue !== 'dashboard') return
-    
+
     const frame = document.getElementById('reservations_list_frame')
     if (frame) {
       frame.src = `/reservations/calendar_list?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&view_type=${viewType}`

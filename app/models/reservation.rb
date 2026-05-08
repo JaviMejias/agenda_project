@@ -175,7 +175,8 @@ class Reservation < ApplicationRecord
 
   def send_status_notifications
     return if skip_notifications
-    return unless saved_change_to_status? || saved_change_to_id? || saved_change_to_start_time? || saved_change_to_end_time?
+    return unless saved_change_to_status? || saved_change_to_id? || saved_change_to_start_time? || 
+                  saved_change_to_end_time? || saved_change_to_client_id?
     return if client.blank? || client.email.blank? || blocked?
 
     case status

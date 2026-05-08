@@ -57,7 +57,6 @@
     <div class="p-6 sm:p-10">
       <%= form_with(model: @reservation) do |form| %>
         <%= hidden_field_tag :from, params[:from] %>
-        <%= form.hidden_field :status %>
         
         <% if @reservation.errors.any? %>
           <div class="p-4 mb-6 text-sm text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 animate-shake">
@@ -78,10 +77,11 @@
             <%= render "shared/calendar_container", 
                        property: property, 
                        mode: 'booking', 
-                       omit_controller: true do %>
+                       omit_controller: true,
+                       omit_inputs: true do %>
               <!-- Inputs ocultos para Stimulus -->
-              <input type="hidden" name="reservation[start_time]" value="<%= initial_start %>" data-fullcalendar-target="startInput" required>
-              <input type="hidden" name="reservation[end_time]" value="<%= initial_end %>" data-fullcalendar-target="endInput" required>
+              <%= form.hidden_field :start_time, value: initial_start, data: { fullcalendar_target: "startInput" } %>
+              <%= form.hidden_field :end_time, value: initial_end, data: { fullcalendar_target: "endInput" } %>
             <% end %>
           </div>
 
@@ -113,6 +113,11 @@
                         (@reservation.client ? [[@reservation.client.name, @reservation.client.id, { 'data-data': { id: @reservation.client.id, name: @reservation.client.name, rut: @reservation.client.rut }.to_json, 'data-rut': @reservation.client.rut }]] : []), 
                         { include_blank: "Buscar cliente..." }, 
                         { data: { client_select_target: "select" }, class: "w-full" } %>
+                  </div>
+
+                  <div>
+                    <%= form.label :status, "Estado de la Reserva", class: "text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" %>
+                    <%= form.select :status, Reservation.selectable_statuses.map { |s| [I18n.t("enums.reservation.status.#{s}"), s] }, {}, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-white dark:bg-slate-800 dark:text-white font-bold" %>
                   </div>
 
                   <div class="pt-4">

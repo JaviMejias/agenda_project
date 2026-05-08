@@ -23,7 +23,9 @@
           <div class="flex items-center gap-2">
             <i class="fa-solid fa-calendar-check text-[10px] text-amber-400"></i>
             <p class="text-xs font-bold text-amber-900 dark:text-amber-200">
-              <%= local_assigns[:previous_reservation].end_time.strftime(local_assigns[:previous_reservation].property.per_hour? ? "%d/%m/%Y %H:%M" : "%d/%m/%Y") %>
+              <% prev_res = local_assigns[:previous_reservation] %>
+              <% display_end = (prev_res.property.per_day? ? prev_res.end_time - 1.day : prev_res.end_time) %>
+              <%= display_end.strftime(prev_res.property.per_hour? ? "%d/%m/%Y %H:%M" : "%d/%m/%Y") %>
             </p>
           </div>
         </div>
