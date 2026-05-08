@@ -6,13 +6,6 @@
     <link rel="manifest" href="<%= pwa_manifest_path %>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker.register("<%= pwa_service_worker_path %>");
-        });
-      }
-    </script>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -30,23 +23,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <script>
-      (function() {
-        const theme = localStorage.getItem('theme') || 'dark';
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      })();
-    </script>
-
     <%= vite_client_tag %>
     <%= vite_stylesheet_tag "application.css", "data-turbo-track": "reload" %>
     <%= vite_javascript_tag "theme", "data-turbo-track": "reload" %>
     <%= vite_javascript_tag "application", "data-turbo-track": "reload" %>
-    
-  <body class="min-h-screen bg-white dark:bg-slate-950 text-gray-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white transition-colors duration-500" data-controller="omnibar">
+  </head>
+  <body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white transition-colors duration-500" data-controller="omnibar">
     <%= render "shared/navbar" if user_signed_in? %>
 
     <main class="<%= user_signed_in? ? '' : 'flex min-h-screen items-center justify-center px-4' %>">

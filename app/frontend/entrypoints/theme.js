@@ -1,13 +1,23 @@
 const applyTheme = () => {
-  const theme = localStorage.getItem('theme')
-  
-  // Default to 'dark' if no theme is set, otherwise check if explicitly 'dark'
-  if (theme === 'dark' || theme === null) {
-    document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
+  try {
+    const theme = localStorage.getItem('theme') || 'system';
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = theme === 'dark' || (theme === 'system' && systemPrefersDark);
+    
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
+      document.documentElement.style.backgroundColor = '#020617';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.colorScheme = 'light';
+      document.documentElement.style.backgroundColor = '';
+    }
+  } catch (e) {
+    document.documentElement.classList.add('dark');
   }
 }
 
-applyTheme()
-document.addEventListener('turbo:load', applyTheme)
+applyTheme();
+document.addEventListener('turbo:load', applyTheme);
+document.addEventListener('turbo:render', applyTheme);

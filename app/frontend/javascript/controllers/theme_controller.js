@@ -20,13 +20,16 @@ export default class extends Controller {
   }
 
   applyTheme() {
-    const theme = localStorage.getItem("theme") || "dark"
+    const theme = localStorage.getItem("theme") || "system"
     const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+    const isDark = theme === "dark" || (theme === "system" && systemPrefersDark)
 
-    if (theme === "dark" || (theme === "system" && systemPrefersDark)) {
+    if (isDark) {
       document.documentElement.classList.add("dark")
+      document.documentElement.style.colorScheme = "dark"
     } else {
       document.documentElement.classList.remove("dark")
+      document.documentElement.style.colorScheme = "light"
     }
 
     this.updateUI(theme)
