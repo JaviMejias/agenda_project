@@ -232,5 +232,4 @@ class Reservation < ApplicationRecord
 
     ReservationReminderJob.set(wait_until: start_time - 24.hours).perform_later(self)
   end
-
 end

@@ -20,7 +20,7 @@ class Company < ApplicationRecord
   def self.ordered
     order(name: :asc)
   end
-  
+
   def associate_properties(property_ids)
     return false if property_ids.blank?
     Property.where(id: property_ids).update_all(company_id: id)
