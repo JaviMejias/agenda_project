@@ -1,3 +1,39 @@
+<%
+  form_structure = [
+    { name: :name, label: "Nombre de la Propiedad", placeholder: "Ej: Casa de la Playa", type: :text_field, icon: "fa-solid fa-signature", col_span: "sm:col-span-2" },
+    { name: :description, label: "Descripción", placeholder: "Detalles adicionales...", type: :text_area, icon: "fa-solid fa-align-left", col_span: "sm:col-span-2", rows: 2 },
+    { name: :address, label: "Dirección de la Propiedad", placeholder: "Ej: Av. Principal 456, Sector Norte", type: :text_field, icon: "fa-solid fa-location-dot", col_span: "sm:col-span-2" },
+    (current_user.admin? ? { 
+      name: :company_id, 
+      label: "Empresa / Entidad Responsable", 
+      type: :collection_select, 
+      collection: Company.all, 
+      value_method: :id, 
+      text_method: :name, 
+      options: { include_blank: "Ninguna (Independiente)", selected: params[:company_id] || property.company_id }, 
+      icon: "fa-solid fa-building", 
+      col_span: "sm:col-span-2" 
+    } : nil),
+    { 
+      name: :pricing_model, 
+      label: "Modelo de Cobro", 
+      type: :select, 
+      options: [["Por Día", "per_day"], ["Por Hora", "per_hour"]], 
+      icon: "fa-solid fa-file-invoice" 
+    },
+    { 
+      name: :base_price, 
+      label: "Precio Base", 
+      type: :currency, 
+      icon: "fa-solid fa-tag",
+      placeholder: "0"
+    }
+  ].compact
+
+  input_class = "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white"
+  label_class = "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"
+%>
+
 <%= form_with(model: property, class: "space-y-6") do |form| %>
   <% if property.errors.any? %>
     <div class="p-4 mb-4 text-sm text-red-800 dark:text-red-400 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900">
@@ -11,54 +47,31 @@
   <% end %>
 
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-    <div class="sm:col-span-2">
-      <%= form.label :name, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
-        <i class="fa-solid fa-signature text-gray-400 dark:text-slate-500 mr-1"></i> Nombre de la Propiedad
-      <% end %>
-      <%= form.text_field :name, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white", placeholder: "Ej: Casa de la Playa" %>
-    </div>
-
-    <div class="sm:col-span-2">
-      <%= form.label :description, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
-        <i class="fa-solid fa-align-left text-gray-400 dark:text-slate-500 mr-1"></i> Descripción
-      <% end %>
-      <%= form.text_area :description, rows: 2, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white", placeholder: "Detalles adicionales..." %>
-    </div>
-
-    <div class="sm:col-span-2">
-      <%= form.label :address, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
-        <i class="fa-solid fa-location-dot text-gray-400 dark:text-slate-500 mr-1"></i> Dirección de la Propiedad
-      <% end %>
-      <%= form.text_field :address, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white", placeholder: "Ej: Av. Principal 456, Sector Norte" %>
-    </div>
-
-    <% if current_user.admin? %>
-      <div class="sm:col-span-2">
-        <%= form.label :company_id, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
-          <i class="fa-solid fa-building text-gray-400 dark:text-slate-500 mr-1"></i> Empresa / Entidad Responsable
+    <% form_structure.each do |field| %>
+      <div class="<%= field[:col_span] %>">
+        <%= form.label field[:name], class: label_class do %>
+          <i class="<%= field[:icon] %> text-gray-400 dark:text-slate-500 mr-1"></i> <%= field[:label] %>
         <% end %>
-        <%= form.collection_select :company_id, Company.all, :id, :name, { include_blank: "Ninguna (Independiente)", selected: params[:company_id] || property.company_id }, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white" %>
+
+        <% case field[:type] %>
+        <% when :collection_select %>
+          <%= form.collection_select field[:name], field[:collection], field[:value_method], field[:text_method], field[:options], class: input_class %>
+        <% when :select %>
+          <%= form.select field[:name], field[:options], {}, class: input_class %>
+        <% when :text_area %>
+          <%= form.text_area field[:name], rows: field[:rows], class: input_class, placeholder: field[:placeholder] %>
+        <% when :currency %>
+          <div class="relative mt-1 rounded-xl shadow-sm">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+              <span class="text-gray-500 dark:text-slate-400 sm:text-sm font-bold">$</span>
+            </div>
+            <%= form.text_field :base_price, value: property.base_price&.to_i, data: { controller: "currency", action: "input->currency#format" }, class: "#{input_class} pl-8", placeholder: field[:placeholder] %>
+          </div>
+        <% else %>
+          <%= form.send(field[:type], field[:name], class: input_class, placeholder: field[:placeholder] ) %>
+        <% end %>
       </div>
     <% end %>
-
-    <div>
-      <%= form.label :pricing_model, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
-        <i class="fa-solid fa-file-invoice text-gray-400 dark:text-slate-500 mr-1"></i> Modelo de Cobro
-      <% end %>
-      <%= form.select :pricing_model, [["Por Día", "per_day"], ["Por Hora", "per_hour"]], {}, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white" %>
-    </div>
-    
-    <div>
-      <%= form.label :base_price, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1" do %>
-        <i class="fa-solid fa-tag text-gray-400 dark:text-slate-500 mr-1"></i> Precio Base
-      <% end %>
-      <div class="relative mt-1 rounded-xl shadow-sm">
-        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-          <span class="text-gray-500 dark:text-slate-400 sm:text-sm font-bold">$</span>
-        </div>
-        <%= form.text_field :base_price, value: property.base_price&.to_i, data: { controller: "currency", action: "input->currency#format" }, class: "block w-full rounded-xl border-gray-300 dark:border-slate-700 pl-8 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white", placeholder: "0" %>
-      </div>
-    </div>
   </div>
 
   <div data-controller="color-picker">
@@ -80,28 +93,7 @@
       <%= form.hidden_field :color, data: { color_picker_target: "input" } %>
       
       <div class="flex flex-wrap gap-3">
-        <% [
-          { bg: 'bg-indigo-600', hex: '#4f46e5' },
-          { bg: 'bg-blue-600', hex: '#2563eb' },
-          { bg: 'bg-sky-500', hex: '#0ea5e9' },
-          { bg: 'bg-cyan-500', hex: '#06b6d4' },
-          { bg: 'bg-teal-500', hex: '#14b8a6' },
-          { bg: 'bg-emerald-600', hex: '#059669' },
-          { bg: 'bg-green-600', hex: '#16a34a' },
-          { bg: 'bg-lime-500', hex: '#84cc16' },
-          { bg: 'bg-yellow-400', hex: '#facc15' },
-          { bg: 'bg-amber-500', hex: '#f59e0b' },
-          { bg: 'bg-orange-500', hex: '#f97316' },
-          { bg: 'bg-orange-700', hex: '#c2410c' },
-          { bg: 'bg-red-600', hex: '#dc2626' },
-          { bg: 'bg-rose-600', hex: '#e11d48' },
-          { bg: 'bg-pink-500', hex: '#ec4899' },
-          { bg: 'bg-fuchsia-600', hex: '#c026d3' },
-          { bg: 'bg-purple-600', hex: '#9333ea' },
-          { bg: 'bg-violet-600', hex: '#7c3aed' },
-          { bg: 'bg-slate-700', hex: '#334155' },
-          { bg: 'bg-gray-400', hex: '#9ca3af' }
-        ].each do |color| %>
+        <% property_colors.each do |color| %>
           <button type="button" 
                   data-color-picker-target="swatch"
                   data-color="<%= color[:hex] %>"
