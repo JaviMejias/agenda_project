@@ -36,14 +36,13 @@ class DashboardStatsService
 
     labels = active_dates.map { |d| d.to_date.strftime("%d %b") }
 
-    datasets = @properties.map do |property|
-      daily_revenue = property.reservations
-                              .confirmed
-                              .in_range(@range)
-                              .group("DATE(start_time)")
-                              .sum(:total_price)
+    # Una sola query agrupa ingresos por propiedad y fecha
+    revenue_by_property_date = @reservations.confirmed
+                                            .group(:property_id, "DATE(start_time)")
+                                            .sum(:total_price)
 
-      data_points = active_dates.map { |date| daily_revenue[date] || 0 }
+    datasets = @properties.map do |property|
+      data_points = active_dates.map { |date| revenue_by_property_date[[property.id, date]] || 0 }
 
       {
         label: property.name,

@@ -27,46 +27,63 @@ class ReportStatsService
   private
 
   def properties_data
-    @properties.map do |property|
-      res = property.reservations.in_range(@range)
+    # Una sola query con CASE WHEN en lugar de N queries individuales
+    aggregated = @properties
+      .left_joins(:reservations)
+      .merge(Reservation.in_range(@range))
+      .group("properties.id", "properties.name", "properties.color")
+      .select(
+        "properties.id",
+        "properties.name",
+        "properties.color",
+        "SUM(CASE WHEN reservations.status = 1 THEN reservations.total_price ELSE 0 END) AS income",
+        "SUM(CASE WHEN reservations.status = 3 THEN reservations.total_price ELSE 0 END) AS loss"
+      )
 
-      income = res.confirmed.sum(:total_price)
-      loss = res.blocked.sum(:total_price)
+    # Ocupación requiere datos por reserva; cargamos aparte solo las activas
+    active_reservations = Reservation.active.in_range(@range)
+    active_reservations = active_reservations.joins(:property).where(properties: { company_id: @company_id }) if @company_id.present?
+    reservations_by_property = active_reservations.group_by(&:property_id)
 
+    aggregated.map do |p|
+      res = reservations_by_property[p.id] || []
       {
-        name: property.name,
-        income: income,
-        loss: loss,
-        occupancy_rate: calculate_occupancy_rate(property, res),
-        color: property.color
+        name: p.name,
+        income: p.income.to_f,
+        loss: p.loss.to_f,
+        occupancy_rate: calculate_occupancy_rate_from(res),
+        color: p.color
       }
     end
-  end
-
-  def calculate_occupancy_rate(property, reservations)
-    total_days_in_range = (@end_date - @start_date).to_i + 1
-    return 0 if total_days_in_range <= 0
-
-    occupied_days = 0
-    reservations.active.each do |r|
-      r_start = [ r.start_time.to_date, @start_date ].max
-      r_end = [ r.end_time.to_date, @end_date ].min
-      days = (r_end - r_start).to_i
-      occupied_days += [ days, 0 ].max
-    end
-
-    (occupied_days.to_f / total_days_in_range * 100).round(1)
   end
 
   def monthly_trend
     (0..5).to_a.reverse.map do |i|
       month_start = i.months.ago.beginning_of_month
-      month_end = i.months.ago.end_of_month
-      range = month_start.beginning_of_day..month_end.end_of_day
+      month_end   = i.months.ago.end_of_month
+      range       = month_start.beginning_of_day..month_end.end_of_day
       {
-        month: I18n.l(month_start, format: "%B"),
-        income: Reservation.confirmed.in_range(range).yield_self { |scope| @company_id.present? ? scope.joins(:property).where(properties: { company_id: @company_id }) : scope }.sum(:total_price)
+        month:  I18n.l(month_start, format: "%B"),
+        income: monthly_income_scope(range).sum(:total_price)
       }
     end
+  end
+
+  def monthly_income_scope(range)
+    scope = Reservation.confirmed.in_range(range)
+    @company_id.present? ? scope.joins(:property).where(properties: { company_id: @company_id }) : scope
+  end
+
+  def calculate_occupancy_rate_from(reservations)
+    total_days_in_range = (@end_date - @start_date).to_i + 1
+    return 0 if total_days_in_range <= 0
+
+    occupied_days = reservations.sum do |r|
+      r_start = [ r.start_time.to_date, @start_date ].max
+      r_end   = [ r.end_time.to_date, @end_date ].min
+      [ (r_end - r_start).to_i, 0 ].max
+    end
+
+    (occupied_days.to_f / total_days_in_range * 100).round(1)
   end
 end
