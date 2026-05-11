@@ -41,6 +41,8 @@ Este documento detalla el progreso actual del proyecto y los próximos pasos.
 - **Workflow de Reservas:** Corrección crítica del desfase de fechas en FullCalendar (+1 día) y persistencia robusta de estados.
 - **Notificaciones Proactivas:** Implementación de callbacks en el modelo de Reservas para disparar alertas cuando cambian datos críticos del cliente o horarios.
 - **Limpieza RuboCop:** Eliminación de deuda técnica de estilo y espacios en blanco para mantener un estándar de código profesional.
+- **Estandarización de Interfaz (¡NUEVO!):** Implementación de componentes compartidos (`back_button`, `empty_state`, `loading_state`) para una UI consistente y mantenible.
+- **Confirmación Pública (¡NUEVO!):** Corrección del flujo de confirmación/rechazo por parte del cliente mediante tokens seguros, reparando el acceso a métodos privados en el modelo.
 
 ---
 
