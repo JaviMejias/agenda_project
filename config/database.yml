@@ -13,6 +13,4 @@ test:
 
 production:
   <<: *default
-  database: agenda_project_production
-  username: agenda_project
-  password: <%= ENV["AGENDA_PROJECT_DATABASE_PASSWORD"] %>
+  url: <%= ENV["DATABASE_URL"] %>

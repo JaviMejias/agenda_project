@@ -32,6 +32,7 @@
     "tom-select": "^2.6.0"
   },
   "scripts": {
-    "dev": "foreman start -f Procfile.dev"
+    "dev": "foreman start -f Procfile.dev",
+    "build": "vite build --outDir public"
   }
 }
