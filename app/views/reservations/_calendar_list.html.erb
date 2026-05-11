@@ -4,7 +4,6 @@
     <% if reservations.any? %>
       <% reservations.each do |res| %>
         <div class="group relative flex items-stretch rounded-2xl bg-gray-50/50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 overflow-hidden">
-          <!-- Barra de Color de Propiedad -->
           <div class="w-1.5 shrink-0" style="background-color: <%= res.property.color || '#4f46e5' %>"></div>
           
           <div class="p-3 flex-grow">

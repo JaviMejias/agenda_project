@@ -17,6 +17,9 @@ class Reservation < ApplicationRecord
   scope :projected, -> { confirmed.where("end_time > ?", Time.zone.now) }
   scope :active, -> { where.not(status: :cancelled) }
   scope :upcoming, -> { active.where("start_time >= ?", Time.zone.now).order(start_time: :asc) }
+  scope :overlapping_range, ->(start_time, end_time) {
+    where("start_time < ? AND end_time > ?", end_time, start_time)
+  }
 
   validates :client_name, presence: true, unless: :blocked?
   validates :start_time, presence: true
@@ -80,7 +83,7 @@ class Reservation < ApplicationRecord
       start_date = Time.zone.parse(start_date_str) rescue nil
       end_date = Time.zone.parse(end_date_str) rescue nil
       if start_date && end_date
-        query = query.where("start_time < ? AND end_time > ?", end_date, start_date)
+        query = query.overlapping_range(start_date, end_date)
       end
     end
 
@@ -132,7 +135,7 @@ class Reservation < ApplicationRecord
       overlapping = scope.where("CAST(start_time AS DATE) < CAST(? AS DATE) AND CAST(end_time AS DATE) > CAST(? AS DATE)",
                                 end_time, start_time).first
     else
-      overlapping = scope.where("start_time < ? AND end_time > ?", end_time, start_time).first
+      overlapping = scope.overlapping_range(start_time, end_time).first
     end
 
     if overlapping
@@ -195,5 +198,38 @@ class Reservation < ApplicationRecord
     return unless saved_change_to_start_time? || saved_change_to_status?
 
     ReservationReminderJob.set(wait_until: start_time - 24.hours).perform_later(self)
+  end
+
+  def confirm_by_client!
+    return { status: :error, message: "Este enlace de confirmación ha expirado por seguridad (límite de 24 horas)." } if created_at < 24.hours.ago
+    return { status: :info, message: "Esta reserva ya se encuentra confirmada." } if confirmed?
+    return { status: :error, message: "No se puede confirmar una reserva que ya ha sido cancelada." } if cancelled?
+
+    transaction do
+      self.skip_notifications = true
+      update!(status: :confirmed)
+      Notification.create!(
+        user: user,
+        notifiable: self,
+        message: "¡Reserva Confirmada! #{client_name} ha aceptado la reserva para #{property.name}."
+      )
+    end
+    { status: :success, message: "¡Gracias! Tu reserva ha sido confirmada exitosamente." }
+  end
+
+  def reject_by_client!
+    return { status: :error, message: "Este enlace ha expirado por seguridad (límite de 24 horas)." } if created_at < 24.hours.ago
+    return { status: :info, message: "Esta reserva ya se encuentra cancelada." } if cancelled?
+
+    transaction do
+      self.skip_notifications = true
+      update!(status: :cancelled)
+      Notification.create!(
+        user: user,
+        notifiable: self,
+        message: "Reserva Rechazada: #{client_name} ha cancelado la solicitud para #{property.name}."
+      )
+    end
+    { status: :success, message: "La reserva ha sido rechazada y cancelada." }
   end
 end

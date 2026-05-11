@@ -1,0 +1,7 @@
+<div class="flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm <%= local_assigns[:class] %>">
+  <div class="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 text-gray-200 dark:text-slate-700">
+    <i class="<%= local_assigns[:icon] || 'fa-solid fa-ghost' %> text-2xl"></i>
+  </div>
+  <h3 class="text-lg font-black text-gray-900 dark:text-white"><%= local_assigns[:title] || "Sin resultados" %></h3>
+  <p class="text-xs text-gray-500 dark:text-slate-400 font-medium max-w-xs mx-auto"><%= local_assigns[:subtitle] || "No hay registros para mostrar en este momento." %></p>
+</div>

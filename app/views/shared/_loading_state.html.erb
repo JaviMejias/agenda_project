@@ -1,0 +1,6 @@
+<div data-<%= local_assigns[:target] || 'search' %>-target="loading" class="hidden absolute inset-0 z-50 bg-white/60 dark:bg-slate-950/60 backdrop-blur-[2px] items-center justify-center rounded-[2rem] transition-all duration-300">
+  <div class="flex flex-col items-center">
+    <div class="w-16 h-16 border-4 border-indigo-100 dark:border-slate-800 border-t-indigo-600 dark:border-t-indigo-500 rounded-full animate-spin mb-4"></div>
+    <p class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest animate-pulse"><%= local_assigns[:text] || "Buscando..." %></p>
+  </div>
+</div>

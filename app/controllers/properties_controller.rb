@@ -10,10 +10,7 @@ class PropertiesController < ApplicationController
 
   def list
     authorize Property
-    @properties = current_user.admin? ? Property.all : current_user.properties
-    @properties = @properties.where("name ILIKE ?", "%#{params[:q]}%")
-                             .where(company_id: [ nil, "" ])
-                             .limit(20)
+    @properties = Property.available_for_selector(current_user, query: params[:q])
     render json: @properties.as_json(only: [ :id, :name ])
   end
 

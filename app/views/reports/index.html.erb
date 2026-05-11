@@ -79,12 +79,7 @@
   </div>
   <% end %>
 
-  <div data-dashboard-filters-target="loading" class="hidden absolute inset-0 z-50 bg-white/60 dark:bg-slate-950/60 backdrop-blur-[2px] items-center justify-center rounded-[2.5rem] transition-all duration-300">
-    <div class="flex flex-col items-center">
-      <div class="w-16 h-16 border-4 border-indigo-100 dark:border-slate-800 border-t-indigo-600 dark:border-t-indigo-500 rounded-full animate-spin mb-4"></div>
-      <p class="text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest animate-pulse">Actualizando Reportes...</p>
-    </div>
-  </div>
+  <%= render "shared/loading_state", target: "dashboard-filters", text: "Actualizando Reportes..." %>
 
   <turbo-frame id="reports_content" class="relative block" data-action="turbo:frame-load->dashboard-filters#hideLoading">
 

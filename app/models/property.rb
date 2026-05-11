@@ -10,6 +10,11 @@ class Property < ApplicationRecord
   validates :base_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   scope :search, ->(query) { where("name ILIKE ?", "%#{query}%") if query.present? }
+  scope :available_for_selector, ->(user, query: nil) {
+    base = user.admin? ? all : user.properties
+    base = base.search(query) if query.present?
+    base.where(company_id: [ nil, "" ]).limit(20)
+  }
 
   def pricing_model_text
     per_day? ? "Por Día" : "Por Hora"

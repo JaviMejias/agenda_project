@@ -52,12 +52,10 @@ class CompaniesController < ApplicationController
   def associate_properties
     authorize @company
     property_ids = params[:property_ids] || []
-
-    if property_ids.any?
-      Property.where(id: property_ids).update_all(company_id: @company.id)
+    if @company.associate_properties(property_ids)
       @notice = "Propiedades vinculadas exitosamente."
     else
-      @notice = "No se seleccionaron propiedades para vincular."
+      @notice = "No se seleccionaron propiedades para vincular o hubo un error."
     end
 
     @pagy, @properties = pagy(@company.properties.order(created_at: :desc), limit: 8)

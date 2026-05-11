@@ -5,6 +5,14 @@ class Notification < ApplicationRecord
   scope :unread, -> { where(read_at: nil) }
   scope :ordered, -> { order(created_at: :desc) }
 
+  def self.mark_as_read_for_notifiable(notifiable, user)
+    user.notifications.unread.where(notifiable: notifiable).update_all(read_at: Time.current)
+  end
+
+  def self.mark_all_as_read_for_user(user)
+    user.notifications.unread.update_all(read_at: Time.current)
+  end
+
   after_create_commit :broadcast_notification
 
   private

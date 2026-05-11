@@ -23,7 +23,7 @@ class NotificationsController < ApplicationController
   end
 
   def mark_all_as_read
-    current_user.notifications.unread.update_all(read_at: Time.current)
+    Notification.mark_all_as_read_for_user(current_user)
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_back fallback_location: root_path }

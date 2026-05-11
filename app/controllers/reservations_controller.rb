@@ -46,7 +46,7 @@ class ReservationsController < ApplicationController
 
     @reservations = Reservation.includes(:property).order(start_time: :asc)
     if start_date && end_date
-      @reservations = @reservations.where("start_time < ? AND end_time > ?", end_date, start_date)
+      @reservations = @reservations.overlapping_range(start_date, end_date)
     end
 
     @pagy, @reservations = pagy(@reservations, limit: 5)
@@ -60,7 +60,7 @@ class ReservationsController < ApplicationController
 
   def show
     authorize @reservation
-    current_user.notifications.unread.where(notifiable: @reservation).update_all(read_at: Time.current)
+    Notification.mark_as_read_for_notifiable(@reservation, current_user)
   end
 
   def new

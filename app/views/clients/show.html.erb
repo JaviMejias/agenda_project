@@ -2,14 +2,7 @@
 
 <div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
   
-  <div class="mb-8">
-    <%= link_to clients_path, class: "group inline-flex items-center text-sm font-bold text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" do %>
-      <div class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-md border border-gray-100 dark:border-slate-700 flex items-center justify-center mr-3 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:border-indigo-200 transition-all group-hover:-translate-x-1">
-        <i class="fa-solid fa-arrow-left text-[10px]"></i>
-      </div>
-      Volver al listado
-    <% end %>
-  </div>
+  <%= render "shared/back_button", path: clients_path %>
 
   <div class="bg-white dark:bg-slate-900 shadow-2xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 animate-fade-in-up">
     <!-- Light Header Style -->

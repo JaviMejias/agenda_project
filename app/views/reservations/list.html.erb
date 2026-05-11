@@ -68,12 +68,7 @@
 
   
   <turbo-frame id="list_frame" class="relative block w-full">
-    <div data-search-target="loading" class="hidden absolute inset-0 z-50 bg-white/60 dark:bg-slate-950/60 backdrop-blur-[2px] items-center justify-center rounded-[2rem] transition-all duration-300">
-      <div class="flex flex-col items-center">
-        <div class="w-16 h-16 border-4 border-indigo-100 dark:border-slate-800 border-t-indigo-600 dark:border-t-indigo-500 rounded-full animate-spin mb-4"></div>
-        <p class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest animate-pulse">Actualizando listado...</p>
-      </div>
-    </div>
+    <%= render "shared/loading_state", text: "Actualizando listado..." %>
     <% if @reservations.any? %>
       <div class="space-y-3 mb-8">
         <% @reservations.each do |reservation| %>
@@ -147,13 +142,10 @@
 
     <%= render "shared/pagination" %>
     <% else %>
-      <div class="flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm">
-        <div class="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 text-gray-200 dark:text-slate-700">
-          <i class="fa-solid fa-calendar-xmark text-2xl"></i>
-        </div>
-        <h3 class="text-lg font-black text-gray-900 dark:text-white">No hay resultados</h3>
-        <p class="text-xs text-gray-500 dark:text-slate-400 font-medium">Prueba con otros términos o limpia la búsqueda.</p>
-      </div>
+      <%= render "shared/empty_state", 
+          icon: "fa-solid fa-calendar-xmark", 
+          title: "No hay resultados", 
+          subtitle: "Prueba con otros términos o limpia la búsqueda." %>
     <% end %>
   </turbo-frame>
 </div>

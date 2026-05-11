@@ -29,7 +29,7 @@ class SearchController < ApplicationController
       }
     end
 
-    reservations = Reservation.joins(:property).where("client_name ILIKE ?", "%#{query}%").limit(5)
+    reservations = Reservation.search(query).limit(5)
     reservations.each do |r|
       results << {
         category: "Reservas",
@@ -41,7 +41,7 @@ class SearchController < ApplicationController
     end
 
     if current_user.admin?
-      users = User.where("email ILIKE ?", "%#{query}%").limit(5)
+      users = User.search(query).limit(5)
       users.each do |u|
         results << {
           category: "Usuarios",

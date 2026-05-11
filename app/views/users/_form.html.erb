@@ -142,10 +142,7 @@
     </div>
 
     <div class="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 px-6 py-6 sm:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <%= link_to users_path, class: "group inline-flex items-center text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] hover:text-indigo-600 dark:hover:text-indigo-400 transition-all" do %>
-        <i class="fa-solid fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i>
-        Cancelar y Volver
-      <% end %>
+      <%= render "shared/back_button", path: users_path, form: true %>
       
       <button type="submit" class="w-full sm:w-auto min-w-[200px] flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-4 text-xs font-black text-white shadow-lg hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:-translate-y-1 uppercase tracking-widest cursor-pointer">
         <i class="fa-solid <%= user.new_record? ? 'fa-check' : 'fa-save' %> mr-2"></i>
