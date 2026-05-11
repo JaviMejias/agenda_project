@@ -2,75 +2,60 @@
 
 <div class="mx-auto px-4 sm:px-6 lg:px-8 py-6" data-controller="dashboard-filters">
 
-  <div class="relative mb-8 p-5 sm:p-8 rounded-[2.5rem] bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border border-indigo-100 dark:border-slate-800 shadow-xl shadow-indigo-100/30 dark:shadow-none group">
-    <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
+  <%= render "shared/index_header", 
+      title: "Análisis de Gestión", 
+      icon: "fa-solid fa-chart-pie", 
+      subtitle: (@company_id.present? ? current_user.companies.find_by(id: @company_id)&.name : "Análisis Global de Ingresos"),
+      large_form: true do %>
     
-    <div class="relative flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-      <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-2xl">
-          <i class="fa-solid fa-chart-pie"></i>
-        </div>
-        <div>
-          <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
-            Análisis de Gestión
-          </h1>
-          <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest">
-            <%= @company_id.present? ? current_user.companies.find_by(id: @company_id)&.name : "Análisis Global de Ingresos" %>
-          </p>
+    <%= form_with url: dashboard_path, method: :get, class: "grid grid-cols-1 md:grid-cols-12 items-end gap-3 w-full", 
+        data: { 
+          dashboard_filters_target: "form",
+          turbo_frame: "dashboard_content", 
+          turbo_action: "advance" 
+        } do |f| %>
+      
+      <div class="md:col-span-5">
+        <%= f.label :company_id, "Empresa", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
+        <div class="relative h-[42px] flex items-center">
+          <%= f.collection_select :company_id, current_user.companies.order(name: :asc), :id, :name, { include_blank: "Todas las Empresas" }, 
+              data: { 
+                controller: "select",
+                action: "change->dashboard-filters#submit" 
+              }, 
+              class: "w-full" %>
         </div>
       </div>
 
-      <div class="flex-grow lg:max-w-4xl">
-        <%= form_with url: dashboard_path, method: :get, class: "grid grid-cols-1 md:grid-cols-12 items-end gap-3", 
+      <div class="md:col-span-3">
+        <%= f.label :start_date, "Fecha Inicio", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
+        <%= f.text_field :start_date, value: @start_date, 
             data: { 
-              dashboard_filters_target: "form",
-              turbo_frame: "dashboard_content", 
-              turbo_action: "advance" 
-            } do |f| %>
-          
-          <div class="md:col-span-5">
-            <%= f.label :company_id, "Empresa", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
-            <div class="relative h-[42px] flex items-center">
-              <%= f.collection_select :company_id, current_user.companies.order(name: :asc), :id, :name, { include_blank: "Todas las Empresas" }, 
-                  data: { 
-                    controller: "select",
-                    action: "change->dashboard-filters#submit" 
-                  }, 
-                  class: "w-full" %>
-            </div>
-          </div>
-
-          <div class="md:col-span-3">
-            <%= f.label :start_date, "Fecha Inicio", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
-            <%= f.text_field :start_date, value: @start_date, 
-                data: { 
-                  controller: "datepicker", 
-                  dashboard_filters_target: "startDate",
-                  action: "change->dashboard-filters#submit" 
-                }, 
-                class: "w-full h-[42px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
-          </div>
-
-          <div class="md:col-span-3">
-            <%= f.label :end_date, "Fecha Fin", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
-            <%= f.text_field :end_date, value: @end_date, 
-                data: { 
-                  controller: "datepicker", 
-                  dashboard_filters_target: "endDate",
-                  action: "change->dashboard-filters#submit" 
-                }, 
-                class: "w-full h-[42px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
-          </div>
-
-          <div class="md:col-span-1">
-            <button type="button" data-action="click->dashboard-filters#reset" class="w-full flex items-center justify-center h-[42px] bg-white/80 dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-xl hover:bg-white dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm border border-indigo-100 dark:border-slate-700" title="Restablecer">
-              <i class="fa-solid fa-arrow-rotate-left"></i>
-            </button>
-          </div>
-        <% end %>
+              controller: "datepicker", 
+              dashboard_filters_target: "startDate",
+              action: "change->dashboard-filters#submit" 
+            }, 
+            class: "w-full h-[42px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-50 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
       </div>
-    </div>
-  </div>
+
+      <div class="md:col-span-3">
+        <%= f.label :end_date, "Fecha Fin", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
+        <%= f.text_field :end_date, value: @end_date, 
+            data: { 
+              controller: "datepicker", 
+              dashboard_filters_target: "endDate",
+              action: "change->dashboard-filters#submit" 
+            }, 
+            class: "w-full h-[42px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
+      </div>
+
+      <div class="md:col-span-1">
+        <button type="button" data-action="click->dashboard-filters#reset" class="w-full flex items-center justify-center h-[42px] bg-white/80 dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-xl hover:bg-white dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm border border-indigo-100 dark:border-slate-700" title="Restablecer">
+          <i class="fa-solid fa-arrow-rotate-left"></i>
+        </button>
+      </div>
+    <% end %>
+  <% end %>
 
   <div data-dashboard-filters-target="loading" class="hidden absolute inset-0 z-[60] bg-white/60 dark:bg-slate-950/60 backdrop-blur-[2px] items-center justify-center rounded-[2.5rem] transition-all duration-300">
     <div class="flex flex-col items-center">

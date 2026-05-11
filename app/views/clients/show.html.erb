@@ -96,11 +96,7 @@
                 </div>
               <% end %>
             </div>
-            <% if @pagy.pages > 1 %>
-              <div class="mt-6 flex justify-center">
-                <%== @pagy.series_nav %>
-              </div>
-            <% end %>
+            <%= render "shared/pagination" %>
           <% else %>
             <div class="py-12 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-gray-200 dark:border-slate-800 text-center">
               <p class="text-sm text-gray-500 dark:text-slate-400 font-medium">No registra reservas.</p>

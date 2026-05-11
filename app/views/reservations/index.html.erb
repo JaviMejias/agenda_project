@@ -6,32 +6,15 @@
      data-fullcalendar-events-url-value="<%= reservations_path(format: :json) %>">
      
   
-  <div class="relative mb-6 p-5 sm:p-6 rounded-[2rem] bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border border-indigo-100 dark:border-slate-800 shadow-xl shadow-indigo-100/30 dark:shadow-none overflow-hidden group">
-    <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
-    
-    <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-xl">
-          <i class="fa-solid fa-calendar-check"></i>
-        </div>
-        <div>
-          <h1 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
-            Agenda de Reservas
-          </h1>
-          <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest">
-            Vista Global
-          </p>
-        </div>
-      </div>
-
-      <div class="flex flex-col sm:flex-row items-center gap-3">
-        <div class="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-1 rounded-xl border border-indigo-100 dark:border-slate-700 inline-flex shadow-sm">
-           <span class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 tab-active">Agenda</span>
-           <%= link_to list_reservations_path, class: "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 text-gray-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400" do %>Listado<% end %>
-        </div>
-      </div>
+  <%= render "shared/index_header", 
+      title: "Agenda de Reservas", 
+      icon: "fa-solid fa-calendar-check", 
+      subtitle: "Vista Global" do %>
+    <div class="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-1 rounded-xl border border-indigo-100 dark:border-slate-700 inline-flex shadow-sm">
+       <span class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 tab-active">Agenda</span>
+       <%= link_to list_reservations_path, class: "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 text-gray-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400" do %>Listado<% end %>
     </div>
-  </div>
+  <% end %>
 
   <div class="flex flex-col lg:flex-row gap-6">
     <!-- Columna Izquierda: Calendario Compacto -->

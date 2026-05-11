@@ -1,0 +1,53 @@
+<%# 
+  Partial: shared/_index_header
+  Renders a premium header for index pages with title, icon, search and actions.
+%>
+
+<div class="relative mb-8 p-5 sm:p-6 rounded-[2rem] bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border border-indigo-100 dark:border-slate-800 shadow-xl shadow-indigo-100/30 dark:shadow-none overflow-hidden group">
+  <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+  
+  <div class="relative z-10 flex flex-col <%= local_assigns[:large_form] ? 'lg:flex-row' : 'md:flex-row' %> md:items-center justify-between gap-6">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-xl lg:text-2xl">
+        <i class="<%= local_assigns[:icon] %>"></i>
+      </div>
+      
+      <% header_content = capture do %>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
+            <%= local_assigns[:title] %>
+          </h1>
+          <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+            <%= local_assigns[:subtitle] || (local_assigns[:count].present? ? "#{local_assigns[:count]} Totales" : "Gestión Centralizada") %>
+          </p>
+        </div>
+      <% end %>
+
+      <% if local_assigns[:count_frame_id].present? %>
+        <turbo-frame id="<%= count_frame_id %>">
+          <%= header_content %>
+        </turbo-frame>
+      <% else %>
+        <%= header_content %>
+      <% end %>
+    </div>
+
+    <div class="flex-grow <%= local_assigns[:large_form] ? 'lg:max-w-5xl' : '' %>">
+      <div class="flex flex-col sm:flex-row items-center justify-end gap-4">
+        <% if local_assigns[:search_url].present? %>
+          <%= form_with url: search_url, method: :get, class: "flex items-center gap-2 w-full sm:w-auto", 
+              data: { search_target: "form", turbo_frame: local_assigns[:search_frame_id] || "list_frame", turbo_action: "advance" }.merge(local_assigns[:search_data] || {}) do |f| %>
+            <div class="relative group w-full sm:w-64">
+              <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 group-focus-within:text-indigo-600 transition-colors"></i>
+              <%= f.text_field :q, value: params[:q], placeholder: local_assigns[:search_placeholder] || "Buscar...", 
+                  data: { search_target: "input", action: "input->search#search" },
+                  class: "w-full pl-11 pr-10 py-2.5 bg-white dark:bg-slate-800 border border-indigo-50 dark:border-slate-700 rounded-xl text-xs font-bold dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 transition-all shadow-sm" %>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%= yield %>
+      </div>
+    </div>
+  </div>
+</div>

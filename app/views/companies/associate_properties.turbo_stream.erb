@@ -47,11 +47,7 @@
           <% end %>
         </div>
 
-        <% if @pagy.pages > 1 %>
-          <div class="flex justify-center pb-8 pt-4">
-            <%== @pagy.series_nav %>
-          </div>
-        <% end %>
+        <%= render "shared/pagination" %>
       <% else %>
         <div class="flex flex-col items-center justify-center py-16 text-center bg-white dark:bg-slate-900 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm border-dashed border-2">
           <div class="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-4 text-gray-200 dark:text-slate-700">

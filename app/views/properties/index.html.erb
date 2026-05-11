@@ -2,53 +2,21 @@
 
 <div class="mx-auto px-4 sm:px-6 lg:px-8 py-6" data-controller="search">
   
-  <div class="relative mb-6 p-5 sm:p-6 rounded-[2rem] bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border border-indigo-100 dark:border-slate-800 shadow-xl shadow-indigo-100/30 dark:shadow-none overflow-hidden group">
-    <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
+  <%= render "shared/index_header", 
+      title: "Mis Propiedades", 
+      icon: "fa-solid fa-hotel", 
+      count: @pagy.count, 
+      count_frame_id: "properties_count", 
+      search_url: properties_path, 
+      search_frame_id: "properties_frame" do %>
     
-    <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-xl">
-          <i class="fa-solid fa-hotel"></i>
-        </div>
-        <turbo-frame id="properties_count">
-          <div>
-            <h1 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
-              Mis Propiedades
-            </h1>
-            <p class="text-indigo-600 text-[10px] font-bold uppercase tracking-widest">
-              <%= @pagy.count %> Totales
-            </p>
-          </div>
-        </turbo-frame>
-      </div>
-      
-      <div class="flex flex-col sm:flex-row items-center gap-3">
-        
-        <%= form_with url: properties_path, method: :get, class: "flex items-center gap-2 w-full sm:w-auto", local: true, 
-            data: { search_target: "form", turbo_frame: "properties_frame", turbo_action: "advance" } do |f| %>
-          <div class="relative group w-full sm:w-64">
-            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors"></i>
-            <%= f.text_field :q, value: params[:q], placeholder: "Buscar...", 
-                data: { search_target: "input", action: "input->search#search" },
-                class: "w-full pl-11 pr-10 py-2.5 bg-white dark:bg-slate-800 border border-indigo-50 dark:border-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 transition-all shadow-sm dark:text-white" %>
-          </div>
-
-          <% if params[:q].present? %>
-            <button type="button" data-action="click->search#reset" class="h-[38px] px-4 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all text-[10px] font-black uppercase tracking-widest shadow-sm border border-indigo-50 dark:border-slate-700" title="Limpiar búsqueda">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          <% end %>
-        <% end %>
-
-        <% if current_user.admin? %>
-          <%= link_to new_property_path, class: "w-full sm:w-auto group flex items-center justify-center gap-3 px-6 py-3.5 bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white rounded-2xl border border-indigo-100 dark:border-transparent hover:bg-indigo-50 dark:hover:bg-indigo-500 transition-all shadow-md shadow-indigo-100/50 dark:shadow-none hover:-translate-y-1 active:scale-95" do %>
-            <i class="fa-solid fa-plus-circle text-indigo-500 dark:text-indigo-200 group-hover:rotate-90 transition-transform duration-500"></i>
-            <span class="text-[10px] font-black uppercase tracking-widest">Nueva Propiedad</span>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
-  </div>
+    <% if current_user.admin? %>
+      <%= link_to new_property_path, class: "w-full sm:w-auto group flex items-center justify-center gap-3 px-6 py-3.5 bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white rounded-2xl border border-indigo-100 dark:border-transparent hover:bg-indigo-50 dark:hover:bg-indigo-500 transition-all shadow-md shadow-indigo-100/50 dark:shadow-none hover:-translate-y-1 active:scale-95" do %>
+        <i class="fa-solid fa-plus-circle text-indigo-500 dark:text-indigo-200 group-hover:rotate-90 transition-transform duration-500"></i>
+        <span class="text-[10px] font-black uppercase tracking-widest">Nueva Propiedad</span>
+      <% end %>
+    <% end %>
+  <% end %>
 
   
   <turbo-frame id="properties_frame" class="relative block w-full">
@@ -147,12 +115,7 @@
         <% end %>
       </div>
 
-      <% if @pagy.pages > 1 %>
-        
-        <div class="flex justify-center pb-12 pt-4">
-          <%== @pagy.series_nav %>
-        </div>
-      <% end %>
+    <%= render "shared/pagination" %>
     <% else %>
       <div class="flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm">
         <div class="w-16 h-16 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 text-gray-200 dark:text-slate-700">

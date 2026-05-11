@@ -9,87 +9,73 @@
       <p>Periodo: <%= l(@start_date) %> al <%= l(@end_date) %></p>
     </div>
   <% else %>
-    <div class="relative mb-8 p-5 sm:p-8 rounded-[2.5rem] bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border border-indigo-100 dark:border-slate-800 shadow-xl shadow-indigo-100/30 dark:shadow-none group">
-    <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
-    
-    <div class="relative flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-      <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-2xl">
-            <i class="fa-solid fa-file-invoice-dollar"></i>
+    <%= render "shared/index_header", 
+        title: "Reportes de Gestión", 
+        icon: "fa-solid fa-file-invoice-dollar", 
+        subtitle: (@company_id.present? ? current_user.companies.find_by(id: @company_id)&.name : "Análisis Global de Ingresos"),
+        large_form: true do %>
+      
+      <%= form_with url: reports_path, method: :get, class: "grid grid-cols-1 md:grid-cols-12 items-end gap-3 w-full",
+          data: { 
+            dashboard_filters_target: "form",
+            turbo_frame: "reports_content",
+            turbo_action: "advance"
+          } do |f| %>
+        <div class="md:col-span-3 text-left">
+          <%= f.label :company_id, "Empresa", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
+          <div class="relative h-[38px] flex items-center">
+            <%= f.collection_select :company_id, current_user.companies.order(name: :asc), :id, :name, { include_blank: "Todas" }, 
+                data: { 
+                  controller: "select",
+                  action: "change->dashboard-filters#submit" 
+                }, 
+                class: "w-full" %>
           </div>
-          <div>
-            <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
-              Reportes de Gestión
-            </h1>
-            <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest">
-              <%= @company_id.present? ? current_user.companies.find_by(id: @company_id)&.name : "Análisis Global de Ingresos" %>
-            </p>
         </div>
-      </div>
 
-      <div class="flex-grow lg:max-w-5xl">
-        <%= form_with url: reports_path, method: :get, class: "grid grid-cols-1 md:grid-cols-12 items-end gap-3",
-            data: { 
-              dashboard_filters_target: "form",
-              turbo_frame: "reports_content",
-              turbo_action: "advance"
-            } do |f| %>
-                  <div class="md:col-span-3">
-            <%= f.label :company_id, "Empresa", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
-            <div class="relative h-[38px] flex items-center">
-              <%= f.collection_select :company_id, current_user.companies.order(name: :asc), :id, :name, { include_blank: "Todas" }, 
-                  data: { 
-                    controller: "select",
-                    action: "change->dashboard-filters#submit" 
-                  }, 
-                  class: "w-full" %>
-            </div>
-          </div>
+        <div class="md:col-span-2 text-left">
+          <%= f.label :start_date, "Desde", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
+          <%= f.text_field :start_date, value: @start_date, 
+              data: { 
+                controller: "datepicker",
+                dashboard_filters_target: "startDate",
+                action: "change->dashboard-filters#submit"
+              }, 
+              class: "w-full h-[38px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
+        </div>
 
-          <div class="md:col-span-2">
-            <%= f.label :start_date, "Desde", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
-            <%= f.text_field :start_date, value: @start_date, 
-                data: { 
-                  controller: "datepicker",
-                  dashboard_filters_target: "startDate",
-                  action: "change->dashboard-filters#submit"
-                }, 
-                class: "w-full h-[38px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-50 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
-          </div>
+        <div class="md:col-span-2 text-left">
+          <%= f.label :end_date, "Hasta", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
+          <%= f.text_field :end_date, value: @end_date, 
+              data: { 
+                controller: "datepicker",
+                dashboard_filters_target: "endDate",
+                action: "change->dashboard-filters#submit"
+              }, 
+              class: "w-full h-[38px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
+        </div>
 
-          <div class="md:col-span-2">
-            <%= f.label :end_date, "Hasta", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
-            <%= f.text_field :end_date, value: @end_date, 
-                data: { 
-                  controller: "datepicker",
-                  dashboard_filters_target: "endDate",
-                  action: "change->dashboard-filters#submit"
-                }, 
-                class: "w-full h-[38px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-50 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
-          </div>
+        <div class="md:col-span-5 flex gap-2">
+          <button type="button" data-action="click->dashboard-filters#reset" class="flex-grow flex items-center justify-center h-[38px] px-4 bg-white/80 dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-xl hover:bg-white dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all text-xs font-bold shadow-sm border border-indigo-50 dark:border-slate-700" title="Restablecer">
+            <i class="fa-solid fa-arrow-rotate-left"></i>
+          </button>
 
-          <div class="md:col-span-5 flex gap-2">
-            <button type="button" data-action="click->dashboard-filters#reset" class="flex-grow flex items-center justify-center h-[38px] px-4 bg-white/80 dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-xl hover:bg-white dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all text-xs font-bold shadow-sm border border-indigo-50 dark:border-slate-700" title="Restablecer">
-              <i class="fa-solid fa-arrow-rotate-left"></i>
-            </button>
+          <%= link_to reports_path(format: :xlsx, start_date: @start_date, end_date: @end_date, company_id: @company_id), 
+              class: "flex-grow flex items-center justify-center h-[38px] px-4 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-xl hover:bg-emerald-600 hover:text-white transition-all gap-2 text-xs font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-900/30 shadow-sm",
+              title: "Exportar Excel" do %>
+            <i class="fa-solid fa-file-excel"></i>
+            <span class="hidden lg:inline">Excel</span>
+          <% end %>
 
-            <%= link_to reports_path(format: :xlsx, start_date: @start_date, end_date: @end_date, company_id: @company_id), 
-                class: "flex-grow flex items-center justify-center h-[38px] px-4 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-xl hover:bg-emerald-600 hover:text-white transition-all gap-2 text-xs font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-900/30 shadow-sm",
-                title: "Exportar Excel" do %>
-              <i class="fa-solid fa-file-excel"></i>
-              <span class="hidden lg:inline">Excel</span>
-            <% end %>
-
-            <%= link_to reports_path(format: :pdf, start_date: @start_date, end_date: @end_date, company_id: @company_id), 
-                class: "flex-grow flex items-center justify-center h-[38px] px-4 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-600 hover:text-white transition-all gap-2 text-xs font-black uppercase tracking-widest border border-rose-100 dark:border-rose-900/30 shadow-sm",
-                title: "Exportar PDF", target: "_blank" do %>
-              <i class="fa-solid fa-file-pdf"></i>
-              <span class="hidden lg:inline">PDF</span>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-    </div>
+          <%= link_to reports_path(format: :pdf, start_date: @start_date, end_date: @end_date, company_id: @company_id), 
+              class: "flex-grow flex items-center justify-center h-[38px] px-4 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-600 hover:text-white transition-all gap-2 text-xs font-black uppercase tracking-widest border border-rose-100 dark:border-rose-900/30 shadow-sm",
+              title: "Exportar PDF", target: "_blank" do %>
+            <i class="fa-solid fa-file-pdf"></i>
+            <span class="hidden lg:inline">PDF</span>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
   </div>
   <% end %>
 

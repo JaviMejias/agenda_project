@@ -1,0 +1,18 @@
+<%# 
+  Partial: shared/_pagination
+  Standardizes the look of Pagy pagination across the app.
+%>
+
+<% pagy_obj = local_assigns[:pagy] || @pagy %>
+<% use_container = local_assigns.fetch(:container, true) %>
+<% if pagy_obj && pagy_obj.pages > 1 %>
+  <div class="<%= local_assigns[:class] || (use_container ? 'mt-12 flex justify-center' : 'pt-4 flex justify-center scale-90 origin-center') %>">
+    <% if use_container %>
+      <div class="bg-white dark:bg-slate-900 px-6 py-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm">
+        <%== pagy_obj.series_nav %>
+      </div>
+    <% else %>
+      <%== pagy_obj.series_nav %>
+    <% end %>
+  </div>
+<% end %>
