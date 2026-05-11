@@ -42,7 +42,7 @@ class DashboardStatsService
                                             .sum(:total_price)
 
     datasets = @properties.map do |property|
-      data_points = active_dates.map { |date| revenue_by_property_date[[property.id, date]] || 0 }
+      data_points = active_dates.map { |date| revenue_by_property_date[[ property.id, date ]] || 0 }
 
       {
         label: property.name,
