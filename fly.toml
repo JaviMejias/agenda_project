@@ -13,7 +13,7 @@ console_command = '/rails/bin/rails console'
   PORT = '8080'
 
 [processes]
-  app = './bin/thrust ./bin/rails server -p 3000'
+  app = './bin/rails server'
   solidq = 'bundle exec rake solid_queue:start'
 
 [deploy]
