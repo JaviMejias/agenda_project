@@ -6,9 +6,5 @@ if [ -z "${LD_PRELOAD+x}" ]; then
     export LD_PRELOAD
 fi
 
-# If running the rails server or worker then create or migrate existing database
-if [[ "$*" == *"rails server"* ]] || [[ "$*" == *"rails solid_queue:start"* ]]; then
-  ./bin/rails db:prepare
-fi
 
 exec "${@}"

@@ -16,8 +16,11 @@ console_command = '/rails/bin/rails console'
   app = './bin/thrust ./bin/rails server -p 3000'
   solidq = 'bundle exec rake solid_queue:start'
 
+[deploy]
+  release_command = "./bin/rails db:prepare"
+
 [http_service]
-  internal_port = 8080
+  internal_port = 80
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
