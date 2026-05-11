@@ -35,12 +35,8 @@ Rails.application.routes.draw do
 
   get "dashboard", to: "dashboard#index", as: :dashboard
 
-  authenticated :user, ->(u) { u.admin? } do
-    root "dashboard#index", as: :admin_root
-  end
-
-  authenticated :user, ->(u) { u.normal? } do
-    root "properties#index", as: :user_root
+  authenticated :user do
+    root "dashboard#index", as: :authenticated_root
   end
 
   root to: redirect("/users/sign_in")
