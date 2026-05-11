@@ -35,26 +35,33 @@ Este documento detalla el progreso actual del proyecto y los próximos pasos.
 - Reporte detallado de "Pérdidas por Bloqueo" (mantenimiento).
 - Generación de reportes en Excel y PDF con filtros dinámicos.
 
+### 🛠️ Estabilización & Calidad de Código (Mayo 2026)
+- **Docker Ready-to-Run:** Refactorización del `entrypoint` para automatizar migraciones y preparación de base de datos en cualquier entorno (Windows/WSL/Linux).
+- **Seguridad ActiveRecord:** Refactorización de consultas SQL crudas a lenguaje ActiveRecord para prevenir inyecciones SQL y mejorar la mantenibilidad.
+- **Workflow de Reservas:** Corrección crítica del desfase de fechas en FullCalendar (+1 día) y persistencia robusta de estados.
+- **Notificaciones Proactivas:** Implementación de callbacks en el modelo de Reservas para disparar alertas cuando cambian datos críticos del cliente o horarios.
+- **Limpieza RuboCop:** Eliminación de deuda técnica de estilo y espacios en blanco para mantener un estándar de código profesional.
+
 ---
 
 ## 🟡 Próximos Pasos (Sugeridos)
 
-1. **📱 Notificaciones Avanzadas**:
-   - **Integración WhatsApp:** API de WhatsApp para confirmaciones y recordatorios automáticos usando los mismos tokens de seguridad.
-   - **SMS de Respaldo:** Notificaciones vía mensaje de texto para clientes sin acceso a internet o correo.
+1. **💰 Gestión Financiera & Facturación**:
+   - **Recibos PDF:** Generación automática de comprobantes de pago y facturas proforma al completar una reserva.
+   - **Control de Abonos:** Registro de pagos parciales y seguimiento de saldos pendientes por cliente.
+   - **Gastos Operativos:** Registro de facturas de luz, agua o mantenimiento por propiedad para cálculo de rentabilidad neta.
 
-2. **💰 Gestión Financiera**:
-   - Control detallado de abonos y saldos pendientes por reserva.
-   - Registro de gastos operativos para cálculo de utilidad neta real en reportes.
-   - Integración de pasarela de pagos para automatizar confirmaciones.
+2. **🔧 Gestión Operativa & Checklists**:
+   - **Checklists de Entrada/Salida:** Listas de tareas dinámicas (Limpieza, Llaves, Inventario) vinculadas al flujo de la reserva.
+   - **Auditoría (Timeline):** Registro histórico de cambios ("X cambió el estado de la reserva a Confirmada hace 2 horas").
+   - **Gestión de Incidencias:** Reporte de roturas o problemas técnicos encontrados durante la estancia.
 
-3. **🗓️ Sincronización & Apertura**:
-   - Sincronización vía iCal con calendarios externos (Google, Airbnb, Booking).
-   - Portal o link público de disponibilidad para permitir auto-reservas de clientes.
+3. **👤 CRM & Fidelización**:
+   - **Perfil 360° del Cliente:** Historial de estancias, ingresos totales generados (LTV) y notas privadas de comportamiento.
+   - **Etiquetado Inteligente:** Segmentación de clientes (VIP, Recurrente, Conflictivo).
 
-4. **🔧 Gestión Operativa**:
-   - Sistema de tareas (limpieza/mantenimiento) vinculado al flujo de reservas.
-   - Gestión de bloqueos recurrentes para mantenimientos preventivos.
+4. **📑 Gestión Documental**:
+   - **Almacenamiento Seguro:** Subida de fotos de contratos firmados, documentos de identidad o fotos del estado de la propiedad antes/después.
 
 ---
-*Última actualización: 07 de Mayo, 2026 - 13:00 (Sesión de Estabilización y UX)*
+*Última actualización: 09 de Mayo, 2026 - 15:05 (Sesión de Estabilización Docker y Refactorización)*

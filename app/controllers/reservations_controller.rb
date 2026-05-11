@@ -60,6 +60,7 @@ class ReservationsController < ApplicationController
 
   def show
     authorize @reservation
+    current_user.notifications.unread.where(notifiable: @reservation).update_all(read_at: Time.current)
   end
 
   def new

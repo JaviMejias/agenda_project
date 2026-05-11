@@ -3,7 +3,7 @@ class NotificationsController < ApplicationController
   before_action :set_notification, only: [ :update, :destroy ]
 
   def index
-    @notifications = current_user.notifications.ordered.limit(20)
+    @pagy, @notifications = pagy(current_user.notifications.ordered, limit: 20)
   end
 
   def update

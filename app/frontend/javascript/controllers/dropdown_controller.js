@@ -17,6 +17,10 @@ export default class extends Controller {
     }
   }
 
+  stop(event) {
+    event.stopPropagation()
+  }
+
   show() {
     this.isOpen = true
     

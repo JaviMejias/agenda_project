@@ -1,4 +1,5 @@
 @import "../stylesheets/application.tailwind.css";
+@import "../stylesheets/notifications.css";
 @import "flatpickr/dist/flatpickr.min.css";
 
 /* ── Flatpickr indigo theme overrides ── */
