@@ -91,6 +91,39 @@ class Reservation < ApplicationRecord
     query.order(start_time: :asc)
   end
 
+  def confirm_by_client!
+    return { status: :error, message: "Este enlace de confirmación ha expirado por seguridad (límite de 24 horas)." } if created_at < 24.hours.ago
+    return { status: :info, message: "Esta reserva ya se encuentra confirmada." } if confirmed?
+    return { status: :error, message: "No se puede confirmar una reserva que ya ha sido cancelada." } if cancelled?
+
+    transaction do
+      self.skip_notifications = true
+      update!(status: :confirmed)
+      Notification.create!(
+        user: user,
+        notifiable: self,
+        message: "¡Reserva Confirmada! #{client_name} ha aceptado la reserva para #{property.name}."
+      )
+    end
+    { status: :success, message: "¡Gracias! Tu reserva ha sido confirmada exitosamente." }
+  end
+
+  def reject_by_client!
+    return { status: :error, message: "Este enlace ha expirado por seguridad (límite de 24 horas)." } if created_at < 24.hours.ago
+    return { status: :info, message: "Esta reserva ya se encuentra cancelada." } if cancelled?
+
+    transaction do
+      self.skip_notifications = true
+      update!(status: :cancelled)
+      Notification.create!(
+        user: user,
+        notifiable: self,
+        message: "Reserva Rechazada: #{client_name} ha cancelado la solicitud para #{property.name}."
+      )
+    end
+    { status: :success, message: "La reserva ha sido rechazada y cancelada." }
+  end
+
   private
 
   def sync_client_name
@@ -200,36 +233,4 @@ class Reservation < ApplicationRecord
     ReservationReminderJob.set(wait_until: start_time - 24.hours).perform_later(self)
   end
 
-  def confirm_by_client!
-    return { status: :error, message: "Este enlace de confirmación ha expirado por seguridad (límite de 24 horas)." } if created_at < 24.hours.ago
-    return { status: :info, message: "Esta reserva ya se encuentra confirmada." } if confirmed?
-    return { status: :error, message: "No se puede confirmar una reserva que ya ha sido cancelada." } if cancelled?
-
-    transaction do
-      self.skip_notifications = true
-      update!(status: :confirmed)
-      Notification.create!(
-        user: user,
-        notifiable: self,
-        message: "¡Reserva Confirmada! #{client_name} ha aceptado la reserva para #{property.name}."
-      )
-    end
-    { status: :success, message: "¡Gracias! Tu reserva ha sido confirmada exitosamente." }
-  end
-
-  def reject_by_client!
-    return { status: :error, message: "Este enlace ha expirado por seguridad (límite de 24 horas)." } if created_at < 24.hours.ago
-    return { status: :info, message: "Esta reserva ya se encuentra cancelada." } if cancelled?
-
-    transaction do
-      self.skip_notifications = true
-      update!(status: :cancelled)
-      Notification.create!(
-        user: user,
-        notifiable: self,
-        message: "Reserva Rechazada: #{client_name} ha cancelado la solicitud para #{property.name}."
-      )
-    end
-    { status: :success, message: "La reserva ha sido rechazada y cancelada." }
-  end
 end
