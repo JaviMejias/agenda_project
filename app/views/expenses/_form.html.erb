@@ -1,0 +1,120 @@
+<%
+  input_class = "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white"
+  label_class = "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"
+
+  fields = [
+    { 
+      name: :category, 
+      label: "Categoría del Gasto", 
+      icon: "fa-tags", 
+      type: :select, 
+      options: Expense.translated_categories.invert.to_a 
+    },
+    { 
+      name: :amount, 
+      label: "Monto del Gasto ($)", 
+      icon: "fa-money-bill-wave", 
+      type: :currency, 
+      placeholder: "Ej: 15.000" 
+    },
+    { 
+      name: :expense_date, 
+      label: "Fecha del Gasto", 
+      icon: "fa-calendar-day", 
+      type: :datepicker 
+    }
+  ]
+%>
+
+<%= form_with(model: [@property, @expense], class: "space-y-6") do |f| %>
+  <% if @expense.errors.any? %>
+    <div class="p-6 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900 rounded-2xl animate-shake">
+      <h2 class="text-rose-800 dark:text-rose-400 text-sm font-black uppercase tracking-widest mb-3 flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <%= pluralize(@expense.errors.count, "error") %> impidieron guardar este gasto:
+      </h2>
+      <ul class="space-y-1">
+        <% @expense.errors.full_messages.each do |message| %>
+          <li class="text-rose-600 dark:text-rose-500 text-xs font-bold"><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <% fields.each do |field| %>
+      <div class="space-y-2 <%= field[:class] %>" <%= "data-controller=currency" if field[:type] == :currency %>>
+        <%= f.label field[:name], class: label_class do %>
+          <i class="fa-solid <%= field[:icon] %> text-gray-400 dark:text-slate-500 mr-1"></i> <%= field[:label] %>
+        <% end %>
+
+        <% case field[:type] %>
+        <% when :select %>
+          <%= f.select field[:name], field[:options], {}, { class: input_class } %>
+        <% when :currency %>
+          <%= f.text_field field[:name], 
+              value: (@expense.amount.present? ? number_with_delimiter(@expense.amount.to_i, delimiter: ".") : ""), 
+              placeholder: field[:placeholder], 
+              class: input_class, 
+              required: true, 
+              data: { action: "input->currency#format" } %>
+        <% when :datepicker %>
+          <%= f.text_field field[:name], 
+              value: (f.object.send(field[:name]) || Date.current).strftime("%Y-%m-%d"), 
+              class: input_class, 
+              required: true, 
+              data: { controller: "datepicker" } %>
+        <% else %>
+          <%= f.text_field field[:name], placeholder: field[:placeholder], class: input_class %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="space-y-2 md:col-span-2">
+      <%= f.label :description, class: label_class do %>
+        <i class="fa-solid fa-comment-dots text-gray-400 dark:text-slate-500 mr-1"></i> Descripción / Notas
+      <% end %>
+      <%= f.text_area :description, rows: 3, placeholder: "Ej: Pago de boleta de luz mes de Mayo, reparaciones de grifería...", class: input_class %>
+    </div>
+
+    <div class="space-y-2 md:col-span-2">
+      <%= f.label :vouchers, class: label_class do %>
+        <i class="fa-solid fa-images text-gray-400 dark:text-slate-500 mr-1"></i> Comprobantes / Fotos (Opcional)
+      <% end %>
+      <div class="relative group">
+        <%= f.file_field :vouchers, multiple: true, accept: "image/*,application/pdf", class: "block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-slate-800 dark:file:text-slate-300 dark:hover:file:bg-slate-700 transition-colors border border-gray-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 cursor-pointer" %>
+      </div>
+      <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-2">Puedes seleccionar varios archivos a la vez.</p>
+      
+      <% if @expense.vouchers.attached? %>
+        <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <% @expense.vouchers.each do |voucher| %>
+            <div class="relative group rounded-xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-sm">
+              <% if voucher.image? %>
+                <%= image_tag voucher.variant(resize_to_limit: [200, 200]), class: "w-full h-24 object-cover" %>
+              <% else %>
+                <div class="w-full h-24 bg-gray-50 dark:bg-slate-800 flex flex-col items-center justify-center text-gray-400">
+                  <i class="fa-solid fa-file-pdf text-2xl mb-1 text-rose-500"></i>
+                  <span class="text-[8px] font-black truncate w-full px-2 text-center"><%= voucher.filename %></span>
+                </div>
+              <% end %>
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <%= link_to rails_blob_path(voucher, disposition: "attachment"), class: "w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-colors" do %>
+                  <i class="fa-solid fa-download text-[10px]"></i>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="pt-6 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-start gap-8">
+    <%= render "shared/back_button", path: property_expenses_path(@property), form: true %>
+
+    <%= f.button type: "submit", class: "w-full sm:w-auto sm:min-w-[200px] flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl shadow-lg text-base font-bold text-white transition-all duration-300 transform hover:-translate-y-1 cursor-pointer", style: "background-color: #{@property.color || '#4f46e5'};" do %>
+      <i class="fa-solid fa-floppy-disk mr-2"></i> <%= @expense.new_record? ? "Guardar Gasto" : "Actualizar Gasto" %>
+    <% end %>
+  </div>
+<% end %>

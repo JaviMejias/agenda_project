@@ -15,9 +15,24 @@ class ReportStatsService
   end
 
   def stats
+    total_income = @reservations_in_range.confirmed.sum(:total_price)
+    total_expenses = Expense.where(property: @properties, expense_date: @range).sum(:amount)
+
+    # Caja Real: Pagos realizados en el periodo
+    abonos = Payment.joins(reservation: :property)
+                   .where(properties: { id: @properties.ids }, payment_date: @range, transaction_type: :abono)
+                   .sum(:amount)
+    reembolsos = Payment.joins(reservation: :property)
+                       .where(properties: { id: @properties.ids }, payment_date: @range, transaction_type: :reembolso)
+                       .sum(:amount)
+    actual_cash_in = abonos - reembolsos
+
     {
-      total_income: @reservations_in_range.confirmed.sum(:total_price),
+      total_income: total_income,
       total_loss: @reservations_in_range.blocked.sum(:total_price),
+      total_expenses: total_expenses,
+      actual_cash_in: actual_cash_in,
+      net_profit: actual_cash_in - total_expenses,
       reservations_count: @reservations_in_range.active.count,
       properties_data: properties_data,
       monthly_trend: monthly_trend
@@ -52,19 +67,29 @@ class ReportStatsService
         income: p.income.to_f,
         loss: p.loss.to_f,
         occupancy_rate: calculate_occupancy_rate_from(res),
+        reservations_count: res.count,
         color: p.color
       }
     end
   end
 
   def monthly_trend
+    six_months_ago = 5.months.ago.beginning_of_month.beginning_of_day
+
+    scope = Reservation.confirmed.where("start_time >= ?", six_months_ago)
+    scope = scope.joins(:property).where(properties: { company_id: @company_id }) if @company_id.present?
+
+    reservations = scope.select(:id, :start_time, :total_price)
+
+    data = reservations.group_by { |r| r.start_time.beginning_of_month }.transform_values do |res|
+      res.sum(&:total_price)
+    end
+
     (0..5).to_a.reverse.map do |i|
       month_start = i.months.ago.beginning_of_month
-      month_end   = i.months.ago.end_of_month
-      range       = month_start.beginning_of_day..month_end.end_of_day
       {
-        month:  I18n.l(month_start, format: "%B"),
-        income: monthly_income_scope(range).sum(:total_price)
+        month: I18n.l(month_start, format: "%B"),
+        income: data[month_start] || 0
       }
     end
   end

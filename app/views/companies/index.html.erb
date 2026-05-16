@@ -27,9 +27,15 @@
             <div class="flex-grow grid grid-cols-1 md:grid-cols-12 items-center p-4 sm:p-5 gap-4 sm:gap-6">
               
               <div class="md:col-span-4 flex items-center gap-4 min-w-0">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-slate-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 shadow-sm">
-                  <i class="fa-solid fa-building text-base"></i>
-                </div>
+                <% if company.logo.attached? %>
+                  <div class="w-12 h-12 rounded-2xl shrink-0 shadow-sm overflow-hidden border border-gray-100 dark:border-slate-700">
+                    <%= image_tag company.logo, loading: "lazy", class: "w-full h-full object-cover" %>
+                  </div>
+                <% else %>
+                  <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-slate-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 shadow-sm border border-gray-100 dark:border-slate-700">
+                    <i class="fa-solid fa-building text-base"></i>
+                  </div>
+                <% end %>
                 <div class="truncate">
                   <h3 class="text-sm sm:text-base font-black text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
                     <%= company.name %>

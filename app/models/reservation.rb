@@ -2,6 +2,7 @@ class Reservation < ApplicationRecord
   belongs_to :property
   belongs_to :user
   belongs_to :client, optional: true
+  has_many :payments, dependent: :destroy
 
   attr_accessor :skip_notifications
 
@@ -71,6 +72,39 @@ class Reservation < ApplicationRecord
     when "confirmed" then "bg-emerald-50 text-emerald-600 border-emerald-100"
     when "cancelled" then "bg-rose-50 text-rose-600 border-rose-100"
     when "blocked" then "bg-slate-700 text-white border-slate-800 shadow-sm"
+    else "bg-gray-50 text-gray-600 border-gray-100"
+    end
+  end
+
+  def total_paid
+    payments.abono.sum(:amount) - payments.reembolso.sum(:amount)
+  end
+
+  def pending_balance
+    (total_price || 0) - total_paid
+  end
+
+  def payment_state
+    paid = total_paid
+    if cancelled?
+      return paid == 0 ? "Devuelto / Reembolsado" : "Reembolso pendiente"
+    end
+
+    if paid <= 0
+      "No pagado"
+    elsif paid < (total_price || 0)
+      "Abonado"
+    else
+      "Pagado"
+    end
+  end
+
+  def payment_state_color_classes
+    case payment_state
+    when "Pagado" then "bg-emerald-50 text-emerald-600 border-emerald-100"
+    when "Abonado" then "bg-amber-50 text-amber-600 border-amber-100"
+    when "Devuelto / Reembolsado" then "bg-slate-50 text-slate-600 border-slate-100"
+    when "Reembolso pendiente" then "bg-rose-50 text-rose-600 border-rose-100"
     else "bg-gray-50 text-gray-600 border-gray-100"
     end
   end
@@ -217,11 +251,11 @@ class Reservation < ApplicationRecord
 
     case status
     when "pending"
-      ReservationMailer.pending_confirmation(self).deliver_now
+      ReservationMailer.pending_confirmation(self).deliver_later
     when "confirmed"
-      ReservationMailer.confirmed(self).deliver_now
+      ReservationMailer.confirmed(self).deliver_later
     when "cancelled"
-      ReservationMailer.cancelled(self).deliver_now
+      ReservationMailer.cancelled(self).deliver_later
     end
   end
 
@@ -230,6 +264,6 @@ class Reservation < ApplicationRecord
     return if start_time < 24.hours.from_now
     return unless saved_change_to_start_time? || saved_change_to_status?
 
-    ReservationReminderJob.set(wait_until: start_time - 24.hours).perform_later(self)
+    ReservationReminderJob.set(wait_until: start_time - 24.hours).perform_later(self, start_time)
   end
 end

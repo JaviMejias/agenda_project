@@ -17,7 +17,7 @@ class ReservationReminderJobTest < ActiveJob::TestCase
       @reservation.update_column(:status, :confirmed) # Force confirmed status
 
       assert_emails 1 do
-        ReservationReminderJob.perform_now(@reservation)
+        ReservationReminderJob.perform_now(@reservation, @reservation.start_time)
       end
     end
   end
@@ -27,7 +27,7 @@ class ReservationReminderJobTest < ActiveJob::TestCase
     @reservation.update!(start_time: start, end_time: start + 2.hours)
 
     assert_emails 0 do
-      ReservationReminderJob.perform_now(@reservation)
+      ReservationReminderJob.perform_now(@reservation, @reservation.start_time)
     end
   end
 
@@ -36,7 +36,7 @@ class ReservationReminderJobTest < ActiveJob::TestCase
     @reservation.update!(start_time: start, end_time: start + 2.hours, status: :pending)
 
     assert_emails 0 do
-      ReservationReminderJob.perform_now(@reservation)
+      ReservationReminderJob.perform_now(@reservation, @reservation.start_time)
     end
   end
 end

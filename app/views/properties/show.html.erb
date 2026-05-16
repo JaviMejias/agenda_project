@@ -1,6 +1,6 @@
 <% content_for :title, @property.name %>
 
-<div id="calendar_wrapper_<%= @property.id %>" class="mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in"
+<div id="calendar_wrapper_<%= @property.id %>" class="mx-auto px-2 sm:px-6 lg:px-8 py-6 animate-fade-in"
      data-controller="fullcalendar"
      data-fullcalendar-mode-value="booking"
      data-fullcalendar-per-hour-value="<%= @property.per_hour? %>"
@@ -11,76 +11,57 @@
   
   <%= render "shared/back_button", path: properties_path %>
 
-  <div class="bg-white dark:bg-slate-900 shadow-xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 mb-8 animate-fade-in-up">
-    <!-- Header -->
-    <div class="relative p-6 sm:p-10 bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border-b border-indigo-100 dark:border-slate-800 overflow-hidden">
-      <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
-      
-      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div class="flex items-center gap-4">
-          <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-3xl">
-            <i class="fa-solid fa-house-chimney"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-3 mb-1">
-              <div class="w-4 h-4 rounded-full shadow-inner border border-indigo-100 dark:border-indigo-900" style="background-color: <%= @property.color || '#4f46e5' %>;"></div>
-              <h3 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-tight"><%= @property.name %></h3>
-            </div>
-            <div class="flex flex-wrap items-center gap-4 mt-2">
-              <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest opacity-80 flex items-center gap-1.5">
-                <i class="fa-solid fa-align-left text-[8px]"></i> <%= @property.description %>
-              </p>
-              <% if @property.address.present? %>
-                <p class="text-gray-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
-                  <i class="fa-solid fa-location-dot text-[8px]"></i> <%= @property.address %>
-                </p>
-              <% end %>
-              <% if @property.company.present? %>
-                <p class="text-indigo-500 dark:text-indigo-300 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
-                  <i class="fa-solid fa-building text-[8px]"></i> <%= @property.company.name %>
-                </p>
-              <% end %>
-            </div>
-          </div>
+  <!-- Premium Header Refactored -->
+  <%= render "shared/index_header", 
+      title: @property.name, 
+      icon: "fa-solid fa-house-chimney", 
+      subtitle: "#{@property.address} · #{@property.company&.name}" do %>
+    
+    <div class="flex flex-wrap items-center justify-end gap-4">
+      <!-- Mini Stats Compactas -->
+      <div class="hidden sm:flex items-center gap-4 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md px-4 py-2 rounded-xl border border-indigo-50 dark:border-slate-700 shadow-sm">
+        <div class="text-right">
+          <p class="text-[8px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest leading-none mb-0.5">Precio</p>
+          <p class="text-xs font-black text-gray-900 dark:text-white leading-none">$<%= number_with_delimiter(@property.base_price.to_i, delimiter: ".") %></p>
         </div>
-
-        <div class="flex flex-col sm:flex-row items-center gap-3 relative z-10">
-          <% if current_user.admin? %>
-            <%= link_to edit_property_path(@property), class: "w-full sm:w-auto group flex items-center justify-center gap-2 px-5 py-3 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm" do %>
-              <i class="fa-solid fa-pen-to-square text-sm"></i>
-              <span class="text-[10px] font-black uppercase tracking-widest">Editar</span>
-            <% end %>
-
-            <%= button_to property_path(@property), method: :delete, data: { turbo_confirm: "¿Estás seguro de eliminar esta propiedad?" }, class: "w-full sm:w-auto group flex items-center justify-center gap-2 px-5 py-3 bg-white dark:bg-slate-800 text-red-600 dark:text-red-400 rounded-xl border border-red-100 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all shadow-sm" do %>
-              <i class="fa-solid fa-trash-can text-sm"></i>
-              <span class="text-[10px] font-black uppercase tracking-widest">Eliminar Propiedad</span>
-            <% end %>
-          <% end %>
-
-          <div class="flex items-center gap-6 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-4 rounded-2xl border border-indigo-100 dark:border-slate-700 shadow-sm">
-            <div class="text-left sm:text-right">
-              <dt class="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> Modelo</dt>
-              <dd class="text-sm font-black text-gray-900 dark:text-white"><%= @property.per_day? ? "Por Día" : "Por Hora" %></dd>
-            </div>
-            <div class="hidden sm:block w-px h-10 bg-indigo-100 dark:bg-slate-700"></div>
-            <div class="text-left sm:text-right">
-              <dt class="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1"><i class="fa-solid fa-tag mr-1"></i> Precio</dt>
-              <dd class="text-sm font-black text-gray-900 dark:text-white">$<%= number_with_delimiter(@property.base_price.to_i, delimiter: ".") %></dd>
-            </div>
-          </div>
+        <div class="w-px h-6 bg-indigo-100 dark:bg-slate-700"></div>
+        <div class="text-right">
+          <p class="text-[8px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest leading-none mb-0.5">Cobro</p>
+          <p class="text-xs font-black text-gray-900 dark:text-white leading-none"><%= @property.per_day? ? "Día" : "Hora" %></p>
         </div>
       </div>
+
+      <!-- Acciones de Edición (Solo Iconos) -->
+      <% if current_user.admin? %>
+        <div class="flex items-center gap-2">
+          <%= link_to edit_property_path(@property), class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 text-gray-400 hover:text-indigo-600 border border-gray-100 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm active:scale-90", title: "Editar Propiedad" do %>
+            <i class="fa-solid fa-pen-to-square text-xs"></i>
+          <% end %>
+
+          <%= button_to property_path(@property), method: :delete, data: { turbo_confirm: "¿Estás seguro de eliminar esta propiedad?" }, class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 text-gray-400 hover:text-rose-600 border border-gray-100 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm active:scale-90", title: "Eliminar Propiedad" do %>
+            <i class="fa-solid fa-trash-can text-xs"></i>
+          <% end %>
+        </div>
+
+        <!-- Toggle de Vistas -->
+        <div class="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-1 rounded-xl border border-indigo-100 dark:border-slate-700 inline-flex shadow-sm">
+          <span class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 tab-active">Agenda</span>
+          <%= link_to property_expenses_path(@property), class: "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 text-gray-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400" do %>Gastos<% end %>
+        </div>
+      <% end %>
     </div>
-    
+  <% end %>
+
+  <div class="bg-white dark:bg-slate-900 shadow-xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 mb-8">
     <div class="p-6 sm:p-10">
       <div class="flex flex-col lg:flex-row gap-8">
         <div class="lg:w-7/12">
-           <%= render "shared/calendar_container", property: @property, omit_controller: true, omit_inputs: true %>
+          <%= render "shared/calendar_container", property: @property, omit_controller: true, omit_inputs: true %>
         </div>
         <div class="lg:w-5/12">
-           <div class="sticky top-6">
-                <%= render "reservations/booking_form", property: @property, reservation: @reservation || @property.reservations.build %>
-           </div>
+          <div class="sticky top-6">
+            <%= render "reservations/booking_form", property: @property, reservation: @reservation || @property.reservations.build %>
+          </div>
         </div>
       </div>
     </div>

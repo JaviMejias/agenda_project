@@ -311,3 +311,17 @@ body { font-family: 'Inter', sans-serif; }
   border: 1px solid rgba(0, 0, 0, 0.05) !important;
   z-index: 9999 !important;
 }
+
+/* ── Custom View Toggles ── */
+.tab-active {
+  background-color: white !important;
+  color: #4f46e5 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+  transform: scale(1.02);
+}
+
+html.dark .tab-active {
+  background-color: #1e293b !important;
+  color: #818cf8 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
+}

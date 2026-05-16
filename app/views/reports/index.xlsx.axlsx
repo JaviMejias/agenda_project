@@ -3,76 +3,95 @@ wb = xlsx_package.workbook
 wb.styles do |style|
   project_color = "4F46E5"
   emerald_color = "059669"
-  border = { style: :thin, color: "E5E7EB" }
+  border_color = "94A3B8"
+  border = { style: :thin, color: border_color }
 
   title_style = style.add_style(sz: 20, b: true, fg_color: project_color, alignment: { vertical: :center })
   header_style = style.add_style(bg_color: project_color, fg_color: "FFFFFF", b: true, sz: 12, alignment: { horizontal: :center, vertical: :center }, border: border)
   sub_header_style = style.add_style(bg_color: "F8FAFC", b: true, sz: 10, alignment: { horizontal: :center }, border: border, fg_color: "475569")
 
   cell_style = style.add_style(alignment: { horizontal: :left, vertical: :center }, border: border, sz: 10)
+  number_style = style.add_style(alignment: { horizontal: :center, vertical: :center }, border: border, sz: 10, b: true)
   money_style = style.add_style(format_code: "$#,##0", alignment: { horizontal: :right }, border: border, sz: 10, b: true, fg_color: emerald_color)
   money_loss_style = style.add_style(format_code: "$#,##0", alignment: { horizontal: :right }, border: border, sz: 10, fg_color: "DC2626")
   percent_style = style.add_style(format_code: "0.0%", alignment: { horizontal: :center }, border: border, sz: 10)
   date_style = style.add_style(alignment: { horizontal: :left }, b: true, sz: 10)
+  no_style = style.add_style(border: nil)
 
   wb.add_worksheet(name: "Reporte de Gestión", tab_color: project_color) do |sheet|
     sheet.page_setup.orientation = :landscape
 
+    # Fila 1
     sheet.add_row [ "REPORTE DE GESTIÓN INMOBILIARIA" ], style: title_style
-    sheet.add_row [ "Generado por Agenda Propietario" ], style: style.add_style(sz: 10, i: true, fg_color: "6B7280")
+    sheet.merge_cells "A1:E1"
 
+    # Fila 2
+    sheet.add_row [ "Periodo de Análisis:", "#{@start_date.strftime('%d/%m/%Y')} al #{@end_date.strftime('%d/%m/%Y')}" ], style: [ date_style, date_style ]
+
+    # Fila 3 (Opcional Empresa)
     if @company_id.present?
       company = Company.find_by(id: @company_id)
       sheet.add_row [ "Empresa:", company&.name || "N/A" ], style: [ date_style, date_style ]
+    else
+      sheet.add_row []
     end
 
-    sheet.add_row [ "Periodo de Análisis:", "#{@start_date} al #{@end_date}" ], style: [ date_style, date_style ]
+    # Fila 4: RESUMEN EJECUTIVO
+    sheet.add_row [ "RESUMEN EJECUTIVO", "" ], style: [ header_style, header_style ]
+    sheet.merge_cells "A4:B4"
+
+    # Fila 5: Header
+    sheet.add_row [ "Métrica", "Valor Actual" ], style: sub_header_style
+
+    # Filas 6-11
+    sheet.add_row [ "Ingresos Teóricos (Reservas)", @total_income ], style: [ cell_style, money_style ]
+    sheet.add_row [ "Caja Real (Abonos Recibidos)", @actual_cash_in ], style: [ cell_style, money_style ]
+    sheet.add_row [ "Gastos Operativos", @total_expenses ], style: [ cell_style, money_loss_style ]
+    sheet.add_row [ "Utilidad Neta", @net_profit ], style: [ cell_style, money_style ]
+    sheet.add_row [ "Reservas Realizadas", @reservations_count.to_i ], style: [ cell_style, number_style ]
+    sheet.add_row [ "Pérdida por Bloqueo", @total_loss ], style: [ cell_style, money_loss_style ]
+
+    # Fila 12: Espacio
     sheet.add_row []
 
-    sheet.add_row [ "RESUMEN EJECUTIVO" ], style: header_style
-    sheet.add_row [ "Métrica", "Valor Actual", "Estado" ], style: sub_header_style
-    sheet.add_row [ "Ingresos Totales", @total_income, "CONFIRMADO" ], style: [ cell_style, money_style, style.add_style(fg_color: "059669", b: true, alignment: { horizontal: :center }, border: border) ]
-    sheet.add_row [ "Reservas Realizadas", @reservations_count, "ACTIVO" ], style: [ cell_style, cell_style, style.add_style(fg_color: "4F46E5", b: true, alignment: { horizontal: :center }, border: border) ]
-    sheet.add_row [ "Pérdida por Bloqueo", @total_loss, "PROYECTADO" ], style: [ cell_style, money_loss_style, style.add_style(fg_color: "DC2626", b: true, alignment: { horizontal: :center }, border: border) ]
-    sheet.add_row []
+    # Fila 13: ANÁLISIS DETALLADO POR PROPIEDAD
+    sheet.add_row [ "ANÁLISIS DETALLADO POR PROPIEDAD", "", "", "", "" ], style: [ header_style, header_style, header_style, header_style, header_style ]
+    sheet.merge_cells "A13:E13"
 
-    sheet.add_row [ "ANÁLISIS DETALLADO POR PROPIEDAD" ], style: header_style
-    sheet.add_row [ "Propiedad", "Ingresos Reales", "Pérdida Bloqueo", "Tasa Ocupación" ], style: sub_header_style
+    # Fila 14: Header Detalle
+    sheet.add_row [ "Propiedad", "Ingresos Reales", "Pérdida Bloqueo", "Ocupación", "Reservas" ], style: sub_header_style
 
-    start_row_table = sheet.rows.size + 1
-    @properties_data.select { |d| d[:income] > 0 }.each do |data|
+    start_row_table = 15
+    @properties_data.each do |data|
       sheet.add_row [
         data[:name],
         data[:income],
         data[:loss],
-        data[:occupancy_rate] / 100.0
-      ], style: [ cell_style, money_style, money_loss_style, percent_style ]
+        data[:occupancy_rate] / 100.0,
+        data[:reservations_count].to_i
+      ], style: [ cell_style, money_style, money_loss_style, percent_style, number_style ]
     end
     end_row_table = sheet.rows.size
 
-    sheet.auto_filter = "A#{start_row_table-1}:D#{end_row_table}"
-
     sheet.add_row []
 
-    sheet.add_row [ "TENDENCIA MENSUAL" ], style: header_style
+    # Fila TENDENCIA (Dinámica)
+    trend_header_row = sheet.rows.size + 1
+    sheet.add_row [ "TENDENCIA MENSUAL", "" ], style: [ header_style, header_style ]
+    sheet.merge_cells "A#{trend_header_row}:B#{trend_header_row}"
+
     sheet.add_row [ "Mes", "Ingresos Mensuales" ], style: sub_header_style
     @monthly_trend.each do |trend|
       sheet.add_row [ trend[:month], trend[:income] ], style: [ cell_style, money_style ]
     end
 
-    sheet.column_widths 35, 20, 20, 20
-    sheet.merge_cells "A1:D1"
-    sheet.merge_cells "A2:D2"
-    sheet.merge_cells "A5:C5"
-    sheet.merge_cells "A11:D11"
+    sheet.column_widths 35, 20, 20, 20, 20
 
-    sheet.sheet_view.pane do |pane|
-      pane.top_left_cell = "A5"
-      pane.state = :frozen
-      pane.y_split = 4
-    end
+    # No frozen panes to keep the view clean as requested
 
-    sheet.add_chart(Axlsx::Bar3DChart, start_at: "F5", end_at: "L20", title: "Ingresos por Propiedad") do |chart|
+
+    # Gráfico ajustado
+    sheet.add_chart(Axlsx::Bar3DChart, start_at: "G4", end_at: "M20", title: "Ingresos por Propiedad") do |chart|
       chart.add_series data: sheet["B#{start_row_table}:B#{end_row_table}"],
                        labels: sheet["A#{start_row_table}:A#{end_row_table}"],
                        title: "Ingresos ($)",

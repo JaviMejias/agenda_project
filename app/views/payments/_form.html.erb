@@ -1,0 +1,123 @@
+<%
+  input_class = "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white"
+  label_class = "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"
+
+  fields = [
+    { 
+      name: :transaction_type, 
+      label: "Tipo de Transacción", 
+      icon: "fa-exchange-alt", 
+      type: :select, 
+      options: [['Abono / Pago Total', 'abono'], ['Reembolso / Devolución', 'reembolso']] 
+    },
+    { 
+      name: :payment_method, 
+      label: "Método de Pago", 
+      icon: "fa-credit-card", 
+      type: :select, 
+      options: [['Efectivo', 'cash'], ['Transferencia', 'transfer'], ['Tarjeta (Crédito/Débito)', 'card'], ['Depósito / Otro', 'other']],
+      data: { payment_form_target: "methodSelect", action: "change->payment-form#toggleFields" },
+      selected: @payment.payment_method || 'cash'
+    },
+    { 
+      name: :amount, 
+      label: "Monto ($)", 
+      icon: "fa-money-bill", 
+      type: :currency, 
+      placeholder: "Ej: 25.000" 
+    },
+    { 
+      name: :payment_date, 
+      label: "Fecha y Hora", 
+      icon: "fa-calendar", 
+      type: :datepicker 
+    }
+  ]
+%>
+
+<%= form_with(model: [@reservation, @payment], class: "space-y-6", data: { controller: "payment-form" }) do |f| %>
+  <% if @payment.errors.any? %>
+    <div class="p-6 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900 rounded-2xl animate-shake">
+      <h2 class="text-rose-800 dark:text-rose-400 text-sm font-black uppercase tracking-widest mb-3 flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <%= @payment.errors.count == 1 ? "1 error impide" : "#{@payment.errors.count} errores impiden" %> guardar este registro:
+      </h2>
+      <ul class="space-y-1">
+        <% @payment.errors.full_messages.each do |message| %>
+          <li class="text-rose-600 dark:text-rose-500 text-xs font-bold"><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <% fields.each do |field| %>
+      <div class="space-y-2 <%= field[:class] %>" <%= "data-controller=currency" if field[:type] == :currency %>>
+        <%= f.label field[:name], class: label_class do %>
+          <i class="fa-solid <%= field[:icon] %> text-gray-400 dark:text-slate-500 mr-1"></i> <%= field[:label] %>
+        <% end %>
+
+        <% case field[:type] %>
+        <% when :select %>
+          <%= f.select field[:name], field[:options], { selected: field[:selected] }, { class: input_class, data: field[:data] } %>
+        <% when :currency %>
+          <% max_allowed = @payment.new_record? ? @reservation.pending_balance : (@reservation.pending_balance + @payment.amount) %>
+          <%= f.text_field :amount, 
+              value: (@payment.amount.present? ? number_with_delimiter(@payment.amount.to_i, delimiter: ".") : (@reservation.pending_balance > 0 ? number_with_delimiter(@reservation.pending_balance.to_i, delimiter: ".") : "")), 
+              placeholder: field[:placeholder], 
+              class: input_class, 
+              required: true, 
+              data: { action: "input->currency#format", currency_max_value: max_allowed.to_i } %>
+          <div class="mt-2 text-xs font-bold text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800/50 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 flex justify-between items-center shadow-inner">
+            <span>Saldo Restante:</span>
+            <span data-currency-target="balanceDisplay" class="text-indigo-600 dark:text-indigo-400 font-black text-sm tracking-wide">--</span>
+          </div>
+        <% when :datepicker %>
+          <%= f.text_field field[:name], 
+              value: (f.object.send(field[:name]) || Time.current).strftime("%Y-%m-%d %H:%M"), 
+              class: input_class, 
+              required: true, 
+              data: { controller: "datepicker", datepicker_enable_time_value: "true" } %>
+        <% else %>
+          <%= f.text_field field[:name], placeholder: field[:placeholder], class: input_class %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Campos Especiales (Transferencia/Depósito) -->
+    <div data-payment-form-target="operationFields" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 bg-indigo-50/50 dark:bg-slate-800/30 p-6 rounded-2xl border border-indigo-100 dark:border-slate-700">
+      <div class="space-y-2">
+        <%= f.label :operation_number, class: label_class do %>
+          <i class="fa-solid fa-hashtag text-gray-400 dark:text-slate-500 mr-1"></i> N° de Operación / Transferencia
+        <% end %>
+        <%= f.text_field :operation_number, placeholder: "Ej: 987654321", class: input_class %>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :voucher, class: label_class do %>
+          <i class="fa-solid fa-file-invoice text-gray-400 dark:text-slate-500 mr-1"></i> Comprobante (Voucher)
+        <% end %>
+        <%= f.file_field :voucher, accept: "image/*,application/pdf", class: "block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 dark:hover:file:bg-indigo-900/50 transition-colors border border-gray-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 cursor-pointer" %>
+        <% if @payment.voucher.attached? %>
+          <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-2 font-bold"><i class="fa-solid fa-paperclip mr-1"></i> Archivo actual: <%= @payment.voucher.filename %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Notas -->
+    <div class="space-y-2 md:col-span-2">
+      <%= f.label :notes, class: label_class do %>
+        <i class="fa-solid fa-comment text-gray-400 dark:text-slate-500 mr-1"></i> Notas o Detalles (Opcional)
+      <% end %>
+      <%= f.text_area :notes, rows: 3, placeholder: "Ej: Comprobante de transferencia #123456 banco BCI...", class: input_class %>
+    </div>
+  </div>
+
+  <div class="pt-6 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-start gap-8">
+    <%= render "shared/back_button", path: reservation_path(@reservation), form: true %>
+
+    <%= f.button type: "submit", class: "w-full sm:w-auto sm:min-w-[200px] flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transform hover:-translate-y-1 transition-all duration-300" do %>
+      <i class="fa-solid fa-floppy-disk mr-2"></i> <%= @payment.new_record? ? "Guardar Transacción" : "Actualizar Transacción" %>
+    <% end %>
+  </div>
+<% end %>

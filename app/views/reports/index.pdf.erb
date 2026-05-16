@@ -126,26 +126,41 @@
 
 <div class="pdf-header">
   <h1>Reporte de Gestión</h1>
-  <p>Agenda Propietario • Periodo: <%= l(@start_date) %> al <%= l(@end_date) %></p>
+  <p>Agenda Propietario • Periodo: <%= @start_date.strftime('%d/%m/%Y') %> al <%= @end_date.strftime('%d/%m/%Y') %></p>
 </div>
 
 <div class="stats-grid">
-  <div class="stat-card">
-    <div class="stat-label">Ingresos Totales</div>
-    <div class="stat-value" style="color: #059669;">$<%= number_to_currency(@total_income, unit: "", separator: ",", delimiter: ".") %></div>
+  <div class="stat-card" style="width: 25%;">
+    <div class="stat-label">Ingresos Teóricos</div>
+    <div class="stat-value">$<%= number_to_currency(@total_income, unit: "", separator: ",", delimiter: ".") %></div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">Reservas Realizadas</div>
+  <div class="stat-card" style="width: 25%;">
+    <div class="stat-label">Reservas</div>
     <div class="stat-value"><%= @reservations_count %></div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">Pérdida por Bloqueo</div>
+  <div class="stat-card" style="width: 25%;">
+    <div class="stat-label">Pérdida Bloqueo</div>
     <div class="stat-value" style="color: #dc2626;">$<%= number_to_currency(@total_loss, unit: "", separator: ",", delimiter: ".") %></div>
   </div>
-  <div class="stat-card">
+  <div class="stat-card" style="width: 25%;">
     <% avg_occ = @properties_data.map { |p| p[:occupancy_rate] }.sum / [@properties_data.size, 1].max %>
-    <div class="stat-label">Ocupación Promedio</div>
+    <div class="stat-label">Ocupación Prom.</div>
     <div class="stat-value"><%= avg_occ.round(1) %>%</div>
+  </div>
+</div>
+
+<div class="stats-grid" style="margin-top: -20px;">
+  <div class="stat-card" style="width: 33.33%; border-left: 5px solid #059669;">
+    <div class="stat-label">Caja Real (Abonos)</div>
+    <div class="stat-value" style="color: #059669;">$<%= number_to_currency(@actual_cash_in, unit: "", separator: ",", delimiter: ".") %></div>
+  </div>
+  <div class="stat-card" style="width: 33.33%; border-left: 5px solid #dc2626;">
+    <div class="stat-label">Gastos Operativos</div>
+    <div class="stat-value" style="color: #dc2626;">-$<%= number_to_currency(@total_expenses, unit: "", separator: ",", delimiter: ".") %></div>
+  </div>
+  <div class="stat-card" style="width: 33.33%; border-left: 5px solid #4f46e5; background-color: #f8fafc;">
+    <div class="stat-label">Utilidad Neta</div>
+    <div class="stat-value" style="color: #111827;">$<%= number_to_currency(@net_profit, unit: "", separator: ",", delimiter: ".") %></div>
   </div>
 </div>
 

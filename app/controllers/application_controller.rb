@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   include Pagy::Method
   include Pundit::Authorization
 
+  before_action :authenticate_user!
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   around_action :set_time_zone

@@ -30,7 +30,8 @@ class Notification < ApplicationRecord
     broadcast_replace_to(
       "notifications_#{user_id}",
       target: "notifications_count",
-      html: "<span id='notifications_count' class='absolute top-1.5 right-1.5 flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-black text-white bg-red-500 rounded-full border-2 border-white dark:border-slate-900'>#{user.notifications.unread.count}</span>"
+      partial: "notifications/count_badge",
+      locals: { count: user.notifications.unread.count }
     )
 
     broadcast_append_to(

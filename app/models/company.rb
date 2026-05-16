@@ -1,6 +1,7 @@
 class Company < ApplicationRecord
   belongs_to :user
   has_many :properties, dependent: :nullify
+  has_one_attached :logo
 
   include RutValidatable
 

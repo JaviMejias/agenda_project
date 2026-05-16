@@ -15,8 +15,11 @@ class DashboardStatsService
 
   def stats
     {
-      completed_revenue: @reservations.completed.sum(:total_price),
+      completed_revenue: @reservations.confirmed.sum(:total_price),
       projected_revenue: @reservations.projected.sum(:total_price),
+      actual_cash_in: Payment.joins(reservation: :property).where(properties: { id: @properties.ids }, payment_date: @range, transaction_type: :abono).sum(:amount) -
+                      Payment.joins(reservation: :property).where(properties: { id: @properties.ids }, payment_date: @range, transaction_type: :reembolso).sum(:amount),
+      total_expenses: Expense.where(property: @properties, expense_date: @range).sum(:amount),
       pending_count: @reservations.pending.count,
       total_count: @reservations.active.count,
       status_counts: @reservations.group(:status).count,

@@ -1,15 +1,14 @@
 class ReservationReminderJob < ApplicationJob
   queue_as :default
 
-  def perform(reservation)
+  # expected_start_time is passed at enqueue time so that if the reservation's
+  # start_time changes later (which enqueues a new job), older stale jobs
+  # detect the mismatch and exit early — avoiding duplicate reminder emails.
+  def perform(reservation, expected_start_time)
     return if reservation.blank?
-    return unless reservation.confirmed?
+    return unless reservation.confirmed? && !reservation.blocked?
+    return if reservation.start_time != expected_start_time
 
-    window_start = reservation.start_time - 24.hours - 5.minutes
-    window_end = reservation.start_time - 24.hours + 5.minutes
-
-    if Time.zone.now.between?(window_start, window_end)
-      ReservationMailer.reminder(reservation).deliver_now
-    end
+    ReservationMailer.reminder(reservation).deliver_now
   end
 end

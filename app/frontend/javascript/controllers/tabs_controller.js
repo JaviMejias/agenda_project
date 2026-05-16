@@ -1,30 +1,32 @@
 import { Controller } from "@hotwired/stimulus"
 
-
 export default class extends Controller {
   static targets = ["tab", "panel"]
   static values = { default: String }
 
   connect() {
-    this.switch({ currentTarget: this.tabTargets.find(t => t.dataset.tab === this.defaultValue) || this.tabTargets[0] })
+    const defaultTab = this.defaultValue || this.tabTargets[0].dataset.tab
+    this.activateTab(defaultTab)
   }
 
   switch(event) {
-    const selectedTab = event.currentTarget
-    const tabName = selectedTab.dataset.tab
+    const tabName = event.currentTarget.dataset.tab
+    this.activateTab(tabName)
+  }
 
-    
+  activateTab(tabName) {
+    // Actualizar Botones
     this.tabTargets.forEach(tab => {
       if (tab.dataset.tab === tabName) {
-        tab.classList.add("bg-white", "text-indigo-600", "shadow-sm")
-        tab.classList.remove("text-gray-500", "hover:bg-gray-200/50")
+        tab.classList.add("tab-active")
+        tab.classList.remove("text-gray-400", "dark:text-slate-500", "hover:text-indigo-600", "dark:hover:text-indigo-400")
       } else {
-        tab.classList.remove("bg-white", "text-indigo-600", "shadow-sm")
-        tab.classList.add("text-gray-500", "hover:bg-gray-200/50")
+        tab.classList.remove("tab-active")
+        tab.classList.add("text-gray-400", "dark:text-slate-500", "hover:text-indigo-600", "dark:hover:text-indigo-400")
       }
     })
 
-    
+    // Actualizar Paneles
     this.panelTargets.forEach(panel => {
       if (panel.dataset.panel === tabName) {
         panel.classList.remove("hidden")
@@ -32,5 +34,8 @@ export default class extends Controller {
         panel.classList.add("hidden")
       }
     })
+
+    // Dispatch resize for fullcalendar just in case
+    window.dispatchEvent(new Event('resize'))
   }
 }

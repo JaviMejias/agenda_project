@@ -1,6 +1,6 @@
 class CompaniesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_company, only: %i[ show edit update destroy associate_properties ]
+  before_action :set_company, only: %i[ show edit update destroy associate_properties destroy_logo ]
 
   def index
     authorize Company
@@ -66,6 +66,15 @@ class CompaniesController < ApplicationController
     end
   end
 
+  def destroy_logo
+    authorize @company
+    @company.logo.purge if @company.logo.attached?
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.remove("company_logo_preview") }
+      format.html { redirect_to edit_company_path(@company), notice: "Logo eliminado exitosamente." }
+    end
+  end
+
   private
 
   def set_company
@@ -73,6 +82,6 @@ class CompaniesController < ApplicationController
   end
 
   def company_params
-    params.require(:company).permit(:name, :rut, :business_type, :address)
+    params.require(:company).permit(:name, :rut, :business_type, :address, :phone, :email, :logo)
   end
 end

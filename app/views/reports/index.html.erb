@@ -1,12 +1,12 @@
+<% content_for :title, "Dashboard de Reportes" %>
 <div class="mx-auto px-4 sm:px-6 lg:px-8 py-6" data-controller="dashboard-filters">
-  
   <% if params[:format] == 'pdf' %>
     <div class="header">
       <h1>Reporte de Gestión</h1>
       <% if @company_id.present? %>
         <p>Empresa: <%= current_user.companies.find_by(id: @company_id)&.name %></p>
       <% end %>
-      <p>Periodo: <%= l(@start_date) %> al <%= l(@end_date) %></p>
+      <p>Periodo: <%= @start_date.strftime('%d/%m/%Y') %> al <%= @end_date.strftime('%d/%m/%Y') %></p>
     </div>
   <% else %>
     <%= render "shared/index_header", 
@@ -14,7 +14,6 @@
         icon: "fa-solid fa-file-invoice-dollar", 
         subtitle: (@company_id.present? ? current_user.companies.find_by(id: @company_id)&.name : "Análisis Global de Ingresos"),
         large_form: true do %>
-      
       <%= form_with url: reports_path, method: :get, class: "grid grid-cols-1 md:grid-cols-12 items-end gap-3 w-full",
           data: { 
             dashboard_filters_target: "form",
@@ -32,10 +31,9 @@
                 class: "w-full" %>
           </div>
         </div>
-
         <div class="md:col-span-2 text-left">
           <%= f.label :start_date, "Desde", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
-          <%= f.text_field :start_date, value: @start_date, 
+          <%= f.text_field :start_date, value: @start_date.strftime('%d/%m/%Y'), 
               data: { 
                 controller: "datepicker",
                 dashboard_filters_target: "startDate",
@@ -43,10 +41,9 @@
               }, 
               class: "w-full h-[38px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
         </div>
-
         <div class="md:col-span-2 text-left">
           <%= f.label :end_date, "Hasta", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
-          <%= f.text_field :end_date, value: @end_date, 
+          <%= f.text_field :end_date, value: @end_date.strftime('%d/%m/%Y'), 
               data: { 
                 controller: "datepicker",
                 dashboard_filters_target: "endDate",
@@ -54,19 +51,16 @@
               }, 
               class: "w-full h-[38px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
         </div>
-
         <div class="md:col-span-5 flex gap-2">
           <button type="button" data-action="click->dashboard-filters#reset" class="flex-grow flex items-center justify-center h-[38px] px-4 bg-white/80 dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-xl hover:bg-white dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all text-xs font-bold shadow-sm border border-indigo-50 dark:border-slate-700" title="Restablecer">
             <i class="fa-solid fa-arrow-rotate-left"></i>
           </button>
-
           <%= link_to reports_path(format: :xlsx, start_date: @start_date, end_date: @end_date, company_id: @company_id), 
               class: "flex-grow flex items-center justify-center h-[38px] px-4 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 rounded-xl hover:bg-emerald-600 hover:text-white transition-all gap-2 text-xs font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-900/30 shadow-sm",
               title: "Exportar Excel" do %>
             <i class="fa-solid fa-file-excel"></i>
             <span class="hidden lg:inline">Excel</span>
           <% end %>
-
           <%= link_to reports_path(format: :pdf, start_date: @start_date, end_date: @end_date, company_id: @company_id), 
               class: "flex-grow flex items-center justify-center h-[38px] px-4 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-600 hover:text-white transition-all gap-2 text-xs font-black uppercase tracking-widest border border-rose-100 dark:border-rose-900/30 shadow-sm",
               title: "Exportar PDF", target: "_blank" do %>
@@ -76,39 +70,28 @@
         </div>
       <% end %>
     <% end %>
-  </div>
   <% end %>
-
   <%= render "shared/loading_state", target: "dashboard-filters", text: "Actualizando Reportes..." %>
-
   <turbo-frame id="reports_content" class="relative block" data-action="turbo:frame-load->dashboard-filters#hideLoading">
-
     <div data-controller="reports-charts"
          data-reports-charts-properties-value="<%= @properties_data.to_json %>"
          data-reports-charts-trend-value="<%= @monthly_trend.to_json %>"
          class="animate-fade-in">
-
-    <!-- Resumen Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <!-- Total Ingresos -->
-      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-emerald-100/10 dark:shadow-none relative overflow-hidden group">
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors"></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
         <div class="relative flex items-center gap-4">
-          <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shrink-0">
-            <i class="fa-solid fa-money-bill-trend-up text-sm"></i>
+          <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shrink-0">
+            <i class="fa-solid fa-calculator text-sm"></i>
           </div>
           <div class="min-w-0">
-            <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Ingresos Totales</p>
+            <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Ingresos Teóricos</p>
             <h3 class="text-lg font-black text-gray-900 dark:text-white truncate">$<%= number_to_currency(@total_income, unit: "", separator: ",", delimiter: ".") %></h3>
           </div>
         </div>
       </div>
-
-      <!-- Reservas Realizadas -->
-      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-indigo-100/10 dark:shadow-none relative overflow-hidden group">
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-colors"></div>
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
         <div class="relative flex items-center gap-4">
-          <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-sm shrink-0">
             <i class="fa-solid fa-calendar-check text-sm"></i>
           </div>
           <div class="min-w-0">
@@ -117,12 +100,9 @@
           </div>
         </div>
       </div>
-
-      <!-- Pérdida por Bloqueo -->
-      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-slate-100/10 dark:shadow-none relative overflow-hidden group">
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-slate-500/5 rounded-full blur-2xl group-hover:bg-slate-500/10 transition-colors"></div>
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
         <div class="relative flex items-center gap-4">
-          <div class="w-10 h-10 rounded-xl bg-slate-600 flex items-center justify-center text-white shadow-lg shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 shadow-sm shrink-0">
             <i class="fa-solid fa-lock text-sm"></i>
           </div>
           <div class="min-w-0">
@@ -131,11 +111,8 @@
           </div>
         </div>
       </div>
-
-      <!-- Ocupación Promedio -->
       <% avg_occ = @properties_data.map { |p| p[:occupancy_rate] }.sum / [@properties_data.size, 1].max %>
-      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-amber-100/10 dark:shadow-none relative overflow-hidden group">
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-colors"></div>
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
         <div class="relative flex items-center gap-4">
           <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white shadow-lg shrink-0">
             <i class="fa-solid fa-percent text-sm"></i>
@@ -148,6 +125,46 @@
       </div>
     </div>
 
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-emerald-100/10 dark:shadow-none relative overflow-hidden group">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shrink-0">
+            <i class="fa-solid fa-money-bill-trend-up text-sm"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Caja Real (Abonos)</p>
+            <h3 class="text-lg font-black text-emerald-600 dark:text-emerald-400 truncate">$<%= number_to_currency(@actual_cash_in, unit: "", separator: ",", delimiter: ".") %></h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-rose-100/10 dark:shadow-none relative overflow-hidden group">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-rose-600 flex items-center justify-center text-white shadow-lg shrink-0">
+            <i class="fa-solid fa-file-invoice-dollar text-sm"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Gastos Operativos</p>
+            <h3 class="text-lg font-black text-rose-600 dark:text-rose-400 truncate">-$<%= number_to_currency(@total_expenses, unit: "", separator: ",", delimiter: ".") %></h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-indigo-100/20 dark:shadow-none relative overflow-hidden group border-b-4 border-b-indigo-500">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-indigo-900 flex items-center justify-center text-white shadow-lg shrink-0">
+            <i class="fa-solid fa-scale-balanced text-sm"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Utilidad Neta</p>
+            <h3 class="text-lg font-black text-gray-900 dark:text-white truncate">$<%= number_to_currency(@net_profit, unit: "", separator: ",", delimiter: ".") %></h3>
+          </div>
+        </div>
+      </div>
+    </div>
     <% unless params[:format] == 'pdf' %>
       <% if @reservations_count > 0 %>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -160,8 +177,6 @@
               <canvas data-reports-charts-target="incomeChart"></canvas>
             </div>
           </div>
-
-          <!-- Gráfico de Ocupación % -->
           <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm">
             <h3 class="text-lg font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2">
               <i class="fa-solid fa-chart-pie text-emerald-500"></i> Tasa de Ocupación (%)
@@ -171,7 +186,7 @@
             </div>
           </div>
         </div>
-<% else %>
+    <% else %>
       <div class="bg-white dark:bg-slate-900 p-12 rounded-3xl border border-dashed border-gray-200 dark:border-slate-800 mb-8 flex flex-col items-center justify-center text-center">
           <div class="w-16 h-16 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-400 dark:text-slate-500 mb-4">
             <i class="fa-solid fa-chart-area text-2xl"></i>
@@ -181,8 +196,6 @@
         </div>
       <% end %>
     <% end %>
-
-    <!-- Tabla de Detalle -->
     <div class="<%= params[:format] == 'pdf' ? '' : 'bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden' %>">
       <div class="px-8 py-6 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
         <h3 class="text-lg font-black text-gray-900 dark:text-white">Desglose por Propiedad</h3>

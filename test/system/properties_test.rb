@@ -34,7 +34,7 @@ class PropertiesTest < ApplicationSystemTestCase
     fill_in "property[name]", with: "Nombre Editado"
     click_on "Guardar Propiedad"
 
-    assert_text "Propiedad creada correctamente"
+    assert_text "Propiedad actualizada correctamente"
   end
 
   test "should destroy Property" do

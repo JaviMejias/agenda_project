@@ -9,6 +9,9 @@ class ReportsController < ApplicationController
     @stats              = ReportStatsService.new(@start_date, @end_date, company_id: @company_id).stats
     @total_income       = @stats[:total_income]
     @total_loss         = @stats[:total_loss]
+    @total_expenses     = @stats[:total_expenses]
+    @actual_cash_in    = @stats[:actual_cash_in]
+    @net_profit         = @stats[:net_profit]
     @reservations_count = @stats[:reservations_count]
     @properties_data    = @stats[:properties_data]
     @monthly_trend      = @stats[:monthly_trend]

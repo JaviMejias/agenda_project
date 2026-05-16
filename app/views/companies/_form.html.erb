@@ -3,7 +3,9 @@
     { name: :name, label: "Razón Social", placeholder: "Ej: Inversiones Logísticas SpA", type: :text_field, icon: "fa-solid fa-building", required: true },
     { name: :rut, label: "RUT Empresa", placeholder: "Ej: 76.123.456-K", type: :text_field, icon: "fa-solid fa-id-card", required: true, data: { action: "input->rut#format", rut_target: "input" } },
     { name: :business_type, label: "Giro / Actividad", placeholder: "Ej: Arriendo de bodegas y logística", type: :text_field, icon: "fa-solid fa-tag", required: true },
-    { name: :address, label: "Dirección Comercial", placeholder: "Ej: Av. Providencia 1234, Santiago", type: :text_field, icon: "fa-solid fa-location-dot", required: true }
+    { name: :address, label: "Dirección Comercial", placeholder: "Ej: Av. Providencia 1234, Santiago", type: :text_field, icon: "fa-solid fa-location-dot", required: true },
+    { name: :phone, label: "Teléfono / WhatsApp", placeholder: "+56 9 1234 5678", type: :text_field, icon: "fa-solid fa-phone" },
+    { name: :email, label: "Correo Electrónico", placeholder: "contacto@empresa.com", type: :email_field, icon: "fa-solid fa-envelope" }
   ]
 
   input_class = "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white"
@@ -38,6 +40,44 @@
             data: field[:data]) %>
       </div>
     <% end %>
+  </div>
+
+  <div data-controller="image-preview" class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 mt-6">
+    <%= f.label :logo, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-4" do %>
+      <i class="fa-solid fa-image text-indigo-500 mr-1"></i> Logo de la Empresa
+    <% end %>
+    
+    <% if company.logo.attached? && company.logo.persisted? %>
+      <div id="company_logo_preview" class="mt-2 mb-6 bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm inline-block">
+        <p class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">Logo actual:</p>
+        <div data-controller="lightbox" class="relative group inline-block">
+          <%= image_tag company.logo, 
+              class: "w-32 h-32 object-contain rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm transition-all duration-300 group-hover:scale-105 cursor-zoom-in",
+              data: { 
+                action: "click->lightbox#open",
+                url: url_for(company.logo)
+              } %>
+          <%= link_to destroy_logo_company_path(company), data: { turbo_method: :delete, turbo_confirm: "¿Borrar logo?" }, class: "absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs shadow-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all cursor-pointer z-10 hover:bg-red-600 active:scale-95 sm:hover:scale-110" do %>
+            <i class="fa-solid fa-xmark"></i>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="mt-2 mb-4">
+      <div data-image-preview-target="previewContainer" class="flex flex-wrap gap-3 sm:gap-4"></div>
+    </div>
+
+    <div class="relative flex items-center justify-center w-full">
+      <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-indigo-300 dark:border-indigo-900 border-dashed rounded-xl cursor-pointer bg-indigo-50 dark:bg-indigo-950/20 hover:bg-indigo-100 dark:hover:bg-indigo-950/40 transition-colors">
+        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+          <i class="fa-solid fa-cloud-arrow-up text-3xl text-indigo-500 mb-2"></i>
+          <p class="mb-1 text-sm text-gray-600 dark:text-slate-400 text-center"><span class="font-bold text-indigo-600 dark:text-indigo-400">Toca para subir</span> <span class="hidden sm:inline">o arrastra tu logo aquí</span></p>
+          <p class="text-xs text-gray-500 dark:text-slate-500">PNG, JPG o GIF</p>
+        </div>
+        <%= f.file_field :logo, accept: "image/*", data: { image_preview_target: "input", action: "change->image-preview#previewImages" }, class: "hidden" %>
+      </label>
+    </div>
   </div>
 
   <div class="pt-6 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-start gap-8">

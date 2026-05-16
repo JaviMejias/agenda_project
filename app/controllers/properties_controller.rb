@@ -61,7 +61,7 @@ class PropertiesController < ApplicationController
       if @property.update(property_params)
         @property.images.attach(images) if images.present?
         GeneratePropertyImagesJob.perform_later(@property.id)
-        format.html { redirect_to properties_path, notice: "Propiedad creada correctamente.", status: :see_other }
+        format.html { redirect_to properties_path, notice: "Propiedad actualizada correctamente.", status: :see_other }
         format.json { render :show, status: :ok, location: @property }
       else
         format.turbo_stream do

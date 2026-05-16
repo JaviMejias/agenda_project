@@ -128,4 +128,188 @@
       <% end %>
     </div>
   </div>
+
+  <% unless @reservation.blocked? %>
+    <div class="mt-8 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 animate-fade-in-up" style="animation-delay: 0.1s;">
+      <div class="px-6 py-8 sm:px-10 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+        <div>
+          <h4 class="text-2xl font-black text-gray-900 dark:text-white">Estado Financiero</h4>
+          <span class="mt-2 inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border shadow-sm <%= @reservation.payment_state_color_classes %>">
+            <%= @reservation.payment_state %>
+          </span>
+        </div>
+        <div class="sm:text-right bg-gray-50 dark:bg-slate-800/50 p-4 sm:p-0 sm:bg-transparent rounded-xl border border-gray-100 dark:border-slate-700 sm:border-0">
+          <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">Saldo Pendiente</p>
+          <p class="text-3xl font-black <%= @reservation.pending_balance <= 0 ? 'text-emerald-500' : 'text-amber-500' %>">
+            $<%= number_to_currency(@reservation.pending_balance, unit: "", separator: ",", delimiter: ".") %>
+          </p>
+        </div>
+      </div>
+
+      <div class="px-6 py-6 sm:px-10">
+        <% if @reservation.payments.any? %>
+          <!-- Vista de Escritorio (Tabla) -->
+          <div class="hidden md:block overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+              <thead class="bg-gray-50 dark:bg-slate-800">
+                <tr>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Fecha</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Tipo</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Método</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-black text-gray-500 uppercase tracking-wider">Monto</th>
+                  <th scope="col" class="px-4 py-3 text-right text-xs font-black text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-slate-900 divide-y divide-gray-200 dark:divide-slate-700">
+                <% @reservation.payments.order(payment_date: :desc).each do |payment| %>
+                  <tr>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-300">
+                      <%= payment.payment_date.strftime("%d/%m/%Y") %>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <% transaction_label = payment.abono? ? 'Abono / Pago' : 'Reembolso' %>
+                      <span class="px-2 py-1 text-xs font-bold rounded-full <%= payment.abono? ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400' %>">
+                        <%= transaction_label %>
+                      </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700 shadow-sm">
+                        <% if payment.payment_method == 'cash' %>
+                          <i class="fa-solid fa-money-bill text-[10px]"></i>
+                        <% elsif payment.payment_method == 'transfer' %>
+                          <i class="fa-solid fa-money-bill-transfer text-[10px]"></i>
+                        <% elsif payment.payment_method == 'card' %>
+                          <i class="fa-solid fa-credit-card text-[10px]"></i>
+                        <% else %>
+                          <i class="fa-solid fa-money-check text-[10px]"></i>
+                        <% end %>
+                        <%
+                          method_label = case payment.payment_method
+                            when 'transfer' then 'Transferencia'
+                            when 'cash' then 'Efectivo'
+                            when 'card' then 'Tarjeta'
+                            else 'Depósito / Otro'
+                          end
+                        %>
+                        <%= method_label %>
+                      </span>
+                      <% if payment.operation_number.present? %>
+                        <span class="inline-flex items-center gap-1 ml-1 px-2 py-1 rounded-md text-[10px] font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 shadow-sm">
+                          <i class="fa-solid fa-hashtag text-[9px]"></i> <%= payment.operation_number %>
+                        </span>
+                      <% end %>
+                      <% if payment.voucher.attached? %>
+                        <%= link_to url_for(payment.voucher), target: "_blank", class: "inline-flex items-center gap-1 ml-1 px-2 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm transition-colors", title: "Ver Voucher" do %>
+                          <i class="fa-solid fa-paperclip text-[9px]"></i>
+                        <% end %>
+                      <% end %>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm font-bold <%= payment.abono? ? 'text-emerald-600' : 'text-rose-600' %>">
+                      <%= payment.abono? ? '+' : '-' %> $<%= number_to_currency(payment.amount, unit: "", separator: ",", delimiter: ".") %>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div class="flex justify-end gap-2">
+                        <%= link_to edit_reservation_payment_path(@reservation, payment), class: "flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 transition-colors", title: "Editar" do %>
+                          <i class="fa-solid fa-pen text-xs"></i>
+                        <% end %>
+                        <%= button_to reservation_payment_path(@reservation, payment), method: :delete, data: { turbo_confirm: "¿Eliminar transacción?" }, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-900/50 transition-colors", title: "Eliminar" do %>
+                          <i class="fa-solid fa-trash-can text-xs"></i>
+                        <% end %>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Vista de Móvil (Tarjetas) -->
+          <div class="space-y-4 md:hidden">
+            <% @reservation.payments.order(payment_date: :desc).each do |payment| %>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 gap-4 transition-all hover:shadow-md">
+                <div class="flex flex-row items-start sm:items-center gap-4">
+                  <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 <%= payment.abono? ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400' %> shadow-sm">
+                    <i class="fa-solid <%= payment.abono? ? 'fa-arrow-down' : 'fa-arrow-up' %> text-lg"></i>
+                  </div>
+                  <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                      <span class="text-sm font-black text-gray-900 dark:text-white">
+                        <%= payment.abono? ? 'Abono / Pago' : 'Reembolso' %>
+                      </span>
+                      <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-full bg-white dark:bg-slate-700 text-gray-500 dark:text-slate-300 border border-gray-200 dark:border-slate-600 shadow-sm">
+                        <% 
+                          method_label = case payment.payment_method
+                            when 'transfer' then 'Transferencia'
+                            when 'cash' then 'Efectivo'
+                            when 'card' then 'Tarjeta'
+                            else 'Otro'
+                          end
+                        %>
+                        <%= method_label %>
+                      </span>
+                      <% if payment.operation_number.present? %>
+                        <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded-md border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1">
+                          <i class="fa-solid fa-hashtag text-[9px]"></i> <%= payment.operation_number %>
+                        </span>
+                      <% end %>
+                      <% if payment.voucher.attached? %>
+                        <%= link_to url_for(payment.voucher), target: "_blank", class: "text-[10px] font-bold text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-2 py-1 rounded-md border border-gray-200 dark:border-slate-700 shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 transition-colors" do %>
+                          <i class="fa-solid fa-paperclip text-[9px]"></i> Voucher
+                        <% end %>
+                      <% end %>
+                    </div>
+                    <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">
+                      <%= payment.payment_date.strftime("%d %b, %Y — %H:%M") %>
+                    </p>
+                    <% if payment.notes.present? %>
+                      <p class="text-xs text-gray-500 dark:text-slate-400 mt-2 italic line-clamp-2"><i class="fa-solid fa-comment-dots mr-1 opacity-50"></i> <%= payment.notes %></p>
+                    <% end %>
+                  </div>
+                </div>
+
+                <div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 sm:gap-2 pt-4 sm:pt-0 border-t border-gray-200 dark:border-slate-700 sm:border-t-0 mt-2 sm:mt-0">
+                  <div class="text-xl font-black <%= payment.abono? ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' %>">
+                    <%= payment.abono? ? '+' : '-' %> $<%= number_to_currency(payment.amount, unit: "", separator: ",", delimiter: ".") %>
+                  </div>
+                  <div class="flex justify-end gap-2">
+                    <%= link_to edit_reservation_payment_path(@reservation, payment), class: "flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-gray-200 dark:border-slate-600 hover:border-indigo-200 transition-colors shadow-sm", title: "Editar" do %>
+                      <i class="fa-solid fa-pen text-xs"></i>
+                    <% end %>
+                    <%= button_to reservation_payment_path(@reservation, payment), method: :delete, data: { turbo_confirm: "¿Eliminar transacción?" }, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 border border-gray-200 dark:border-slate-600 hover:border-rose-200 transition-colors shadow-sm", title: "Eliminar" do %>
+                      <i class="fa-solid fa-trash-can text-xs"></i>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <%= render "shared/empty_state", 
+              icon: "fa-solid fa-money-bill-wave", 
+              title: "Sin Pagos Registrados", 
+              subtitle: "No hay abonos ni reembolsos registrados para esta reserva aún." %>
+        <% end %>
+
+        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div>
+            <% if @reservation.pending_balance > 0 %>
+              <%= link_to new_reservation_payment_path(@reservation), class: "w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg hover:bg-indigo-500 transition-all duration-200" do %>
+                <i class="fa-solid fa-plus mr-2"></i> Registrar Transacción
+              <% end %>
+            <% else %>
+              <div class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 px-6 py-3 text-xs font-black uppercase tracking-widest text-emerald-600">
+                <i class="fa-solid fa-check-double mr-2"></i> Pagado en su totalidad
+              </div>
+            <% end %>
+          </div>
+          
+          <% if @reservation.payments.any? %>
+            <%= link_to receipt_reservation_path(@reservation, format: :pdf), target: "_blank", class: "w-full sm:w-auto inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-700 px-6 py-3 text-xs font-black uppercase tracking-widest hover:bg-indigo-100 transition-all duration-200" do %>
+              <i class="fa-solid fa-file-pdf mr-2"></i> Generar Comprobante
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

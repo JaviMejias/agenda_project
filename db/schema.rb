@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_08_103000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_16_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,11 +57,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_08_103000) do
     t.string "address"
     t.string "business_type"
     t.datetime "created_at", null: false
+    t.string "email"
     t.string "name"
+    t.string "phone"
     t.string "rut"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_companies_on_user_id"
+  end
+
+  create_table "expenses", force: :cascade do |t|
+    t.decimal "amount"
+    t.integer "category"
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.date "expense_date"
+    t.bigint "property_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["property_id"], name: "index_expenses_on_property_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -74,6 +87,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_08_103000) do
     t.bigint "user_id", null: false
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.decimal "amount"
+    t.datetime "created_at", null: false
+    t.text "notes"
+    t.string "operation_number"
+    t.datetime "payment_date"
+    t.integer "payment_method"
+    t.bigint "reservation_id", null: false
+    t.integer "transaction_type"
+    t.datetime "updated_at", null: false
+    t.index ["reservation_id"], name: "index_payments_on_reservation_id"
   end
 
   create_table "properties", force: :cascade do |t|
@@ -253,7 +279,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_08_103000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "clients", "users"
   add_foreign_key "companies", "users"
+  add_foreign_key "expenses", "properties"
   add_foreign_key "notifications", "users"
+  add_foreign_key "payments", "reservations"
   add_foreign_key "properties", "companies"
   add_foreign_key "properties", "users"
   add_foreign_key "reservations", "clients"

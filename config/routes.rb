@@ -9,18 +9,26 @@ Rails.application.routes.draw do
   devise_for :users
   resources :users
   resources :companies do
-    post :associate_properties, on: :member
+    member do
+      post :associate_properties
+      delete :destroy_logo
+    end
   end
 
   resources :properties do
     get :list, on: :collection
     resources :reservations, only: [ :new, :create ]
+    resources :expenses
     member do
       get :gallery
       delete "images/:image_id", to: "properties#destroy_image", as: :image
     end
   end
   resources :reservations, except: [ :new, :create ] do
+    resources :payments, except: [ :index, :show ]
+    member do
+      get :receipt
+    end
     collection do
       get :list
       get :calendar_list
@@ -36,7 +44,7 @@ Rails.application.routes.draw do
   get "dashboard", to: "dashboard#index", as: :dashboard
 
   authenticated :user do
-    root "dashboard#index", as: :authenticated_root
+    root "home#index", as: :authenticated_root
   end
 
   root to: redirect("/users/sign_in")

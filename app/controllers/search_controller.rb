@@ -29,7 +29,7 @@ class SearchController < ApplicationController
       }
     end
 
-    reservations = Reservation.search(query).limit(5)
+    reservations = Reservation.search(query).includes(:property).limit(5)
     reservations.each do |r|
       results << {
         category: "Reservas",
