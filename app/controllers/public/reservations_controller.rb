@@ -2,11 +2,20 @@ class Public::ReservationsController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
   layout "public"
 
-  before_action :set_reservation, only: [ :show, :confirm, :reject, :receipt, :add_payment ]
+  before_action :set_reservation, only: [ :show, :confirm, :reject, :receipt, :add_payment, :delete_payment ]
 
   def show
     @payments = @reservation.payments.with_attached_voucher.order(payment_date: :desc)
     @new_payment = @reservation.payments.build
+  end
+
+  def delete_payment
+    @payment = @reservation.payments.find(params[:payment_id])
+    if @payment.destroy
+      redirect_to public_reservation_path(@reservation.token), notice: "El comprobante de pago fue eliminado exitosamente."
+    else
+      redirect_to public_reservation_path(@reservation.token), alert: "No se pudo eliminar el comprobante."
+    end
   end
 
   def receipt

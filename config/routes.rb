@@ -65,6 +65,7 @@ Rails.application.routes.draw do
         get :reject
         get :receipt
         post :add_payment
+        delete "delete_payment/:payment_id", to: "reservations#delete_payment", as: :delete_payment
       end
     end
     resources :my_reservations, only: [:index], path: "mis-reservas"

@@ -82,4 +82,14 @@ class PublicReservationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_match "Reserva no encontrada", response.body
   end
+
+  test "should delete payment from reservation" do
+    payment = payments(:one)
+    payment.update!(reservation_id: @reservation.id)
+    
+    assert_difference("Payment.count", -1) do
+      delete delete_payment_public_reservation_url(token: "token123", payment_id: payment.id)
+    end
+    assert_redirected_to public_reservation_url("token123")
+  end
 end
