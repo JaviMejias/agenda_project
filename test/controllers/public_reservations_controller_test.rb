@@ -92,4 +92,22 @@ class PublicReservationsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to public_reservation_url("token123")
   end
+
+  test "should not add payment if already fully paid" do
+    @reservation.payments.destroy_all
+    @reservation.payments.create!(amount: @reservation.total_price, payment_method: :transfer, transaction_type: :abono, payment_date: Time.current)
+    
+    assert_no_difference("Payment.count") do
+      post add_payment_public_reservation_url(token: "token123"), params: {
+        payment: {
+          amount: "5000",
+          operation_number: "111",
+          notes: "Extra pay"
+        }
+      }
+    end
+    assert_redirected_to public_reservation_url("token123")
+    follow_redirect!
+    assert_match "ya se encuentra totalmente pagada", response.body
+  end
 end

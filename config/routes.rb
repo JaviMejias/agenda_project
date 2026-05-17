@@ -6,7 +6,7 @@ Rails.application.routes.draw do
       get :list
     end
   end
-  devise_for :users, controllers: {
+  devise_for :users, path_names: { registration: 'registrarse' }, controllers: {
     registrations: 'users/registrations'
   }
   resources :users

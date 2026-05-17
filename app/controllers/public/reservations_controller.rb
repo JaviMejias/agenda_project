@@ -63,6 +63,11 @@ class Public::ReservationsController < ApplicationController
   end
 
   def add_payment
+    if @reservation.pending_balance <= 0
+      redirect_to public_reservation_path(@reservation.token), alert: "Esta reserva ya se encuentra totalmente pagada."
+      return
+    end
+
     @payment = @reservation.payments.build(payment_params)
     @payment.payment_method = :transfer
     @payment.transaction_type = :abono
