@@ -202,6 +202,10 @@
                         <%= link_to url_for(payment.voucher), target: "_blank", class: "inline-flex items-center gap-1 ml-1 px-2 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm transition-colors", title: "Ver Voucher" do %>
                           <i class="fa-solid fa-paperclip text-[9px]"></i>
                         <% end %>
+                      <% elsif payment.transfer? %>
+                        <span class="inline-flex items-center gap-1 ml-1 px-2 py-1 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border border-amber-200/30 dark:border-amber-900/30 shadow-sm" title="Sin Comprobante Adjunto">
+                          <i class="fa-solid fa-triangle-exclamation text-[9px]"></i> Sin Comprobante
+                        </span>
                       <% end %>
                     </td>
                     <td class="px-4 py-4 whitespace-nowrap text-sm font-bold <%= payment.abono? ? 'text-emerald-600' : 'text-rose-600' %>">
@@ -256,6 +260,10 @@
                         <%= link_to url_for(payment.voucher), target: "_blank", class: "text-[10px] font-bold text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-2 py-1 rounded-md border border-gray-200 dark:border-slate-700 shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 transition-colors" do %>
                           <i class="fa-solid fa-paperclip text-[9px]"></i> Voucher
                         <% end %>
+                      <% elsif payment.transfer? %>
+                        <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 px-2 py-1 rounded-md border border-amber-200/30 dark:border-amber-900/30 shadow-sm flex items-center gap-1">
+                          <i class="fa-solid fa-triangle-exclamation text-[9px]"></i> Sin Voucher
+                        </span>
                       <% end %>
                     </div>
                     <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">

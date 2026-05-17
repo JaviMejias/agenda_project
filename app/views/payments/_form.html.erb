@@ -99,7 +99,45 @@
         <% end %>
         <%= f.file_field :voucher, accept: "image/*,application/pdf", class: "block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 dark:hover:file:bg-indigo-900/50 transition-colors border border-gray-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 cursor-pointer" %>
         <% if @payment.voucher.attached? %>
-          <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-2 font-bold"><i class="fa-solid fa-paperclip mr-1"></i> Archivo actual: <%= @payment.voucher.filename %></p>
+          <div class="mt-4 p-4 bg-gray-50 dark:bg-slate-900/40 rounded-2xl border border-gray-100 dark:border-slate-800">
+            <div class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+              <i class="fa-solid fa-paperclip text-indigo-500"></i> Comprobante Actual
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="relative group w-20 h-20 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center shrink-0">
+                <% if @payment.voucher.image? %>
+                  <%= image_tag @payment.voucher.variant(resize_to_limit: [150, 150]), class: "w-full h-full object-cover" %>
+                <% else %>
+                  <div class="text-gray-400 dark:text-slate-600">
+                    <i class="fa-solid fa-file-pdf text-3xl"></i>
+                  </div>
+                <% end %>
+                <div class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-all duration-300">
+                  <%= link_to url_for(@payment.voucher), target: "_blank", class: "w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-colors", title: "Ver Comprobante" do %>
+                    <i class="fa-solid fa-eye text-xs"></i>
+                  <% end %>
+                  <%= link_to rails_blob_path(@payment.voucher, disposition: "attachment"), class: "w-8 h-8 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-purple-600 hover:text-white transition-colors", title: "Descargar" do %>
+                    <i class="fa-solid fa-download text-xs"></i>
+                  <% end %>
+                </div>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-bold text-gray-700 dark:text-slate-350 truncate"><%= @payment.voucher.filename %></p>
+                <p class="text-xs text-gray-400 dark:text-slate-500 font-bold mt-1 uppercase tracking-wider mb-2"><%= number_to_human_size(@payment.voucher.byte_size) %></p>
+                <div class="flex flex-wrap items-center gap-3">
+                  <%= link_to url_for(@payment.voucher), target: "_blank", class: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-950/50 text-[10px] font-black uppercase tracking-widest transition-colors" do %>
+                    <i class="fa-solid fa-eye"></i> Ver Completo
+                  <% end %>
+                  <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-rose-50 dark:bg-rose-950/20 border border-rose-100/50 dark:border-rose-900/30 rounded-xl transition-all">
+                    <%= f.check_box :purge_voucher, class: "rounded border-rose-300 dark:border-rose-800 text-rose-600 focus:ring-rose-500 w-3.5 h-3.5 cursor-pointer bg-white dark:bg-slate-900" %>
+                    <%= f.label :purge_voucher, class: "text-[9px] font-black uppercase tracking-widest text-rose-700 dark:text-rose-450 cursor-pointer select-none flex items-center gap-1.5" do %>
+                      <i class="fa-solid fa-trash text-[9px]"></i> Eliminar
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         <% end %>
       </div>
     </div>

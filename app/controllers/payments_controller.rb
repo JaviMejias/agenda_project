@@ -49,7 +49,7 @@ class PaymentsController < ApplicationController
   end
 
   def payment_params
-    p = params.require(:payment).permit(:amount, :payment_date, :payment_method, :transaction_type, :notes, :operation_number, :voucher)
+    p = params.require(:payment).permit(:amount, :payment_date, :payment_method, :transaction_type, :notes, :operation_number, :voucher, :purge_voucher)
     if p[:amount].present? && p[:amount].is_a?(String)
       p[:amount] = p[:amount].gsub(".", "").gsub(",", ".")
     end

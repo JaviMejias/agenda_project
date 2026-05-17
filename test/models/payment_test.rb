@@ -1,6 +1,8 @@
 require "test_helper"
 
 class PaymentTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   def setup
     @payment = payments(:one)
   end
@@ -29,5 +31,26 @@ class PaymentTest < ActiveSupport::TestCase
     @payment.operation_number = "123456"
     @payment.save
     assert_nil @payment.operation_number
+  end
+
+  test "should purge voucher when requested" do
+    # Set to transfer since cash/card automatically purge any attached voucher
+    @payment.payment_method = "transfer"
+    @payment.save!
+
+    @payment.voucher.attach(
+      io: StringIO.new("dummy"),
+      filename: "dummy.png",
+      content_type: "image/png"
+    )
+    assert @payment.voucher.attached?
+
+    @payment.purge_voucher = "1"
+
+    perform_enqueued_jobs do
+      @payment.save!
+    end
+
+    assert_not @payment.reload.voucher.attached?
   end
 end
