@@ -1,0 +1,49 @@
+<div>
+  <h3 class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-6">Historial de Transacciones</h3>
+  <% if payments.any? %>
+    <div class="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+      <% payments.each do |payment| %>
+        <div class="p-4 bg-gray-50/50 dark:bg-slate-800/25 rounded-2xl border border-gray-100 dark:border-slate-800/50 flex justify-between items-center gap-4 animate-fade-in">
+          <div>
+            <p class="text-xs font-bold text-gray-500 dark:text-slate-400"><%= I18n.l(payment.payment_date, format: "%d de %B, %Y") %></p>
+            <p class="text-sm font-black text-gray-950 dark:text-white mt-0.5">$<%= number_with_delimiter(payment.amount.to_i, delimiter: ".") %></p>
+            <div class="flex flex-wrap items-center gap-1.5 mt-1">
+              <% if payment.operation_number.present? %>
+                <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded border border-indigo-100/50 dark:border-indigo-900/50 inline-block">Nº: <%= payment.operation_number %></span>
+              <% end %>
+              <% unless payment.voucher.attached? %>
+                <span class="text-[10px] text-amber-600 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/20 px-2 py-0.5 rounded border border-amber-100/30 dark:border-amber-900/30 inline-block flex-shrink-0">
+                  <i class="fa-solid fa-triangle-exclamation mr-1"></i> Sin Comprobante
+                </span>
+              <% end %>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <% if payment.voucher.attached? %>
+              <%= link_to url_for(payment.voucher), target: "_blank", class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-indigo-600 transition-colors shadow-sm", title: "Ver Comprobante" do %>
+                <i class="fa-solid fa-file-image"></i>
+              <% end %>
+            <% else %>
+              <%= form_with(model: payment, url: upload_voucher_public_reservation_path(reservation.token, payment_id: payment.id), method: :post, local: true, class: "flex items-center") do |f| %>
+                <label class="w-10 h-10 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/20 dark:hover:bg-amber-950/40 border border-amber-200/50 dark:border-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400 transition-colors shadow-sm cursor-pointer" title="Subir Comprobante Faltante">
+                  <i class="fa-solid fa-cloud-arrow-up text-sm animate-bounce"></i>
+                  <%= f.file_field :voucher, accept: "image/*,application/pdf", class: "hidden", onchange: "this.form.submit();" %>
+                </label>
+              <% end %>
+            <% end %>
+            <%= button_to delete_payment_public_reservation_path(reservation.token, payment_id: payment.id), method: :delete, class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-red-600 transition-colors shadow-sm cursor-pointer", title: "Eliminar Transacción", data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este registro de pago?" } do %>
+              <i class="fa-solid fa-trash-can"></i>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12 bg-gray-50/30 dark:bg-slate-900/30 rounded-3xl border border-dashed border-gray-200 dark:border-slate-800">
+      <div class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-gray-400 mx-auto mb-3 shadow-sm">
+        <i class="fa-solid fa-receipt"></i>
+      </div>
+      <p class="text-xs font-bold text-gray-500 dark:text-slate-400">Aún no registras comprobantes.</p>
+    </div>
+  <% end %>
+</div>

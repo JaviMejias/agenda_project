@@ -24,8 +24,8 @@ class ApplicationController < ActionController::Base
       "pwa"
     ]
 
-    is_allowed = allowed_controllers.any? { |c| params[:controller].start_with?(c) } || 
-                 params[:controller] == "public_reservations" || 
+    is_allowed = allowed_controllers.any? { |c| params[:controller].start_with?(c) } ||
+                 params[:controller] == "public_reservations" ||
                  devise_controller?
 
     unless is_allowed
@@ -58,7 +58,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:first_name, :last_name])
-    devise_parameter_sanitizer.permit(:account_update, keys: [:first_name, :last_name])
+    devise_parameter_sanitizer.permit(:sign_up, keys: [ :first_name, :last_name ])
+    devise_parameter_sanitizer.permit(:account_update, keys: [ :first_name, :last_name ])
   end
 end

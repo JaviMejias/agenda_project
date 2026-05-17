@@ -1,0 +1,28 @@
+<div class="space-y-6">
+  <h3 class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Detalles del Período</h3>
+  <div class="flex gap-4 items-start">
+    <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+      <i class="fa-solid fa-calendar-day"></i>
+    </div>
+    <div>
+      <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Fecha <%= reservation.property.per_hour? ? "y Hora" : "" %> de Inicio</p>
+      <p class="text-sm font-black text-gray-900 dark:text-white mt-1"><%= I18n.l(reservation.start_time, format: "%A, %d de %B de %Y") %></p>
+      <% if reservation.property.per_hour? %>
+        <p class="text-xs text-gray-500 dark:text-slate-400 font-bold mt-0.5">Hora: <%= reservation.start_time.strftime("%H:%M hrs") %></p>
+      <% end %>
+    </div>
+  </div>
+  <div class="flex gap-4 items-start">
+    <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
+      <i class="fa-solid fa-calendar-check"></i>
+    </div>
+    <div>
+      <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Fecha <%= reservation.property.per_hour? ? "y Hora" : "" %> de Término</p>
+      <% display_end_time = reservation.property.per_day? ? reservation.end_time - 1.day : reservation.end_time %>
+      <p class="text-sm font-black text-gray-900 dark:text-white mt-1"><%= I18n.l(display_end_time, format: "%A, %d de %B de %Y") %></p>
+      <% if reservation.property.per_hour? %>
+        <p class="text-xs text-gray-500 dark:text-slate-400 font-bold mt-0.5">Hora: <%= reservation.end_time.strftime("%H:%M hrs") %></p>
+      <% end %>
+    </div>
+  </div>
+</div>

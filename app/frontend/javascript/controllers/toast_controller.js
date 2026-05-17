@@ -7,7 +7,12 @@ export default class extends Controller {
 
   connect() {
     const soundType = this.typeValue === "alert" ? "error" : "success"
-    SoundManager.play(soundType)
+    try {
+      SoundManager.play(soundType).catch(e => console.warn("Toast sound play promise rejected:", e))
+    } catch (e) {
+      console.warn("Could not play toast sound:", e)
+    }
+
     requestAnimationFrame(() => {
       this.element.classList.remove("opacity-0", "translate-y-4", "translate-x-full")
       this.element.classList.add("opacity-100", "translate-y-0", "translate-x-0")

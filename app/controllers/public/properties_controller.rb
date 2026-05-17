@@ -4,11 +4,11 @@ class Public::PropertiesController < ApplicationController
 
   def index
     @properties = Property.with_attached_images.all
-    
+
     if params[:query].present?
       @properties = @properties.where("name LIKE :q OR address LIKE :q OR description LIKE :q", q: "%#{params[:query]}%")
     end
-    
+
     if params[:pricing_model].present?
       @properties = @properties.where(pricing_model: params[:pricing_model])
     end
@@ -20,7 +20,7 @@ class Public::PropertiesController < ApplicationController
 
   def booking
     @property = Property.with_attached_images.find(params[:id])
-    
+
     # Si decide continuar como invitado, marcamos la sesión
     if params[:guest] == "true"
       session[:continue_as_guest] = true

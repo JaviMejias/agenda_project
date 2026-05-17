@@ -1,0 +1,102 @@
+<% if reservation.cancelled? %>
+  <div class="text-center py-12 bg-rose-50/30 dark:bg-rose-950/10 border border-dashed border-rose-100 dark:border-rose-900/50 rounded-3xl p-6">
+    <div class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-3">
+      <i class="fa-solid fa-ban text-xl"></i>
+    </div>
+    <p class="text-xs font-black text-rose-800 dark:text-rose-400 uppercase tracking-wider mb-1">Reserva Cancelada</p>
+    <p class="text-[10px] font-semibold text-rose-600 dark:text-rose-500">No se permite registrar pagos para reservas canceladas.</p>
+  </div>
+<% elsif reservation.pending_balance > 0 %>
+  <%= form_with(model: new_payment, url: add_payment_public_reservation_path(reservation.token), method: :post, class: "space-y-4") do |f| %>
+    <% if new_payment.errors.any? %>
+      <div class="p-4 mb-4 text-xs text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900">
+        <ul class="list-disc pl-5 space-y-1 font-bold">
+          <% new_payment.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <%
+      form_fields = [
+        {
+          name: :amount,
+          label: "Monto Transferido",
+          type: :text_field,
+          required: true,
+          placeholder: "Ej: 50.000",
+          data: { 
+            action: "input->currency#format",
+            "currency-max-value": reservation.pending_balance.to_i 
+          }
+        },
+        {
+          name: :operation_number,
+          label: "Código / Número de Operación",
+          type: :text_field,
+          required: false,
+          placeholder: "Ej: 12345678"
+        },
+        {
+          name: :voucher,
+          label: "Archivo del Comprobante (Imagen o PDF)",
+          type: :file_field,
+          required: true
+        },
+        {
+          name: :notes,
+          label: "Notas adicionales",
+          type: :text_area,
+          required: false,
+          placeholder: "Ej: Pago del abono inicial...",
+          rows: 2
+        }
+      ]
+    %>
+    <% form_fields.each do |field| %>
+      <div>
+        <%= f.label field[:name], field[:label], class: "block text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+        <% if field[:name] == :amount %>
+          <div data-controller="currency" class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600 font-bold">$</div>
+            <%= f.text_field :amount, 
+                required: true,
+                placeholder: field[:placeholder], 
+                data: field[:data],
+                class: "block w-full pl-8 pr-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+          </div>
+        <% elsif field[:name] == :voucher %>
+          <div class="border border-dashed border-gray-200 dark:border-slate-800 rounded-2xl p-4 bg-white dark:bg-slate-900 text-center relative hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-all">
+            <%= f.file_field :voucher, 
+                required: true,
+                class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer" %>
+            <div class="text-gray-400 dark:text-slate-600">
+              <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2"></i>
+              <p class="text-xs font-bold">Haz clic o arrastra para subir tu comprobante</p>
+            </div>
+          </div>
+        <% elsif field[:type] == :text_area %>
+          <%= f.text_area field[:name], 
+              rows: field[:rows],
+              placeholder: field[:placeholder], 
+              class: "block w-full px-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+        <% else %>
+          <%= f.text_field field[:name], 
+              required: field[:required],
+              placeholder: field[:placeholder], 
+              class: "block w-full px-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+        <% end %>
+      </div>
+    <% end %>
+    <%= f.submit "Enviar Comprobante", 
+        class: "w-full py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/10 hover:-translate-y-0.5 active:scale-95 cursor-pointer" %>
+  <% end %>
+<% else %>
+  <div class="text-center py-12 bg-emerald-50/30 dark:bg-emerald-950/10 border border-dashed border-emerald-100 dark:border-emerald-900/50 rounded-3xl p-6">
+    <div class="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
+      <i class="fa-solid fa-check-double text-xl"></i>
+    </div>
+    <p class="text-xs font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-wider mb-1">¡Reserva Totalmente Pagada!</p>
+    <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-500">No tienes saldos pendientes para transferir.</p>
+  </div>
+<% end %>
