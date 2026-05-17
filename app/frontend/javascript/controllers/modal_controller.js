@@ -4,11 +4,12 @@ export default class extends Controller {
   static targets = ["dialog", "overlay", "content"]
 
   connect() {
-    // Inicia oculto si tiene la clase 'hidden' en el HTML
+    console.log("Modal controller connected!", this.element)
   }
 
   open(e) {
     if (e) e.preventDefault()
+    console.log("Modal open called!")
     this.dialogTarget.classList.remove("hidden")
     
     // Animación suave de entrada (fade-in y zoom-in)
@@ -28,6 +29,7 @@ export default class extends Controller {
 
   close(e) {
     if (e) e.preventDefault()
+    console.log("Modal close called!")
     
     // Animación de salida
     if (this.hasOverlayTarget) {
@@ -41,6 +43,11 @@ export default class extends Controller {
     setTimeout(() => {
       this.dialogTarget.classList.add("hidden")
       document.body.classList.remove("overflow-hidden")
+      console.log("Modal hidden!")
     }, 300)
+  }
+
+  stopPropagation(e) {
+    if (e) e.stopPropagation()
   }
 }

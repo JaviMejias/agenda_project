@@ -108,18 +108,18 @@
   <!-- Modal de Pasarela de Acceso -->
   <div data-modal-target="dialog" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <!-- Backdrop Blur overlay -->
-    <div data-modal-target="overlay" data-action="click->modal#close" class="fixed inset-0 bg-slate-950/40 dark:bg-slate-950/65 backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
+    <div data-modal-target="overlay" class="fixed inset-0 bg-slate-950/40 dark:bg-slate-950/65 backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
     
     <!-- Modal Wrapper -->
-    <div class="fixed inset-0 z-[51] flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
-      <div data-modal-target="content" class="relative bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-slate-800 w-full max-w-2xl overflow-hidden transition-all duration-300 transform scale-95 opacity-0 translate-y-4">
+    <div data-action="click->modal#close" class="fixed inset-0 z-[51] flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto cursor-pointer">
+      <div data-modal-target="content" data-action="click->modal#stopPropagation" class="relative bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-slate-800 w-full max-w-2xl overflow-hidden transition-all duration-300 transform scale-95 opacity-0 translate-y-4 cursor-default">
         
         <!-- Background Orbs -->
         <div class="absolute -top-32 -left-32 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-32 -right-32 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
         
         <!-- Close Button -->
-        <button data-action="click->modal#close" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+        <button data-action="click->modal#close" type="button" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:scale-105 active:scale-95 transition-all cursor-pointer z-25">
           <i class="fa-solid fa-xmark"></i>
         </button>
 
