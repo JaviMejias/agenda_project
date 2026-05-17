@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_16_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_17_150700) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_16_190000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "bank_accounts", force: :cascade do |t|
+    t.string "account_number", null: false
+    t.string "account_type", null: false
+    t.string "bank_name", null: false
+    t.bigint "company_id", null: false
+    t.datetime "created_at", null: false
+    t.string "holder_email", null: false
+    t.string "holder_name", null: false
+    t.string "holder_rut", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_bank_accounts_on_company_id"
   end
 
   create_table "clients", force: :cascade do |t|
@@ -277,6 +290,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_16_190000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "bank_accounts", "companies"
   add_foreign_key "clients", "users"
   add_foreign_key "companies", "users"
   add_foreign_key "expenses", "properties"

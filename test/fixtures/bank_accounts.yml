@@ -1,0 +1,17 @@
+one:
+  company: one
+  bank_name: state_bank
+  account_type: checking
+  account_number: "123456789"
+  holder_name: "Juan Perez"
+  holder_rut: "19.456.789-8"
+  holder_email: "juan@example.com"
+
+two:
+  company: two
+  bank_name: santander
+  account_type: sight
+  account_number: "987654321"
+  holder_name: "Maria Gonzalez"
+  holder_rut: "19.456.789-8"
+  holder_email: "maria@example.com"

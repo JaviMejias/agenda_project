@@ -4,7 +4,7 @@ class CompaniesController < ApplicationController
 
   def index
     authorize Company
-    @companies = Company.search(params[:q]).ordered
+    @companies = Company.with_attached_logo.includes(:properties).search(params[:q]).ordered
     @pagy, @companies = pagy(@companies, limit: 10)
   end
 
@@ -82,6 +82,9 @@ class CompaniesController < ApplicationController
   end
 
   def company_params
-    params.require(:company).permit(:name, :rut, :business_type, :address, :phone, :email, :logo)
+    params.require(:company).permit(
+      :name, :rut, :business_type, :address, :phone, :email, :logo,
+      bank_accounts_attributes: [ :id, :bank_name, :account_type, :account_number, :holder_name, :holder_rut, :holder_email, :_destroy ]
+    )
   end
 end

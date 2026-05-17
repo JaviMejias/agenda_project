@@ -1,14 +1,15 @@
 class Company < ApplicationRecord
   belongs_to :user
   has_many :properties, dependent: :nullify
+  has_many :bank_accounts, dependent: :destroy
   has_one_attached :logo
+
+  accepts_nested_attributes_for :bank_accounts, allow_destroy: true, reject_if: :all_blank
 
   include RutValidatable
 
-  validates :name, presence: true
+  validates :name, :business_type, :address, presence: true
   validates :rut, presence: true, uniqueness: { scope: :user_id }
-  validates :address, presence: true
-  validates :business_type, presence: true
 
   scope :search, ->(query) {
     if query.present?

@@ -1,0 +1,239 @@
+<% company = reservation.property.company %>
+<% bank_accounts = company&.bank_accounts&.reject(&:new_record?) || [] %>
+
+<div class="bg-indigo-50/50 dark:bg-indigo-950/15 border border-indigo-100/50 dark:border-indigo-900/50 rounded-3xl p-6 mb-6">
+  <div class="flex items-center gap-3 mb-4">
+    <div class="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+      <i class="fa-solid fa-building-columns text-sm"></i>
+    </div>
+    <h4 class="text-xs font-black text-indigo-950 dark:text-indigo-300 uppercase tracking-widest">Datos para Transferencia</h4>
+  </div>
+
+  <% if bank_accounts.any? %>
+    <% if bank_accounts.size > 1 %>
+      <div data-controller="tabs" class="space-y-4">
+        <!-- Horizontally Scrollable Pills with Navigation Arrows -->
+        <div data-controller="drag-scroll" class="relative flex items-center group">
+          <!-- Left Arrow Button -->
+          <button type="button" 
+                  data-drag-scroll-target="leftArrow"
+                  data-action="click->drag-scroll#slideLeft"
+                  class="absolute left-1.5 z-10 w-8 h-8 rounded-full bg-white/95 dark:bg-slate-900/95 shadow-md border border-gray-100/80 dark:border-slate-800/80 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all opacity-0 pointer-events-none cursor-pointer"
+                  title="Deslizar Izquierda">
+            <i class="fa-solid fa-chevron-left text-[10px]"></i>
+          </button>
+          
+          <!-- Horizontally Scrollable Pills Container -->
+          <div data-drag-scroll-target="scrollable"
+               class="w-full flex items-center gap-1.5 overflow-x-auto p-1 bg-gray-100/80 dark:bg-slate-800/40 rounded-2xl [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden scroll-smooth">
+            <% bank_accounts.each_with_index do |account, idx| %>
+              <button type="button" 
+                      data-tabs-target="tab" 
+                      data-tab="account_<%= account.id %>" 
+                      data-action="click->tabs#switch" 
+                      class="flex-1 px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer whitespace-nowrap text-center text-gray-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/40 dark:hover:bg-slate-700/30">
+                <%= account.localized_bank_name %>
+              </button>
+            <% end %>
+          </div>
+
+          <!-- Right Arrow Button -->
+          <button type="button" 
+                  data-drag-scroll-target="rightArrow"
+                  data-action="click->drag-scroll#slideRight"
+                  class="absolute right-1.5 z-10 w-8 h-8 rounded-full bg-white/95 dark:bg-slate-900/95 shadow-md border border-gray-100/80 dark:border-slate-800/80 flex items-center justify-center text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-105 active:scale-95 transition-all opacity-0 pointer-events-none cursor-pointer"
+                  title="Deslizar Derecha">
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- Accounts Panels -->
+        <% bank_accounts.each do |account| %>
+          <div data-tabs-target="panel" data-panel="account_<%= account.id %>" class="hidden animate-fade-in">
+            <div class="space-y-2.5 text-xs">
+              <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+                <span class="text-gray-500 dark:text-slate-400 font-bold">Banco:</span>
+                <span class="text-gray-900 dark:text-white font-extrabold"><%= account.localized_bank_name %></span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+                <span class="text-gray-500 dark:text-slate-400 font-bold">Tipo de Cuenta:</span>
+                <span class="text-gray-900 dark:text-white font-extrabold"><%= account.localized_account_type %></span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+                <span class="text-gray-500 dark:text-slate-400 font-bold">Nº de Cuenta:</span>
+                <button type="button" 
+                        data-controller="clipboard"
+                        data-clipboard-text-value="<%= account.account_number %>"
+                        data-action="click->clipboard#copy"
+                        class="relative group flex items-center gap-1.5 px-2 py-1 -mr-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/40 active:scale-95 transition-all cursor-pointer select-none" 
+                        title="Copiar Nº de Cuenta">
+                  <span data-clipboard-target="tooltip" class="copy-msg absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-[9px] font-bold rounded-lg shadow-lg opacity-0 translate-y-1 pointer-events-none transition-all duration-300 whitespace-nowrap z-30">
+                    ¡Nº de cuenta copiado!
+                    <span class="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 w-1.5 h-1.5 bg-slate-900 dark:bg-slate-800 rotate-45"></span>
+                  </span>
+                  <span data-clipboard-target="value" class="copy-val inline-block text-gray-900 dark:text-white font-extrabold transition-all duration-300"><%= account.account_number %></span>
+                  <i data-clipboard-target="icon" class="copy-icon fa-solid fa-copy text-gray-400 text-[10px] transition-all duration-300"></i>
+                </button>
+              </div>
+              
+              <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+                <span class="text-gray-500 dark:text-slate-400 font-bold">RUT:</span>
+                <button type="button" 
+                        data-controller="clipboard"
+                        data-clipboard-text-value="<%= account.holder_rut %>"
+                        data-action="click->clipboard#copy"
+                        class="relative group flex items-center gap-1.5 px-2 py-1 -mr-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/40 active:scale-95 transition-all cursor-pointer select-none" 
+                        title="Copiar RUT">
+                  <span data-clipboard-target="tooltip" class="copy-msg absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-[9px] font-bold rounded-lg shadow-lg opacity-0 translate-y-1 pointer-events-none transition-all duration-300 whitespace-nowrap z-30">
+                    ¡RUT copiado!
+                    <span class="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 w-1.5 h-1.5 bg-slate-900 dark:bg-slate-800 rotate-45"></span>
+                  </span>
+                  <span data-clipboard-target="value" class="copy-val inline-block text-gray-900 dark:text-white font-extrabold transition-all duration-300"><%= account.holder_rut %></span>
+                  <i data-clipboard-target="icon" class="copy-icon fa-solid fa-copy text-gray-400 text-[10px] transition-all duration-300"></i>
+                </button>
+              </div>
+              
+              <div class="flex justify-between pb-0.5 items-center">
+                <span class="text-gray-500 dark:text-slate-400 font-bold">Correo de Aviso:</span>
+                <button type="button" 
+                        data-controller="clipboard"
+                        data-clipboard-text-value="<%= account.holder_email %>"
+                        data-action="click->clipboard#copy"
+                        class="relative group flex items-center gap-1.5 px-2 py-1 -mr-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/40 active:scale-95 transition-all cursor-pointer select-none" 
+                        title="Copiar Correo de Aviso">
+                  <span data-clipboard-target="tooltip" class="copy-msg absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-[9px] font-bold rounded-lg shadow-lg opacity-0 translate-y-1 pointer-events-none transition-all duration-300 whitespace-nowrap z-30">
+                    ¡Correo copiado!
+                    <span class="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 w-1.5 h-1.5 bg-slate-900 dark:bg-slate-800 rotate-45"></span>
+                  </span>
+                  <span data-clipboard-target="value" class="copy-val inline-block text-gray-955 dark:text-white font-extrabold transition-all duration-300"><%= account.holder_email %></span>
+                  <i data-clipboard-target="icon" class="copy-icon fa-solid fa-copy text-gray-400 text-[10px] transition-all duration-300"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <% account = bank_accounts.first %>
+      <div class="space-y-2.5 text-xs">
+        <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+          <span class="text-gray-500 dark:text-slate-400 font-bold">Banco:</span>
+          <span class="text-gray-900 dark:text-white font-extrabold"><%= account.localized_bank_name %></span>
+        </div>
+        <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+          <span class="text-gray-500 dark:text-slate-400 font-bold">Tipo de Cuenta:</span>
+          <span class="text-gray-900 dark:text-white font-extrabold"><%= account.localized_account_type %></span>
+        </div>
+        <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+          <span class="text-gray-500 dark:text-slate-400 font-bold">Nº de Cuenta:</span>
+          <button type="button" 
+                  data-controller="clipboard"
+                  data-clipboard-text-value="<%= account.account_number %>"
+                  data-action="click->clipboard#copy"
+                  class="relative group flex items-center gap-1.5 px-2 py-1 -mr-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/40 active:scale-95 transition-all cursor-pointer select-none" 
+                  title="Copiar Nº de Cuenta">
+            <span data-clipboard-target="tooltip" class="copy-msg absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-[9px] font-bold rounded-lg shadow-lg opacity-0 translate-y-1 pointer-events-none transition-all duration-300 whitespace-nowrap z-30">
+              ¡Nº de cuenta copiado!
+              <span class="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 w-1.5 h-1.5 bg-slate-900 dark:bg-slate-800 rotate-45"></span>
+            </span>
+            <span data-clipboard-target="value" class="copy-val inline-block text-gray-900 dark:text-white font-extrabold transition-all duration-300"><%= account.account_number %></span>
+            <i data-clipboard-target="icon" class="copy-icon fa-solid fa-copy text-gray-400 text-[10px] transition-all duration-300"></i>
+          </button>
+        </div>
+        
+        <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+          <span class="text-gray-500 dark:text-slate-400 font-bold">RUT:</span>
+          <button type="button" 
+                  data-controller="clipboard"
+                  data-clipboard-text-value="<%= account.holder_rut %>"
+                  data-action="click->clipboard#copy"
+                  class="relative group flex items-center gap-1.5 px-2 py-1 -mr-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/40 active:scale-95 transition-all cursor-pointer select-none" 
+                  title="Copiar RUT">
+            <span data-clipboard-target="tooltip" class="copy-msg absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-[9px] font-bold rounded-lg shadow-lg opacity-0 translate-y-1 pointer-events-none transition-all duration-300 whitespace-nowrap z-30">
+              ¡RUT copiado!
+              <span class="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 w-1.5 h-1.5 bg-slate-900 dark:bg-slate-800 rotate-45"></span>
+            </span>
+            <span data-clipboard-target="value" class="copy-val inline-block text-gray-900 dark:text-white font-extrabold transition-all duration-300"><%= account.holder_rut %></span>
+            <i data-clipboard-target="icon" class="copy-icon fa-solid fa-copy text-gray-400 text-[10px] transition-all duration-300"></i>
+          </button>
+        </div>
+        
+        <div class="flex justify-between pb-0.5 items-center">
+          <span class="text-gray-500 dark:text-slate-400 font-bold">Correo de Aviso:</span>
+          <button type="button" 
+                  data-controller="clipboard"
+                  data-clipboard-text-value="<%= account.holder_email %>"
+                  data-action="click->clipboard#copy"
+                  class="relative group flex items-center gap-1.5 px-2 py-1 -mr-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/40 active:scale-95 transition-all cursor-pointer select-none" 
+                  title="Copiar Correo de Aviso">
+            <span data-clipboard-target="tooltip" class="copy-msg absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-[9px] font-bold rounded-lg shadow-lg opacity-0 translate-y-1 pointer-events-none transition-all duration-300 whitespace-nowrap z-30">
+              ¡Correo copiado!
+              <span class="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 w-1.5 h-1.5 bg-slate-900 dark:bg-slate-800 rotate-45"></span>
+            </span>
+            <span data-clipboard-target="value" class="copy-val inline-block text-gray-955 dark:text-white font-extrabold transition-all duration-300"><%= account.holder_email %></span>
+            <i data-clipboard-target="icon" class="copy-icon fa-solid fa-copy text-gray-400 text-[10px] transition-all duration-300"></i>
+          </button>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="space-y-2.5 text-xs">
+      <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+        <span class="text-gray-500 dark:text-slate-400 font-bold">Banco:</span>
+        <span class="text-gray-900 dark:text-white font-extrabold">Banco Estado</span>
+      </div>
+      <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+        <span class="text-gray-500 dark:text-slate-400 font-bold">Tipo de Cuenta:</span>
+        <span class="text-gray-900 dark:text-white font-extrabold">Cuenta Vista (Chequera Electrónica)</span>
+      </div>
+      <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+        <span class="text-gray-500 dark:text-slate-400 font-bold">Nº de Cuenta:</span>
+        <button type="button" 
+                data-controller="clipboard"
+                data-clipboard-text-value="123456789"
+                data-action="click->clipboard#copy"
+                class="relative group flex items-center gap-1.5 px-2 py-1 -mr-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/40 active:scale-95 transition-all cursor-pointer select-none" 
+                title="Copiar Nº de Cuenta">
+          <span data-clipboard-target="tooltip" class="copy-msg absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-[9px] font-bold rounded-lg shadow-lg opacity-0 translate-y-1 pointer-events-none transition-all duration-300 whitespace-nowrap z-30">
+            ¡Nº de cuenta copiado!
+            <span class="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 w-1.5 h-1.5 bg-slate-900 dark:bg-slate-800 rotate-45"></span>
+          </span>
+          <span data-clipboard-target="value" class="copy-val inline-block text-gray-900 dark:text-white font-extrabold transition-all duration-300">123456789</span>
+          <i data-clipboard-target="icon" class="copy-icon fa-solid fa-copy text-gray-400 text-[10px] transition-all duration-300"></i>
+        </button>
+      </div>
+      <div class="flex justify-between border-b border-gray-100 dark:border-slate-800/80 pb-2 items-center">
+        <span class="text-gray-500 dark:text-slate-400 font-bold">RUT:</span>
+        <button type="button" 
+                data-controller="clipboard"
+                data-clipboard-text-value="<%= company&.rut || '76.543.210-K' %>"
+                data-action="click->clipboard#copy"
+                class="relative group flex items-center gap-1.5 px-2 py-1 -mr-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/40 active:scale-95 transition-all cursor-pointer select-none" 
+                title="Copiar RUT">
+          <span data-clipboard-target="tooltip" class="copy-msg absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-[9px] font-bold rounded-lg shadow-lg opacity-0 translate-y-1 pointer-events-none transition-all duration-300 whitespace-nowrap z-30">
+            ¡RUT copiado!
+            <span class="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 w-1.5 h-1.5 bg-slate-900 dark:bg-slate-800 rotate-45"></span>
+          </span>
+          <span data-clipboard-target="value" class="copy-val inline-block text-gray-900 dark:text-white font-extrabold transition-all duration-300"><%= company&.rut || "76.543.210-K" %></span>
+          <i data-clipboard-target="icon" class="copy-icon fa-solid fa-copy text-gray-400 text-[10px] transition-all duration-300"></i>
+        </button>
+      </div>
+      <div class="flex justify-between pb-0.5 items-center">
+        <span class="text-gray-500 dark:text-slate-400 font-bold">Correo de Aviso:</span>
+        <button type="button" 
+                data-controller="clipboard"
+                data-clipboard-text-value="<%= company&.email || reservation.user&.email || 'pagos@agendapro.cl' %>"
+                data-action="click->clipboard#copy"
+                class="relative group flex items-center gap-1.5 px-2 py-1 -mr-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/40 active:scale-95 transition-all cursor-pointer select-none" 
+                title="Copiar Correo de Aviso">
+          <span data-clipboard-target="tooltip" class="copy-msg absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 bg-slate-900 dark:bg-slate-800 text-white text-[9px] font-bold rounded-lg shadow-lg opacity-0 translate-y-1 pointer-events-none transition-all duration-300 whitespace-nowrap z-30">
+            ¡Correo copiado!
+            <span class="absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 w-1.5 h-1.5 bg-slate-900 dark:bg-slate-800 rotate-45"></span>
+          </span>
+          <span data-clipboard-target="value" class="copy-val inline-block text-gray-955 dark:text-white font-extrabold transition-all duration-300"><%= company&.email || reservation.user&.email || "pagos@agendapro.cl" %></span>
+          <i data-clipboard-target="icon" class="copy-icon fa-solid fa-copy text-gray-400 text-[10px] transition-all duration-300"></i>
+        </button>
+      </div>
+    </div>
+  <% end %>
+</div>

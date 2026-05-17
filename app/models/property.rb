@@ -34,6 +34,6 @@ class Property < ApplicationRecord
   end
 
   def carousel_variant(image)
-    image.variant(resize_to_limit: [ 400, 300 ])
+    image.variant(resize_to_limit: [ 800, 600 ])
   end
 end

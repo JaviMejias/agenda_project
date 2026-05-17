@@ -5,6 +5,7 @@ es:
       reservation: "Reservas"
       property: "Propiedad"
       user: "usuario"
+      bank_account: "Cuenta Bancaria"
     attributes:
       client:
         name: "Nombre completo"
@@ -19,6 +20,9 @@ es:
         name: "El nombre"
         base_price: "El precio base"
         pricing_model: "El modelo de cobro"
+      bank_account:
+        bank_name: "Banco"
+        account_type: "Tipo de cuenta"
   enums:
     reservation:
       status:
@@ -26,6 +30,43 @@ es:
         confirmed: "Confirmada"
         cancelled: "Cancelada"
         blocked: "Bloqueado / No Disponible"
+    bank_account:
+      bank_name:
+        state_bank: "Banco Estado"
+        bank_of_chile: "Banco de Chile"
+        santander: "Banco Santander"
+        bci: "Banco BCI"
+        itau: "Banco Itaú"
+        scotiabank: "Scotiabank"
+        falabella: "Banco Falabella"
+        ripley: "Banco Ripley"
+        security: "Banco Security"
+        bice: "Banco BICE"
+        coopeuch: "Coopeuch"
+        tenpo: "Tenpo"
+        consorcio: "Banco Consorcio"
+        international_bank: "Banco Internacional"
+        btg_pactual: "BTG Pactual"
+        hsbc: "HSBC"
+        tanner: "Tanner"
+        jp_morgan: "JP Morgan"
+        bank_of_china: "Bank of China"
+        china_construction_bank: "China Construction Bank"
+        mach: "MACH"
+        mercado_pago: "Mercado Pago"
+        copec_pay: "Copec Pay"
+        chek: "Chek"
+        tapp: "Tapp"
+        dale: "Dale Coopeuch"
+        global66: "Global66"
+        prex: "Prex"
+        los_heroes: "Los Héroes Prepago"
+        superdigital: "Superdigital"
+      account_type:
+        checking: "Cuenta Corriente"
+        sight: "Cuenta Vista / RUT"
+        savings: "Cuenta de Ahorro"
+        prepaid: "Cuenta de Prepago"
   errors:
     messages:
       blank: "es obligatorio/a"
