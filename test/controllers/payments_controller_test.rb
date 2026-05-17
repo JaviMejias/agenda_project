@@ -17,13 +17,13 @@ class PaymentsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create payment" do
     assert_difference("Payment.count") do
-      post reservation_payments_url(@reservation), params: { 
-        payment: { 
-          amount: 10000, 
-          payment_date: Time.current, 
-          payment_method: "transfer", 
-          transaction_type: "abono" 
-        } 
+      post reservation_payments_url(@reservation), params: {
+        payment: {
+          amount: 10000,
+          payment_date: Time.current,
+          payment_method: "transfer",
+          transaction_type: "abono"
+        }
       }
     end
 
@@ -36,8 +36,8 @@ class PaymentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update payment" do
-    patch reservation_payment_url(@reservation, @payment), params: { 
-      payment: { amount: 15000 } 
+    patch reservation_payment_url(@reservation, @payment), params: {
+      payment: { amount: 15000 }
     }
     assert_redirected_to reservation_url(@reservation)
     @payment.reload

@@ -22,13 +22,13 @@ class ExpensesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create expense" do
     assert_difference("Expense.count") do
-      post property_expenses_url(@property), params: { 
-        expense: { 
-          amount: 5000, 
-          category: "light", 
-          expense_date: Date.today, 
-          description: "Test expense" 
-        } 
+      post property_expenses_url(@property), params: {
+        expense: {
+          amount: 5000,
+          category: "light",
+          expense_date: Date.today,
+          description: "Test expense"
+        }
       }
     end
 
@@ -41,8 +41,8 @@ class ExpensesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update expense" do
-    patch property_expense_url(@property, @expense), params: { 
-      expense: { amount: 6000 } 
+    patch property_expense_url(@property, @expense), params: {
+      expense: { amount: 6000 }
     }
     assert_redirected_to property_expenses_url(@property)
     @expense.reload
