@@ -6,13 +6,13 @@ class Public::MyReservationsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @client_user = users(:one)
     @client_user.update!(role: :client) # force client role
-    
+
     @owner_user = users(:admin)
     @owner_user.update!(role: :normal) # force normal/owner role for test
 
     @reservation = reservations(:one)
     @client = clients(:one)
-    
+
     # Link reservation to the client email matching client_user
     @client.update!(email: @client_user.email)
     @reservation.update!(client: @client)

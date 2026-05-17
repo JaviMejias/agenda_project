@@ -19,7 +19,7 @@
 <% content = capture do %>
   <div id="calendar-view" class="bg-white dark:bg-slate-900 rounded-3xl sm:rounded-[3rem] shadow-2xl shadow-indigo-100 dark:shadow-none border border-gray-100 dark:border-slate-800 p-3 sm:p-10 animate-fade-in-up">
     <%= render "shared/calendar_header", property: property, mode: mode %>
-    <div data-fullcalendar-target="calendar" class="min-h-[600px] sm:min-h-[700px]"></div>
+    <div id="fullcalendar-widget-grid-<%= property&.id || 'default' %>" data-turbo-permanent data-fullcalendar-target="calendar" class="min-h-[600px] sm:min-h-[700px]"></div>
   </div>
 
   <% if mode == 'booking' && !local_assigns[:omit_inputs] %>

@@ -2,7 +2,8 @@ class Public::ReservationsController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
   layout "public"
 
-  before_action :set_reservation, only: [ :show, :confirm, :reject, :receipt, :add_payment, :delete_payment ]
+  around_action :with_public_flag, only: [ :create ]
+  before_action :set_reservation, only: [ :show, :confirm, :reject, :receipt, :add_payment, :delete_payment, :upload_voucher ]
 
   def show
     @payments = @reservation.payments.with_attached_voucher.order(payment_date: :desc)
@@ -18,7 +19,28 @@ class Public::ReservationsController < ApplicationController
     end
   end
 
+  def upload_voucher
+    @payment = @reservation.payments.find(params[:payment_id])
+    if params[:payment] && params[:payment][:voucher].present?
+      @payment.voucher.attach(params[:payment][:voucher])
+
+      Notification.create!(
+        user: @reservation.user,
+        notifiable: @payment,
+        message: "¡Comprobante Actualizado! #{@reservation.client_name} ha cargado el comprobante para el pago de $#{@payment.amount.to_i} en la reserva ##{@reservation.id}."
+      )
+      redirect_to public_reservation_path(@reservation.token), notice: "El comprobante fue subido exitosamente."
+    else
+      redirect_to public_reservation_path(@reservation.token), alert: "Debes seleccionar un archivo para el comprobante."
+    end
+  end
+
   def receipt
+    if @reservation.cancelled?
+      redirect_to public_reservation_path(@reservation.token), alert: "No se puede descargar el comprobante de una reserva cancelada."
+      return
+    end
+
     respond_to do |format|
       format.pdf do
         render pdf: "Comprobante_#{@reservation.id}",
@@ -33,15 +55,34 @@ class Public::ReservationsController < ApplicationController
   def create
     @property = Property.find(params[:public_property_id] || params[:property_id])
 
-    # 1. Buscar o crear el cliente asociado al dueño de la propiedad
-    @client = @property.user.clients.find_or_initialize_by(email: params[:client_email])
+    if @property.user.nil?
+      fallback_admin = User.admin.first || User.normal.first
+      if fallback_admin
+        @property.update!(user: fallback_admin)
+        Rails.logger.warn "Se asignó automáticamente el usuario ID #{fallback_admin.id} como administrador de la propiedad ID #{@property.id} para evitar huérfanos."
+      else
+        @reservation = @property.reservations.build(reservation_params)
+        @reservation.errors.add(:base, "Esta propiedad no tiene un administrador válido asignado.")
+        render "public/properties/booking", status: :unprocessable_entity
+        return
+      end
+    end
+
+    # 1. Buscar primero por RUT (identificador único nacional) o por email para evitar duplicados y conflictos de unicidad
+    @client = @property.user.clients.find_by(rut: params[:client_rut]) ||
+              @property.user.clients.find_or_initialize_by(email: params[:client_email])
+
     @client.name = params[:client_name]
     @client.phone = params[:client_phone]
+    @client.email = params[:client_email]
     @client.rut = params[:client_rut]
 
     unless @client.save
       @reservation = @property.reservations.build(reservation_params)
-      @reservation.errors.add(:base, "No se pudo guardar los datos de contacto. Revisa la información.")
+      @reservation.errors.add(:base, "No se pudo guardar los datos de contacto. Revisa la información:")
+      @client.errors.full_messages.each do |msg|
+        @reservation.errors.add(:base, msg)
+      end
       render "public/properties/booking", status: :unprocessable_entity
       return
     end
@@ -63,6 +104,11 @@ class Public::ReservationsController < ApplicationController
   end
 
   def add_payment
+    if @reservation.cancelled?
+      redirect_to public_reservation_path(@reservation.token), alert: "No se pueden registrar pagos en una reserva cancelada."
+      return
+    end
+
     if @reservation.pending_balance <= 0
       redirect_to public_reservation_path(@reservation.token), alert: "Esta reserva ya se encuentra totalmente pagada."
       return
@@ -102,7 +148,13 @@ class Public::ReservationsController < ApplicationController
   private
 
   def set_reservation
-    @reservation = Reservation.find_by!(token: params[:token])
+    @reservation = Reservation.includes(property: { company: :bank_accounts }).find_by!(token: params[:token])
+
+    # El enlace público expira al finalizar el día de término de la reserva
+    if Time.zone.now > @reservation.end_time.end_of_day
+      render "public/reservations/expired", status: :gone
+      nil
+    end
   rescue ActiveRecord::RecordNotFound
     render plain: "Reserva no encontrada", status: :not_found
   end
@@ -117,5 +169,12 @@ class Public::ReservationsController < ApplicationController
       p[:amount] = p[:amount].gsub(".", "").gsub(",", ".")
     end
     p
+  end
+
+  def with_public_flag
+    Thread.current[:created_by_public] = true
+    yield
+  ensure
+    Thread.current[:created_by_public] = nil
   end
 end

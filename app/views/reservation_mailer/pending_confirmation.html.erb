@@ -15,7 +15,9 @@
       <p style="margin: 5px 0;"><strong>Hasta:</strong> <%= l(@reservation.end_time, format: :long) %></p>
     <% end %>
     <p style="margin: 5px 0;"><strong>Estado:</strong> <span style="color: #d97706; font-weight: bold;">Pendiente de Confirmación</span></p>
-    <p style="margin: 5px 0;"><strong>Responsable:</strong> <%= @user.first_name %> <%= @user.last_name %></p>
+    <% unless @created_by_public %>
+      <p style="margin: 5px 0;"><strong>Responsable:</strong> <%= @user.first_name %> <%= @user.last_name %></p>
+    <% end %>
   </div>
 
   <p style="color: #e11d48; font-size: 14px; text-align: center; font-weight: bold; margin-bottom: 20px;">

@@ -20,12 +20,6 @@ export default class extends Controller {
   connect() {
     this.isMobile = window.innerWidth < 640
 
-    if (this.modeValue === 'dashboard') {
-      this.initDashboard()
-    } else if (this.modeValue === 'booking') {
-      this.initBooking()
-    }
-
     this.element.addEventListener("fullcalendar:refetch", () => {
       this.refetch()
     })
@@ -34,11 +28,20 @@ export default class extends Controller {
   calendarTargetConnected(element) {
     if (this.calendar) {
       this.calendar.destroy()
+      this.calendar = null
     }
+    
     if (this.modeValue === 'dashboard') {
       this.initDashboard()
     } else if (this.modeValue === 'booking') {
       this.initBooking()
+    }
+  }
+
+  calendarTargetDisconnected(element) {
+    if (this.calendar) {
+      this.calendar.destroy()
+      this.calendar = null
     }
   }
 
@@ -49,7 +52,8 @@ export default class extends Controller {
   }
 
   initDashboard() {
-    const el = this.hasCalendarTarget ? this.calendarTarget : this.element
+    if (!this.hasCalendarTarget) return
+    const el = this.calendarTarget
 
     el.innerHTML = ''
 
@@ -109,7 +113,8 @@ export default class extends Controller {
   }
 
   initBooking() {
-    const el = this.hasCalendarTarget ? this.calendarTarget : this.element
+    if (!this.hasCalendarTarget) return
+    const el = this.calendarTarget
 
     el.innerHTML = ''
 
@@ -134,9 +139,10 @@ export default class extends Controller {
       selectable: true,
       selectMirror: true,
       unselectAuto: false,
-      editable: true, // Permitimos mover y redimensionar
+      editable: false, // No permitimos mover ni redimensionar reservas existentes
       longPressDelay: 100,
       eventOverlap: false,
+      selectOverlap: false, // Previene seleccionar rangos que se crucen con reservas existentes
       slotMinTime: '08:00:00',
       slotMaxTime: '22:00:00',
       allDaySlot: false,
@@ -235,9 +241,17 @@ export default class extends Controller {
     this.initJumpDatePicker()
 
     if (initialStart && initialEnd) {
-      // Goto and select the initial date
-      this.calendar.gotoDate(initialStart)
-      this.calendar.select(initialStart, initialEnd)
+      // Allow browser paint and FullCalendar layout to settle before programmatic selection
+      setTimeout(() => {
+        try {
+          if (this.calendar) {
+            this.calendar.gotoDate(initialStart)
+            this.calendar.select(initialStart, initialEnd)
+          }
+        } catch (err) {
+          console.warn("FullCalendar initial selection failed:", err)
+        }
+      }, 150)
 
       if (!this.startInputTarget.value) this.startInputTarget.value = initialStart
       if (!this.endInputTarget.value) this.endInputTarget.value = initialEnd

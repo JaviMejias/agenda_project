@@ -6,8 +6,8 @@ Rails.application.routes.draw do
       get :list
     end
   end
-  devise_for :users, path_names: { registration: 'registrarse' }, controllers: {
-    registrations: 'users/registrations'
+  devise_for :users, path_names: { registration: "registrarse" }, controllers: {
+    registrations: "users/registrations"
   }
   resources :users
   resources :companies do
@@ -52,23 +52,24 @@ Rails.application.routes.draw do
   root "public/properties#index"
 
   scope module: :public do
-    resources :properties, only: [:index, :show], path: "p", as: :public_property do
+    resources :properties, only: [ :index, :show ], path: "p", as: :public_property do
       member do
         get :booking
         get :events
       end
-      resources :reservations, only: [:create], as: :public_reservations
+      resources :reservations, only: [ :create ], as: :public_reservations
     end
-    resources :reservations, only: [:show], param: :token, path: "r", as: :public_reservation do
+    resources :reservations, only: [ :show ], param: :token, path: "r", as: :public_reservation do
       member do
         get :confirm
         get :reject
         get :receipt
         post :add_payment
         delete "delete_payment/:payment_id", to: "reservations#delete_payment", as: :delete_payment
+        post "upload_voucher/:payment_id", to: "reservations#upload_voucher", as: :upload_voucher
       end
     end
-    resources :my_reservations, only: [:index], path: "mis-reservas"
+    resources :my_reservations, only: [ :index ], path: "mis-reservas"
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

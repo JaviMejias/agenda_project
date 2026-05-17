@@ -125,7 +125,7 @@
                   data: { 
                     image_loader_target: "image",
                     action: "load->image-loader#load click->lightbox#open",
-                    url: url_for(property.gallery_variant(image))
+                    url: url_for(image)
                   } %>
               <% if property.persisted? %>
                 <%= link_to image_property_path(property, image), data: { turbo_method: :delete, turbo_confirm: "¿Borrar imagen?" }, class: "absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs shadow-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all cursor-pointer z-10 hover:bg-red-600 active:scale-95 sm:hover:scale-110" do %>

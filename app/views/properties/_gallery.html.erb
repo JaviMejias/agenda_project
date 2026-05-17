@@ -12,7 +12,8 @@
             loading: "lazy",
             data: { 
               action: "click->lightbox#open load->image-loader#load",
-              image_loader_target: "image"
+              image_loader_target: "image",
+              url: url_for(image)
             } %>
         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 pointer-events-none"></div>
       </div>

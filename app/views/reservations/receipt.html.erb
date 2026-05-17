@@ -80,7 +80,10 @@
       <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; height: 100%;">
         <h3 style="margin: 0 0 15px 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Detalles del Servicio:</h3>
         <p style="margin: 0 0 12px 0; font-size: 14px; font-weight: bold; color: #0f172a;"><%= @reservation.property.name %></p>
-        <% date_format = @reservation.property.per_hour? ? "%d/%m/%Y %H:%M" : "%d/%m/%Y" %>
+        <% 
+          display_end = @reservation.property.per_day? ? @reservation.end_time - 1.day : @reservation.end_time
+          date_format = @reservation.property.per_hour? ? "%d/%m/%Y %H:%M" : "%d/%m/%Y" 
+        %>
         <table style="width: 100%; margin: 0; padding: 0; border: none; font-size: 12px;">
           <tr>
             <td style="padding: 4px 0; color: #64748b; border: none;">Entrada:</td>
@@ -88,7 +91,7 @@
           </tr>
           <tr>
             <td style="padding: 4px 0; color: #64748b; border: none;">Salida:</td>
-            <td style="padding: 4px 0; font-weight: bold; text-align: right; border: none; color: #1e293b;"><%= @reservation.end_time.strftime(date_format) %></td>
+            <td style="padding: 4px 0; font-weight: bold; text-align: right; border: none; color: #1e293b;"><%= display_end.strftime(date_format) %></td>
           </tr>
         </table>
       </div>

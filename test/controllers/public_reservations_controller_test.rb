@@ -86,7 +86,7 @@ class PublicReservationsControllerTest < ActionDispatch::IntegrationTest
   test "should delete payment from reservation" do
     payment = payments(:one)
     payment.update!(reservation_id: @reservation.id)
-    
+
     assert_difference("Payment.count", -1) do
       delete delete_payment_public_reservation_url(token: "token123", payment_id: payment.id)
     end
@@ -96,7 +96,7 @@ class PublicReservationsControllerTest < ActionDispatch::IntegrationTest
   test "should not add payment if already fully paid" do
     @reservation.payments.destroy_all
     @reservation.payments.create!(amount: @reservation.total_price, payment_method: :transfer, transaction_type: :abono, payment_date: Time.current)
-    
+
     assert_no_difference("Payment.count") do
       post add_payment_public_reservation_url(token: "token123"), params: {
         payment: {
@@ -109,5 +109,24 @@ class PublicReservationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to public_reservation_url("token123")
     follow_redirect!
     assert_match "ya se encuentra totalmente pagada", response.body
+  end
+
+  test "should upload missing voucher to payment" do
+    payment = payments(:one)
+    payment.update!(reservation_id: @reservation.id, payment_method: :transfer)
+    payment.voucher.purge if payment.voucher.attached?
+    assert_not payment.voucher.attached?
+
+    uploaded_file = fixture_file_upload("dummy.png", "image/png")
+
+    post upload_voucher_public_reservation_url(token: "token123", payment_id: payment.id), params: {
+      payment: {
+        voucher: uploaded_file
+      }
+    }
+
+    assert_redirected_to public_reservation_url("token123")
+    payment.reload
+    assert payment.voucher.attached?
   end
 end

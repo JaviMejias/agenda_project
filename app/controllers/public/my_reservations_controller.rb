@@ -11,6 +11,6 @@ class Public::MyReservationsController < ApplicationController
     # Buscar todas las reservas que correspondan al email del cliente logeado
     # Esto une el historial de reservas que hicieron como invitados con su cuenta registrada
     @clients = Client.where(email: current_user.email)
-    @reservations = Reservation.where(client: @clients).order(start_time: :desc)
+    @reservations = Reservation.includes(:property, :payments).where(client: @clients).order(start_time: :desc)
   end
 end

@@ -4,7 +4,9 @@
      data-fullcalendar-mode-value="booking"
      data-fullcalendar-per-hour-value="<%= @property.per_hour? %>"
      data-fullcalendar-base-price-value="<%= @property.base_price %>"
-     data-fullcalendar-events-url-value="<%= events_public_property_path(@property, format: :json) %>">
+     data-fullcalendar-events-url-value="<%= events_public_property_path(@property, format: :json) %>"
+     data-fullcalendar-initial-start-value="<%= @reservation&.start_time&.strftime('%Y-%m-%dT%H:%M:%S') if @reservation&.start_time %>"
+     data-fullcalendar-initial-end-value="<%= @reservation&.end_time&.strftime('%Y-%m-%dT%H:%M:%S') if @reservation&.end_time %>">
   <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 dark:border-slate-800">
     <div class="p-8 sm:p-12 border-b border-gray-100 dark:border-slate-800 relative overflow-hidden bg-gradient-to-br from-white to-indigo-50/50 dark:from-slate-900 dark:to-slate-950">
       <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>

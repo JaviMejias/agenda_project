@@ -34,7 +34,11 @@
     <%= form_with(url: public_property_public_reservations_path(@property), 
                   method: :post,
                   class: "space-y-4", 
-                  id: "public-booking-form") do |f| %>
+                  id: "public-booking-form",
+                  data: { 
+                    controller: "rut guest-booking-validation",
+                    action: "validation:check->guest-booking-validation#check input->guest-booking-validation#check"
+                  }) do |f| %>
       <% if reservation.errors.any? %>
         <div class="p-4 mb-4 text-sm text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 animate-shake">
           <ul class="list-disc pl-5 space-y-1 font-bold text-xs">
@@ -78,7 +82,8 @@
               <%= f.text_field :client_name, 
                   required: true,
                   placeholder: "Juan Pérez", 
-                  class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+                  class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm",
+                  data: { guest_booking_validation_target: "input" } %>
             </div>
           </div>
           <div>
@@ -90,7 +95,8 @@
               <%= f.email_field :client_email, 
                   required: true,
                   placeholder: "juan@correo.com", 
-                  class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+                  class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm",
+                  data: { guest_booking_validation_target: "input" } %>
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -103,7 +109,8 @@
                 <%= f.telephone_field :client_phone, 
                     required: true,
                     placeholder: "+56 9 1234 5678", 
-                    class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+                    class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm",
+                    data: { guest_booking_validation_target: "input" } %>
               </div>
             </div>
             <div>
@@ -115,7 +122,12 @@
                 <%= f.text_field :client_rut, 
                     required: true,
                     placeholder: "12.345.678-9", 
-                    class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+                    class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm",
+                    data: {
+                      action: "input->rut#format",
+                      rut_target: "input",
+                      guest_booking_validation_target: "input"
+                    } %>
               </div>
             </div>
           </div>
@@ -129,6 +141,7 @@
             disabled: true,
             data: { 
               fullcalendar_target: "submitButton", 
+              guest_booking_validation_target: "submitButton",
               disable_with: "Enviando Solicitud..." 
             } %>
         <p class="mt-4 text-[10px] text-gray-400 dark:text-slate-500 text-center font-medium leading-relaxed">

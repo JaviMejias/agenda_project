@@ -59,7 +59,7 @@
             </div>
             
             <div class="flex items-center gap-2">
-              <%= link_to receipt_public_reservation_path(reservation.token, format: :pdf), class: "w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 border border-gray-100 dark:border-slate-700 flex items-center justify-center transition-colors shadow-sm active:scale-95", title: "Descargar PDF" do %>
+              <%= link_to receipt_public_reservation_path(reservation.token, format: :pdf), target: "_blank", class: "w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 border border-gray-100 dark:border-slate-700 flex items-center justify-center transition-colors shadow-sm active:scale-95", title: "Descargar PDF" do %>
                 <i class="fa-solid fa-file-pdf"></i>
               <% end %>
               <%= link_to public_reservation_path(reservation.token), class: "inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 hover:bg-black dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white px-5 py-2.5 text-xs font-black uppercase tracking-widest shadow-sm active:scale-95 transition-all" do %>
