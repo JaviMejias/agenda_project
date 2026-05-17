@@ -1,6 +1,6 @@
 <% content_for :title, "Mis Reservas - Agenda Pro" %>
 
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+<div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
   
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
     <div>
@@ -8,7 +8,7 @@
       <p class="text-sm text-gray-500 dark:text-slate-400 mt-2 font-medium">Aquí puedes ver el historial completo y el estado de tus reservas activas y pasadas.</p>
     </div>
     
-    <%= link_to root_path, class: "inline-flex items-center gap-2 rounded-2xl bg-indigo-600 dark:bg-indigo-500 text-white py-3.5 px-6 text-sm font-black shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all hover:-translate-y-0.5 active:scale-95" do %>
+    <%= link_to public_property_index_path, class: "inline-flex items-center gap-2 rounded-2xl bg-indigo-600 dark:bg-indigo-500 text-white py-3.5 px-6 text-sm font-black shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all hover:-translate-y-0.5 active:scale-95" do %>
       <i class="fa-solid fa-house"></i> Buscar Más Espacios
     <% end %>
   </div>
@@ -79,7 +79,7 @@
       </div>
       <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2">No tienes reservas registradas</h3>
       <p class="text-gray-500 dark:text-slate-400 max-w-sm mx-auto mb-8 leading-relaxed">Una vez que solicites tu primera reserva o te registres con el mismo correo, las verás listadas aquí.</p>
-      <%= link_to root_path, class: "inline-flex items-center gap-2 rounded-2xl bg-indigo-600 dark:bg-indigo-500 text-white py-3.5 px-6 text-sm font-black shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all" do %>
+      <%= link_to public_property_index_path, class: "inline-flex items-center gap-2 rounded-2xl bg-indigo-600 dark:bg-indigo-500 text-white py-3.5 px-6 text-sm font-black shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all" do %>
         <i class="fa-solid fa-calendar-plus"></i> Reservar Mi Primer Espacio
       <% end %>
     </div>

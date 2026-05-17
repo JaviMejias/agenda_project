@@ -39,7 +39,7 @@
       <div class="mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 justify-between items-center">
           <div class="flex items-center gap-8">
-            <%= link_to root_path, class: "flex items-center gap-3 group" do %>
+            <%= link_to (user_signed_in? && current_user.client? ? public_property_index_path : root_path), class: "flex items-center gap-3 group" do %>
               <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
                 <i class="fa-solid fa-calendar-check text-xl animate-pulse"></i>
               </div>
@@ -47,8 +47,8 @@
             <% end %>
             
             <div class="hidden sm:flex sm:items-center sm:space-x-1">
-              <%= link_to root_path, class: "group relative inline-flex items-center rounded-xl px-4 py-2 text-sm font-bold transition-all duration-300 #{current_page?(root_path) ? 'text-indigo-600 bg-indigo-50/50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
-                <i class="fa-solid fa-house-chimney mr-2.5 transition-colors <%= current_page?(root_path) ? 'text-indigo-500' : 'text-gray-400 group-hover:text-indigo-500' %>"></i>
+              <%= link_to public_property_index_path, class: "group relative inline-flex items-center rounded-xl px-4 py-2 text-sm font-bold transition-all duration-300 #{current_page?(public_property_index_path) || current_page?(root_path) ? 'text-indigo-600 bg-indigo-50/50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
+                <i class="fa-solid fa-house-chimney mr-2.5 transition-colors <%= current_page?(public_property_index_path) || current_page?(root_path) ? 'text-indigo-500' : 'text-gray-400 group-hover:text-indigo-500' %>"></i>
                 <span>Explorar Espacios</span>
               <% end %>
             </div>
@@ -127,8 +127,8 @@
           <div class="px-5 mb-2">
             <span class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Navegación</span>
           </div>
-          <%= link_to root_path, class: "flex items-center rounded-2xl px-5 py-4 text-base font-black transition-all #{current_page?(root_path) ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
-            <i class="fa-solid fa-house-chimney mr-4 w-6 text-center <%= current_page?(root_path) ? 'text-indigo-500' : 'text-gray-400' %>"></i> Explorar Espacios
+          <%= link_to public_property_index_path, class: "flex items-center rounded-2xl px-5 py-4 text-base font-black transition-all #{current_page?(public_property_index_path) || current_page?(root_path) ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
+            <i class="fa-solid fa-house-chimney mr-4 w-6 text-center <%= current_page?(public_property_index_path) || current_page?(root_path) ? 'text-indigo-500' : 'text-gray-400' %>"></i> Explorar Espacios
           <% end %>
 
           <% if user_signed_in? %>
