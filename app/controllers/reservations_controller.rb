@@ -61,6 +61,7 @@ class ReservationsController < ApplicationController
   def show
     authorize @reservation
     Notification.mark_as_read_for_notifiable(@reservation, current_user)
+    @payments = @reservation.payments.with_attached_voucher.order(payment_date: :desc)
   end
 
   def receipt
