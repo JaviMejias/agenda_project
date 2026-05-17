@@ -1,0 +1,64 @@
+<% content_for :title, "#{@property.name} - Calendario de Reserva" %>
+
+<div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in"
+     data-controller="fullcalendar"
+     data-fullcalendar-mode-value="booking"
+     data-fullcalendar-per-hour-value="<%= @property.per_hour? %>"
+     data-fullcalendar-base-price-value="<%= @property.base_price %>"
+     data-fullcalendar-events-url-value="<%= events_public_property_path(@property, format: :json) %>">
+  
+  <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 dark:border-slate-800">
+    
+    <!-- Property Header -->
+    <div class="p-8 sm:p-12 border-b border-gray-100 dark:border-slate-800 relative overflow-hidden bg-gradient-to-br from-white to-indigo-50/50 dark:from-slate-900 dark:to-slate-950">
+      <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
+        <div class="flex-1">
+          <%= link_to public_property_path(@property), class: "inline-flex items-center gap-2 text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline mb-3" do %>
+            <i class="fa-solid fa-arrow-left"></i> Volver al detalle del espacio
+          <% end %>
+          <h1 class="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight"><%= @property.name %></h1>
+          <p class="text-indigo-600 dark:text-indigo-400 text-sm font-bold uppercase tracking-widest flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-location-dot"></i> <%= @property.address %>
+          </p>
+        </div>
+        
+        <div class="text-left md:text-right bg-white/60 dark:bg-slate-800/60 backdrop-blur-md p-6 rounded-3xl border border-white/40 dark:border-slate-700/50 shadow-xl">
+          <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">Precio base</p>
+          <div class="text-3xl font-black text-indigo-600 dark:text-indigo-400 font-sans">
+            $<%= number_with_delimiter(@property.base_price.to_i, delimiter: ".") %>
+            <span class="text-sm text-gray-500 dark:text-slate-400 font-bold lowercase">/<%= @property.pricing_model == 'per_hour' ? 'hora' : 'día' %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar & Booking Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-gray-100 dark:divide-slate-800">
+      
+      <!-- Calendar Area -->
+      <div class="lg:col-span-2 p-6 sm:p-10 bg-gray-50/30 dark:bg-slate-900/50">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+            <i class="fa-solid fa-calendar-check text-lg"></i>
+          </div>
+          <h2 class="text-xl font-black text-gray-900 dark:text-white">Selecciona Fechas / Horas</h2>
+        </div>
+        
+        <%= render "shared/calendar_container", 
+            property: @property, 
+            omit_controller: true, 
+            omit_inputs: true,
+            events_url: events_public_property_path(@property, format: :json) %>
+      </div>
+
+      <!-- Booking Form Area -->
+      <div class="p-6 sm:p-10 bg-white dark:bg-slate-900 relative">
+        <div class="sticky top-24">
+          <%= render "public/properties/booking_form" %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

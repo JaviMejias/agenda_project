@@ -1,0 +1,106 @@
+<% content_for :title, "Agenda Pro - Encuentra tu espacio ideal" %>
+<div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in" data-controller="search">
+  <div class="text-center mx-auto mb-16 relative">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 rounded-full blur-3xl -z-10"></div>
+    <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 mb-6 border border-indigo-100/50 dark:border-indigo-900/30 animate-pulse shadow-sm">
+      <i class="fa-solid fa-sparkles text-[10px]"></i> Espacios Verificados e Inmediatos
+    </span>
+    <h1 class="text-4xl sm:text-6xl font-black text-gray-900 dark:text-white mb-6 tracking-tight leading-none">
+      Encuentra el espacio perfecto para tu próximo <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">evento</span>
+    </h1>
+    <p class="text-base sm:text-xl text-gray-500 dark:text-slate-400 max-w-2xl mx-auto font-medium">
+      Explora nuestras propiedades exclusivas disponibles, revisa el calendario en tiempo real y solicita tu reserva en segundos sin complicaciones.
+    </p>
+  </div>
+  <div class="mb-12 max-w-4xl mx-auto bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-gray-100 dark:border-slate-800 rounded-3xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.02)]">
+    <%= form_with url: root_path, method: :get, class: "space-y-4 sm:space-y-0 sm:flex sm:items-center sm:gap-4",
+        data: { search_target: "form", turbo_frame: "public_properties_frame", turbo_action: "advance" } do |f| %>
+      <div class="flex-1 relative group">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600 group-focus-within:text-indigo-500 transition-colors">
+          <i class="fa-solid fa-magnifying-glass text-sm"></i>
+        </div>
+        <%= f.text_field :query, value: params[:query], placeholder: "Buscar por nombre, dirección o palabra clave...",
+          data: { search_target: "input", action: "input->search#search" },
+          class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200/60 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50/50 dark:bg-slate-800/40 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm" %>
+      </div>
+      <div class="relative min-w-[180px]">
+        <%= f.select :pricing_model, 
+          [["Todos los cobros", ""], ["Por hora", "per_hour"], ["Por día", "per_day"]], 
+          { selected: params[:pricing_model] },
+          data: { action: "change->search#submit" },
+          class: "block w-full px-4 py-3.5 pr-8 border border-gray-200/60 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50/50 dark:bg-slate-800/40 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm appearance-none font-bold" %>
+        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+          <i class="fa-solid fa-chevron-down text-xs"></i>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <turbo-frame id="public_properties_frame" class="relative block w-full">
+    <%= render "shared/loading_state", text: "Buscando espacios..." %>
+    <% if @properties.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <% @properties.each do |property| %>
+          <%= link_to public_property_path(property), data: { turbo: false }, class: "group bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden border border-gray-100/80 dark:border-slate-800 shadow-[0_15px_40px_rgba(0,0,0,0.02)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all duration-500 flex flex-col relative" do %>
+            <div class="relative h-64 overflow-hidden bg-gray-50 dark:bg-slate-800">
+              <% if property.images.attached? %>
+                <%= image_tag property.images.first.variant(resize_to_fill: [800, 600]), class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out" %>
+              <% else %>
+                <div class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-indigo-50/30 dark:from-slate-800 dark:to-slate-900 text-gray-300 dark:text-slate-700">
+                  <i class="fa-solid fa-hotel text-5xl mb-3 animate-pulse"></i>
+                  <span class="text-xs font-black uppercase tracking-widest text-gray-400">Sin foto de vitrina</span>
+                </div>
+              <% end %>
+              <div class="absolute top-4 left-4 z-10">
+                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-emerald-500/90 dark:bg-emerald-500/20 backdrop-blur text-white dark:text-emerald-400 shadow-md">
+                  <i class="fa-solid fa-circle-check"></i> Verificado
+                </span>
+              </div>
+              <div class="absolute bottom-4 right-4 bg-white/90 dark:bg-slate-950/80 backdrop-blur-md border border-white/20 dark:border-slate-800/80 text-gray-900 dark:text-white px-4 py-2.5 rounded-2xl shadow-xl z-10 transition-transform group-hover:scale-105 duration-500">
+                <span class="text-xs font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400 block mb-0.5">Precio Base</span>
+                <span class="text-lg font-black font-sans">$<%= number_with_delimiter(property.base_price.to_i, delimiter: ".") %></span>
+                <span class="text-[10px] text-gray-400 lowercase font-bold">/<%= property.pricing_model == 'per_hour' ? 'hora' : 'día' %></span>
+              </div>
+            </div>
+            <div class="p-8 flex-1 flex flex-col relative">
+              <div class="flex items-center gap-2 mb-3">
+                <% if property.pricing_model == 'per_hour' %>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border border-amber-100/50 dark:border-amber-900/30">
+                    <i class="fa-regular fa-clock"></i> Por Hora
+                  </span>
+                <% else %>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100/50 dark:border-blue-900/30">
+                    <i class="fa-regular fa-calendar"></i> Por Día
+                  </span>
+                <% end %>
+              </div>
+              <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"><%= property.name %></h3>
+              <p class="text-sm font-bold text-gray-400 dark:text-slate-500 flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-location-dot text-indigo-500/70"></i> <%= property.address %>
+              </p>
+              <% if property.description.present? %>
+                <p class="text-sm text-gray-500 dark:text-slate-400 line-clamp-3 mb-8 flex-1 leading-relaxed"><%= property.description %></p>
+              <% else %>
+                <p class="text-sm italic text-gray-400 dark:text-slate-600 line-clamp-3 mb-8 flex-1">Sin descripción disponible en este momento.</p>
+              <% end %>
+              <div class="mt-auto pt-5 border-t border-gray-100 dark:border-slate-800/80 flex items-center justify-between text-indigo-600 dark:text-indigo-400 font-bold text-sm">
+                <span class="text-xs uppercase tracking-widest font-black group-hover:underline">Reservar y ver disponibilidad</span>
+                <div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 dark:group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-sm">
+                  <i class="fa-solid fa-arrow-right group-hover:translate-x-0.5 transition-transform"></i>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center max-w-lg mx-auto p-12 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.02)]">
+        <div class="w-24 h-24 rounded-[2rem] bg-gradient-to-tr from-gray-50 to-indigo-50/50 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center mx-auto text-gray-400 dark:text-slate-600 mb-6 border border-gray-100 dark:border-slate-800">
+          <i class="fa-solid fa-house-circle-exclamation text-4xl text-indigo-500/70"></i>
+        </div>
+        <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-2">No se encontraron espacios</h3>
+        <p class="text-sm text-gray-500 dark:text-slate-400 mb-6">No encontramos resultados para tu búsqueda. Prueba modificando los filtros o volviendo a ver la lista completa.</p>
+        <%= link_to "Restablecer Filtros", root_path, class: "inline-flex items-center justify-center rounded-2xl bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 text-white px-6 py-3.5 text-sm font-black shadow-md shadow-indigo-500/10 dark:shadow-none transition-all cursor-pointer" %>
+      </div>
+    <% end %>
+  </turbo-frame>
+</div>

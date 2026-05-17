@@ -10,7 +10,7 @@ export default class extends Controller {
     lightbox.id = 'lightbox-modal'
     lightbox.className = 'fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 sm:p-10 cursor-zoom-out animate-fade-in'
     lightbox.innerHTML = `
-      <div class="relative max-w-7xl max-h-full">
+      <div class="relative max-h-full">
         <img src="${imageUrl}" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl animate-scale-in">
         <button class="absolute -top-12 right-0 text-white text-3xl hover:text-gray-300 transition-colors">
           <i class="fa-solid fa-xmark"></i>

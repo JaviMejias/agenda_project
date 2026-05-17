@@ -1,0 +1,135 @@
+<% 
+  reservation = local_assigns[:reservation] || @reservation || @property.reservations.build
+%>
+
+<div id="public_reservation_form_container" class="space-y-6">
+  
+  <!-- Selection Summary Preview -->
+  <div data-fullcalendar-target="preview" class="hidden animate-fade-in bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/50 rounded-3xl p-6 shadow-inner">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+      <h4 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">Tu Selección</h4>
+    </div>
+    
+    <div class="space-y-3 mb-6">
+      <div class="flex justify-between items-center text-xs">
+        <span class="font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">Inicio</span>
+        <span data-fullcalendar-target="inicio" class="font-black text-gray-900 dark:text-white">---</span>
+      </div>
+      <div class="flex justify-between items-center text-xs">
+        <span class="font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">Término</span>
+        <span data-fullcalendar-target="fin" class="font-black text-gray-900 dark:text-white">---</span>
+      </div>
+    </div>
+    
+    <div class="pt-4 border-t border-indigo-100 dark:border-indigo-900/50 flex justify-between items-center">
+      <span class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Total Estimado</span>
+      <span data-fullcalendar-target="precioTotal" class="text-2xl font-black text-indigo-600 dark:text-indigo-400">$0</span>
+    </div>
+  </div>
+
+  <div class="bg-gray-50 dark:bg-slate-800/50 rounded-[2rem] p-6 sm:p-8 border border-gray-100 dark:border-slate-800 shadow-inner">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+        <i class="fa-solid fa-address-card"></i>
+      </div>
+      <h3 class="text-lg font-black text-gray-900 dark:text-white">Datos de Contacto</h3>
+    </div>
+
+    <%= form_with(url: public_property_public_reservations_path(@property), 
+                  method: :post,
+                  class: "space-y-4", 
+                  id: "public-booking-form") do |f| %>
+      
+      <% if reservation.errors.any? %>
+        <div class="p-4 mb-4 text-sm text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 animate-shake">
+          <ul class="list-disc pl-5 space-y-1 font-bold text-xs">
+            <% reservation.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <!-- Campos de Contacto -->
+      <div class="space-y-4">
+        <div>
+          <%= f.label :client_name, "Nombre Completo", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <%= f.text_field :client_name, 
+                value: user_signed_in? ? current_user.full_name : nil, 
+                readonly: user_signed_in?,
+                required: true,
+                placeholder: "Juan Pérez", 
+                class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm #{user_signed_in? ? 'opacity-80 bg-gray-100 cursor-not-allowed' : ''}" %>
+          </div>
+        </div>
+
+        <div>
+          <%= f.label :client_email, "Correo Electrónico", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
+              <i class="fa-solid fa-envelope"></i>
+            </div>
+            <%= f.email_field :client_email, 
+                value: user_signed_in? ? current_user.email : nil, 
+                readonly: user_signed_in?,
+                required: true,
+                placeholder: "juan@correo.com", 
+                class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm #{user_signed_in? ? 'opacity-80 bg-gray-100 cursor-not-allowed' : ''}" %>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <%= f.label :client_phone, "Teléfono", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
+                <i class="fa-solid fa-phone"></i>
+              </div>
+              <%= f.telephone_field :client_phone, 
+                  required: true,
+                  placeholder: "+56 9 1234 5678", 
+                  class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+            </div>
+          </div>
+
+          <div>
+            <%= f.label :client_rut, "RUT", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
+                <i class="fa-solid fa-id-card"></i>
+              </div>
+              <%= f.text_field :client_rut, 
+                  required: true,
+                  placeholder: "12.345.678-9", 
+                  class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fechas ocultas vinculadas a FullCalendar -->
+      <%= f.hidden_field :start_time, name: "reservation[start_time]", data: { fullcalendar_target: "startInput" } %>
+      <%= f.hidden_field :end_time, name: "reservation[end_time]", data: { fullcalendar_target: "endInput" } %>
+
+      <div class="pt-4">
+        <%= f.submit "Solicitar Reserva", 
+            class: "w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/10 hover:-translate-y-1 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+            disabled: true,
+            data: { 
+              fullcalendar_target: "submitButton", 
+              disable_with: "Enviando Solicitud..." 
+            } %>
+        <p class="mt-4 text-[10px] text-gray-400 dark:text-slate-500 text-center font-medium leading-relaxed">
+          <i class="fa-solid fa-circle-info mr-1"></i> Selecciona fechas en el calendario para habilitar el botón.
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>

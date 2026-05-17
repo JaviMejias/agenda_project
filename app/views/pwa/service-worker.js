@@ -28,6 +28,9 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
+  // Evitar interceptar solicitudes de Active Storage (imágenes, archivos adjuntos)
+  if (event.request.url.includes("/rails/active_storage")) return;
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {

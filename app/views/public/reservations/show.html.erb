@@ -1,0 +1,212 @@
+<% content_for :title, "Seguimiento de tu Reserva ##{@reservation.id}" %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
+  
+  <!-- Header Alert/Message -->
+  <% if flash[:notice].present? %>
+    <div class="mb-8 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 rounded-3xl flex items-center gap-3 text-emerald-800 dark:text-emerald-400">
+      <i class="fa-solid fa-circle-check text-xl"></i>
+      <span class="text-sm font-bold"><%= flash[:notice] %></span>
+    </div>
+  <% end %>
+
+  <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 dark:border-slate-800">
+    
+    <!-- Header Hero -->
+    <div class="p-8 sm:p-10 border-b border-gray-100 dark:border-slate-800 relative overflow-hidden bg-gradient-to-br from-indigo-50/30 to-purple-50/30 dark:from-slate-900/50 dark:to-slate-950/50">
+      <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative z-10">
+        <div>
+          <span class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest bg-indigo-50 dark:bg-indigo-900/30 px-3.5 py-1.5 rounded-full border border-indigo-100/50 dark:border-indigo-900/50 mb-3 inline-block">
+            Código: <%= @reservation.token.first(8).upcase %>
+          </span>
+          <h1 class="text-3xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">Estado de tu Reserva</h1>
+          <p class="text-sm text-gray-500 dark:text-slate-400 font-medium">Propiedad: <span class="font-bold text-gray-700 dark:text-slate-300"><%= @reservation.property.name %></span></p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="px-5 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest <%= @reservation.status_color_classes %>">
+            <i class="fa-solid fa-circle-info mr-1.5"></i> <%= @reservation.status_text %>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Details Grid -->
+    <div class="p-8 sm:p-10 grid grid-cols-1 md:grid-cols-2 gap-8 border-b border-gray-100 dark:border-slate-800">
+      
+      <!-- Left side: Dates & Times -->
+      <div class="space-y-6">
+        <h3 class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Detalles del Período</h3>
+        
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+            <i class="fa-solid fa-calendar-day"></i>
+          </div>
+          <div>
+            <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Fecha y Hora de Inicio</p>
+            <p class="text-sm font-black text-gray-900 dark:text-white mt-1"><%= @reservation.start_time.strftime("%A, %d de %B de %Y") %></p>
+            <p class="text-xs text-gray-500 dark:text-slate-400 font-bold mt-0.5">Hora: <%= @reservation.start_time.strftime("%H:%M hrs") %></p>
+          </div>
+        </div>
+
+        <div class="flex gap-4 items-start">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div>
+            <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Fecha y Hora de Término</p>
+            <p class="text-sm font-black text-gray-900 dark:text-white mt-1"><%= @reservation.end_time.strftime("%A, %d de %B de %Y") %></p>
+            <p class="text-xs text-gray-500 dark:text-slate-400 font-bold mt-0.5">Hora: <%= @reservation.end_time.strftime("%H:%M hrs") %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right side: Financial details -->
+      <div class="space-y-6">
+        <h3 class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Información Financiera</h3>
+        
+        <div class="bg-gray-50 dark:bg-slate-800/40 rounded-3xl p-6 border border-gray-100 dark:border-slate-800/60">
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-xs font-bold text-gray-500 dark:text-slate-400">Total Reserva</span>
+            <span class="text-lg font-black text-gray-900 dark:text-white">$<%= number_with_delimiter(@reservation.total_price.to_i, delimiter: ".") %></span>
+          </div>
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-xs font-bold text-gray-500 dark:text-slate-400">Total Abonado</span>
+            <span class="text-sm font-black text-emerald-600 dark:text-emerald-400">-$<%= number_with_delimiter(@reservation.total_paid.to_i, delimiter: ".") %></span>
+          </div>
+          <div class="pt-3 border-t border-gray-200 dark:border-slate-700 flex justify-between items-center">
+            <span class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Saldo Pendiente</span>
+            <span class="text-xl font-black text-indigo-600 dark:text-indigo-400">$<%= number_with_delimiter(@reservation.pending_balance.to_i, delimiter: ".") %></span>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <%= link_to receipt_public_reservation_path(@reservation.token, format: :pdf), class: "flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 py-3.5 px-4 text-xs font-black uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm" do %>
+            <i class="fa-solid fa-file-pdf"></i> Descargar Comprobante PDF
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payments section -->
+    <div class="p-8 sm:p-10 divide-y md:divide-y-0 md:divide-x divide-gray-100 dark:divide-slate-800 grid grid-cols-1 md:grid-cols-2 gap-8">
+      
+      <!-- Payments history -->
+      <div>
+        <h3 class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-6">Historial de Transacciones</h3>
+        
+        <% if @payments.any? %>
+          <div class="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+            <% @payments.each do |payment| %>
+              <div class="p-4 bg-gray-50/50 dark:bg-slate-800/25 rounded-2xl border border-gray-100 dark:border-slate-800/50 flex justify-between items-center gap-4">
+                <div>
+                  <p class="text-xs font-bold text-gray-500 dark:text-slate-400"><%= payment.payment_date.strftime("%d de %B, %Y") %></p>
+                  <p class="text-sm font-black text-gray-950 dark:text-white mt-0.5">$<%= number_with_delimiter(payment.amount.to_i, delimiter: ".") %></p>
+                  <% if payment.operation_number.present? %>
+                    <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded border border-indigo-100/50 dark:border-indigo-900/50 mt-1 inline-block">Nº: <%= payment.operation_number %></span>
+                  <% end %>
+                </div>
+                
+                <% if payment.voucher.attached? %>
+                  <%= link_to url_for(payment.voucher), target: "_blank", class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-indigo-600 transition-colors shadow-sm", title: "Ver Comprobante" do %>
+                    <i class="fa-solid fa-file-image"></i>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-12 bg-gray-50/30 dark:bg-slate-900/30 rounded-3xl border border-dashed border-gray-200 dark:border-slate-800">
+            <div class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-gray-400 mx-auto mb-3 shadow-sm">
+              <i class="fa-solid fa-receipt"></i>
+            </div>
+            <p class="text-xs font-bold text-gray-500 dark:text-slate-400">Aún no registras comprobantes.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Add payment voucher form -->
+      <div class="md:pl-8">
+        <h3 class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-6">Subir Comprobante de Pago</h3>
+        
+        <% if @reservation.pending_balance > 0 %>
+          <%= form_with(model: @new_payment, url: add_payment_public_reservation_path(@reservation.token), method: :post, class: "space-y-4") do |f| %>
+            
+            <% if @new_payment.errors.any? %>
+              <div class="p-4 mb-4 text-xs text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900">
+                <ul class="list-disc pl-5 space-y-1 font-bold">
+                  <% @new_payment.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div>
+              <%= f.label :amount, "Monto Transferido", class: "block text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600 font-bold">$</div>
+                <%= f.text_field :amount, 
+                    value: @reservation.pending_balance.to_i,
+                    required: true,
+                    placeholder: "Ej: 50.000", 
+                    class: "block w-full pl-8 pr-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+              </div>
+            </div>
+
+            <div>
+              <%= f.label :operation_number, "Código / Número de Operación", class: "block text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+              <%= f.text_field :operation_number, 
+                  placeholder: "Ej: 12345678", 
+                  class: "block w-full px-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+            </div>
+
+            <div>
+              <%= f.label :voucher, "Archivo del Comprobante (Imagen o PDF)", class: "block text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+              <div class="border border-dashed border-gray-200 dark:border-slate-800 rounded-2xl p-4 bg-white dark:bg-slate-900 text-center relative hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-all">
+                <%= f.file_field :voucher, 
+                    required: true,
+                    class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer" %>
+                <div class="text-gray-400 dark:text-slate-600">
+                  <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2"></i>
+                  <p class="text-xs font-bold">Haz clic o arrastra para subir tu comprobante</p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <%= f.label :notes, "Notas adicionales", class: "block text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+              <%= f.text_area :notes, 
+                  rows: 2,
+                  placeholder: "Ej: Pago del abono inicial...", 
+                  class: "block w-full px-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+            </div>
+
+            <%= f.submit "Enviar Comprobante", 
+                class: "w-full py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/10 hover:-translate-y-0.5 active:scale-95 cursor-pointer" %>
+
+          <% end %>
+        <% else %>
+          <div class="text-center py-12 bg-emerald-50/30 dark:bg-emerald-950/10 border border-dashed border-emerald-100 dark:border-emerald-900/50 rounded-3xl p-6">
+            <div class="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
+              <i class="fa-solid fa-check-double text-xl"></i>
+            </div>
+            <p class="text-xs font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-wider mb-1">¡Reserva Totalmente Pagada!</p>
+            <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-500">No tienes saldos pendientes para transferir.</p>
+          </div>
+        <% end %>
+      </div>
+
+    </div>
+  </div>
+  
+  <!-- Back button -->
+  <div class="mt-8 text-center">
+    <%= link_to root_path, class: "inline-flex items-center gap-2 text-xs font-black text-gray-500 dark:text-slate-400 uppercase tracking-widest hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" do %>
+      <i class="fa-solid fa-arrow-left"></i> Volver a Propiedades
+    <% end %>
+  </div>
+
+</div>

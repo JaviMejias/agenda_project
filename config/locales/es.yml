@@ -1,9 +1,16 @@
 es:
-  errors:
-    messages:
-      blank: "es obligatorio/a"
   activerecord:
+    models:
+      client: "Cliente"
+      reservation: "Reservas"
+      property: "Propiedad"
+      user: "usuario"
     attributes:
+      client:
+        name: "Nombre completo"
+        rut: "RUT"
+        phone: "Teléfono"
+        email: "Correo electrónico"
       reservation:
         client_name: "El nombre del cliente"
         start_time: "La fecha de inicio"
@@ -19,25 +26,6 @@ es:
         confirmed: "Confirmada"
         cancelled: "Cancelada"
         blocked: "Bloqueado / No Disponible"
-  activerecord:
-    models:
-      client: "Cliente"
-      reservation: "Reservas"
-      property: "Propiedad"
-    attributes:
-      client:
-        name: "Nombre completo"
-        rut: "RUT"
-        phone: "Teléfono"
-        email: "Correo electrónico"
-      reservation:
-        client_name: "El nombre del cliente"
-        start_time: "La fecha de inicio"
-        end_time: "La fecha de fin"
-      property:
-        name: "El nombre"
-        base_price: "El precio base"
-        pricing_model: "El modelo de cobro"
   errors:
     messages:
       blank: "es obligatorio/a"
@@ -46,3 +34,6 @@ es:
       restrict_dependent_destroy:
         has_many: "No se puede eliminar porque tiene %{record} asociadas"
         has_one: "No se puede eliminar porque tiene un %{record} asociado"
+      not_saved:
+        one: "1 error impidió que este %{resource} se guardara:"
+        other: "%{count} errores impidieron que este %{resource} se guardara:"

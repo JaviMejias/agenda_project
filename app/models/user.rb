@@ -1,13 +1,13 @@
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable,
+  devise :database_authenticatable, :registerable,
          :rememberable, :validatable
 
   validates :first_name, presence: true
   validates :last_name, presence: true
 
-  enum :role, { normal: 0, admin: 1 }
+  enum :role, { normal: 0, admin: 1, client: 2 }
 
   scope :search, ->(query) {
     if query.present?

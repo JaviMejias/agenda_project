@@ -19,7 +19,15 @@
 
   <!-- Contenido -->
   <div class="flex-1 min-w-0 relative z-20">
-    <%= link_to notification.notifiable, class: "block group/link", data: { turbo_frame: "_top" } do %>
+    <% 
+      target_path = case notification.notifiable
+                    when Payment
+                      reservation_path(notification.notifiable.reservation)
+                    else
+                      notification.notifiable
+                    end
+    %>
+    <%= link_to target_path, class: "block group/link", data: { turbo_frame: "_top" } do %>
       <p class="text-sm font-bold text-gray-900 dark:text-slate-100 group-hover/link:text-indigo-600 dark:group-hover/link:text-indigo-400 transition-colors leading-relaxed">
         <%= notification.message %>
       </p>

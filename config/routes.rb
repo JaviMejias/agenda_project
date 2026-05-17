@@ -6,7 +6,9 @@ Rails.application.routes.draw do
       get :list
     end
   end
-  devise_for :users
+  devise_for :users, controllers: {
+    registrations: 'users/registrations'
+  }
   resources :users
   resources :companies do
     member do
@@ -47,13 +49,25 @@ Rails.application.routes.draw do
     root "home#index", as: :authenticated_root
   end
 
-  root to: redirect("/users/sign_in")
+  root "public/properties#index"
 
-  resources :public_reservations, only: [], param: :token, path: "r" do
-    member do
-      get :confirm
-      get :reject
+  scope module: :public do
+    resources :properties, only: [:index, :show], path: "p", as: :public_property do
+      member do
+        get :booking
+        get :events
+      end
+      resources :reservations, only: [:create], as: :public_reservations
     end
+    resources :reservations, only: [:show], param: :token, path: "r", as: :public_reservation do
+      member do
+        get :confirm
+        get :reject
+        get :receipt
+        post :add_payment
+      end
+    end
+    resources :my_reservations, only: [:index], path: "mis-reservas"
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
