@@ -1,17 +1,17 @@
 class ExpensePolicy < ApplicationPolicy
   def index?
-    user.admin?
+    record.property.user_id == user.id || user.admin?
   end
 
   def create?
-    user.admin?
+    record.property.user_id == user.id || user.admin?
   end
 
   def update?
-    user.admin?
+    record.property.user_id == user.id || user.admin?
   end
 
   def destroy?
-    user.admin?
+    record.property.user_id == user.id || user.admin?
   end
 end
