@@ -17,6 +17,10 @@ class Reservation < ApplicationRecord
   scope :completed, -> { confirmed.where("end_time <= ?", Time.zone.now) }
   scope :projected, -> { confirmed.where("end_time > ?", Time.zone.now) }
   scope :active, -> { where.not(status: :cancelled) }
+  scope :active_and_valid, -> {
+    where.not(status: :cancelled)
+         .where.not("reservations.status = ? AND reservations.created_at < ?", Reservation.statuses[:pending], 24.hours.ago)
+  }
   scope :upcoming, -> { active.where("start_time >= ?", Time.zone.now).order(start_time: :asc) }
   scope :overlapping_range, ->(start_time, end_time) {
     where("start_time < ? AND end_time > ?", end_time, start_time)
@@ -57,27 +61,27 @@ class Reservation < ApplicationRecord
   end
 
   def status_text
-    case status
-    when "pending" then "Pendiente"
-    when "confirmed" then "Confirmada"
-    when "cancelled" then "Cancelada"
-    when "blocked" then "Bloqueado / No Disponible"
-    else status.humanize
-    end
+    I18n.t("enums.reservation.status.#{status}", default: status.humanize)
   end
 
   def status_color_classes
     case status
-    when "pending" then "bg-amber-50 text-amber-600 border-amber-100"
-    when "confirmed" then "bg-emerald-50 text-emerald-600 border-emerald-100"
-    when "cancelled" then "bg-rose-50 text-rose-600 border-rose-100"
-    when "blocked" then "bg-slate-700 text-white border-slate-800 shadow-sm"
-    else "bg-gray-50 text-gray-600 border-gray-100"
+    when "pending" then "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50"
+    when "confirmed" then "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50"
+    when "cancelled" then "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/50"
+    when "blocked" then "bg-slate-700 text-white border-slate-800 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 shadow-sm"
+    else "bg-gray-50 text-gray-700 border-gray-100 dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700/50"
     end
   end
 
   def total_paid
-    payments.abono.sum(:amount) - payments.reembolso.sum(:amount)
+    if payments.loaded?
+      abonos = payments.select(&:abono?).sum(&:amount)
+      reembolsos = payments.select(&:reembolso?).sum(&:amount)
+      abonos - reembolsos
+    else
+      payments.abono.sum(:amount) - payments.reembolso.sum(:amount)
+    end
   end
 
   def pending_balance
@@ -86,10 +90,6 @@ class Reservation < ApplicationRecord
 
   def payment_state
     paid = total_paid
-    if cancelled?
-      return paid == 0 ? "Devuelto / Reembolsado" : "Reembolso pendiente"
-    end
-
     if paid <= 0
       "No pagado"
     elsif paid < (total_price || 0)
@@ -101,16 +101,15 @@ class Reservation < ApplicationRecord
 
   def payment_state_color_classes
     case payment_state
-    when "Pagado" then "bg-emerald-50 text-emerald-600 border-emerald-100"
-    when "Abonado" then "bg-amber-50 text-amber-600 border-amber-100"
-    when "Devuelto / Reembolsado" then "bg-slate-50 text-slate-600 border-slate-100"
-    when "Reembolso pendiente" then "bg-rose-50 text-rose-600 border-rose-100"
-    else "bg-gray-50 text-gray-600 border-gray-100"
+    when "Pagado" then "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50"
+    when "Abonado" then "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50"
+    when "No pagado" then "bg-gray-50 text-gray-500 border-gray-100 dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700/50"
+    else "bg-gray-50 text-gray-500 border-gray-100 dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700/50"
     end
   end
 
   def self.for_calendar(property_id: nil, start_date_str: nil, end_date_str: nil, exclude_id: nil)
-    query = Reservation.joins(:property).includes(:property)
+    query = Reservation.active_and_valid.joins(:property).includes(:property)
     query = query.where(property_id: property_id) if property_id.present?
 
     if start_date_str.present? && end_date_str.present?
@@ -131,7 +130,6 @@ class Reservation < ApplicationRecord
     return { status: :error, message: "No se puede confirmar una reserva que ya ha sido cancelada." } if cancelled?
 
     transaction do
-      self.skip_notifications = true
       update!(status: :confirmed)
       Notification.create!(
         user: user,
@@ -196,7 +194,7 @@ class Reservation < ApplicationRecord
   def no_overlapping_reservations
     return if property.blank? || start_time.blank? || end_time.blank?
 
-    scope = property.reservations.where.not(id: id).where.not(status: :cancelled)
+    scope = property.reservations.where.not(id: id).active_and_valid
 
     if property.per_day?
       overlapping = scope.where("CAST(start_time AS DATE) < CAST(? AS DATE) AND CAST(end_time AS DATE) > CAST(? AS DATE)",
@@ -251,7 +249,8 @@ class Reservation < ApplicationRecord
 
     case status
     when "pending"
-      ReservationMailer.pending_confirmation(self).deliver_later
+      is_public = !!Thread.current[:created_by_public]
+      ReservationMailer.pending_confirmation(self, created_by_public: is_public).deliver_later
     when "confirmed"
       ReservationMailer.confirmed(self).deliver_later
     when "cancelled"
