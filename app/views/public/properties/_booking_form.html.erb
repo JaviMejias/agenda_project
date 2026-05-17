@@ -44,62 +44,83 @@
           </ul>
         </div>
       <% end %>
-      <div class="space-y-4">
-        <div>
-          <%= f.label :client_name, "Nombre Completo", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
-          <div class="relative group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
-              <i class="fa-solid fa-user"></i>
-            </div>
-            <%= f.text_field :client_name, 
-                value: user_signed_in? ? current_user.full_name : nil, 
-                readonly: user_signed_in?,
-                required: true,
-                placeholder: "Juan Pérez", 
-                class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm #{user_signed_in? ? 'opacity-80 bg-gray-100 cursor-not-allowed' : ''}" %>
+      <% if user_signed_in? %>
+        <div class="p-5 mb-6 rounded-3xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100/80 dark:border-indigo-900/50 flex items-center gap-4 animate-fade-in">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white flex items-center justify-center text-lg font-black shadow-md">
+            <%= current_user.email[0].upcase %>
+          </div>
+          <div class="flex-grow min-w-0">
+            <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Reservando como</p>
+            <h4 class="text-sm font-black text-gray-900 dark:text-white truncate"><%= current_user.full_name %></h4>
+            <p class="text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate mt-0.5"><%= current_user.email %></p>
           </div>
         </div>
-        <div>
-          <%= f.label :client_email, "Correo Electrónico", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
-          <div class="relative group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
-              <i class="fa-solid fa-envelope"></i>
-            </div>
-            <%= f.email_field :client_email, 
-                value: user_signed_in? ? current_user.email : nil, 
-                readonly: user_signed_in?,
-                required: true,
-                placeholder: "juan@correo.com", 
-                class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm #{user_signed_in? ? 'opacity-80 bg-gray-100 cursor-not-allowed' : ''}" %>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <%
+          existing_client = Client.find_by(email: current_user.email)
+          client_name = current_user.full_name
+          client_email = current_user.email
+          client_phone = existing_client&.phone.presence || "+56 9 1111 1111"
+          client_rut = existing_client&.rut.presence || "1-9"
+        %>
+        <%= hidden_field_tag :client_name, client_name %>
+        <%= hidden_field_tag :client_email, client_email %>
+        <%= hidden_field_tag :client_phone, client_phone %>
+        <%= hidden_field_tag :client_rut, client_rut %>
+      <% else %>
+        <div class="space-y-4">
           <div>
-            <%= f.label :client_phone, "Teléfono", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+            <%= f.label :client_name, "Nombre Completo", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
             <div class="relative group">
               <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
-                <i class="fa-solid fa-phone"></i>
+                <i class="fa-solid fa-user"></i>
               </div>
-              <%= f.telephone_field :client_phone, 
+              <%= f.text_field :client_name, 
                   required: true,
-                  placeholder: "+56 9 1234 5678", 
+                  placeholder: "Juan Pérez", 
                   class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
             </div>
           </div>
           <div>
-            <%= f.label :client_rut, "RUT", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+            <%= f.label :client_email, "Correo Electrónico", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
             <div class="relative group">
               <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
-                <i class="fa-solid fa-id-card"></i>
+                <i class="fa-solid fa-envelope"></i>
               </div>
-              <%= f.text_field :client_rut, 
+              <%= f.email_field :client_email, 
                   required: true,
-                  placeholder: "12.345.678-9", 
+                  placeholder: "juan@correo.com", 
                   class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
             </div>
           </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <%= f.label :client_phone, "Teléfono", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
+                  <i class="fa-solid fa-phone"></i>
+                </div>
+                <%= f.telephone_field :client_phone, 
+                    required: true,
+                    placeholder: "+56 9 1234 5678", 
+                    class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+              </div>
+            </div>
+            <div>
+              <%= f.label :client_rut, "RUT", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
+                  <i class="fa-solid fa-id-card"></i>
+                </div>
+                <%= f.text_field :client_rut, 
+                    required: true,
+                    placeholder: "12.345.678-9", 
+                    class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      <% end %>
       <%= f.hidden_field :start_time, name: "reservation[start_time]", data: { fullcalendar_target: "startInput" } %>
       <%= f.hidden_field :end_time, name: "reservation[end_time]", data: { fullcalendar_target: "endInput" } %>
       <div class="pt-4">
