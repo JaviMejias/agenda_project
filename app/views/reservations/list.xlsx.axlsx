@@ -1,6 +1,5 @@
 wb = xlsx_package.workbook
 wb.styles do |s|
-  # Definición de bordes
   border_thin = { style: :thin, color: "E5E7EB" }
   border_header = { style: :thin, color: "4338CA" }
 
@@ -65,14 +64,12 @@ wb.styles do |s|
       ], style: [ row_style, row_style, date_style, date_style, row_style, money_style ]
     end
 
-    # Espacio en blanco
     sheet.add_row []
 
-    # Fila de Total
     sheet.add_row [
       "TOTAL GENERAL",
       "", "", "", "",
-      @reservations.sum(:total_price)
+      @total_price
     ], style: [ total_label_style, total_label_style, total_label_style, total_label_style, total_label_style, total_value_style ]
 
     sheet.column_widths 30, 25, 20, 20, 15, 15

@@ -1,18 +1,18 @@
 class ClientPolicy < ApplicationPolicy
   def index?
-    true
+    !user.client?
   end
 
   def show?
-    record.user_id == user.id || user.admin?
+    !user.client?
   end
 
   def create?
-    true
+    !user.client?
   end
 
   def update?
-    record.user_id == user.id || user.admin?
+    !user.client? && (record.user_id == user.id || user.admin?)
   end
 
   def destroy?
@@ -21,10 +21,10 @@ class ClientPolicy < ApplicationPolicy
 
   class Scope < ApplicationPolicy::Scope
     def resolve
-      if user.admin?
-        scope.all
+      if user.client?
+        scope.none
       else
-        scope.where(user_id: user.id)
+        scope.all
       end
     end
   end

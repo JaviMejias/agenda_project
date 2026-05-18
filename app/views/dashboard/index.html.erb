@@ -1,20 +1,16 @@
 <% content_for :title, "Dashboard de Gestión" %>
-
 <div class="mx-auto px-4 sm:px-6 lg:px-8 py-6" data-controller="dashboard-filters">
-
   <%= render "shared/index_header", 
       title: "Análisis de Gestión", 
       icon: "fa-solid fa-chart-pie", 
       subtitle: (@company_id.present? ? current_user.companies.find_by(id: @company_id)&.name : "Análisis Global de Ingresos"),
       large_form: true do %>
-    
     <%= form_with url: dashboard_path, method: :get, class: "grid grid-cols-1 md:grid-cols-12 items-end gap-3 w-full", 
         data: { 
           dashboard_filters_target: "form",
           turbo_frame: "dashboard_content", 
           turbo_action: "advance" 
         } do |f| %>
-      
       <div class="md:col-span-5">
         <%= f.label :company_id, "Empresa", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
         <div class="relative h-[42px] flex items-center">
@@ -26,7 +22,6 @@
               class: "w-full" %>
         </div>
       </div>
-
       <div class="md:col-span-3">
         <%= f.label :start_date, "Fecha Inicio", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
         <%= f.text_field :start_date, value: @start_date, 
@@ -37,7 +32,6 @@
             }, 
             class: "w-full h-[42px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-50 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
       </div>
-
       <div class="md:col-span-3">
         <%= f.label :end_date, "Fecha Fin", class: "text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase ml-2 mb-1.5 block" %>
         <%= f.text_field :end_date, value: @end_date, 
@@ -48,7 +42,6 @@
             }, 
             class: "w-full h-[42px] px-4 bg-white/80 dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-700 transition-all shadow-sm" %>
       </div>
-
       <div class="md:col-span-1">
         <button type="button" data-action="click->dashboard-filters#reset" class="w-full flex items-center justify-center h-[42px] bg-white/80 dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-xl hover:bg-white dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm border border-indigo-100 dark:border-slate-700" title="Restablecer">
           <i class="fa-solid fa-arrow-rotate-left"></i>
@@ -56,179 +49,16 @@
       </div>
     <% end %>
   <% end %>
-
   <%= render "shared/loading_state", target: "dashboard-filters", text: "Actualizando Datos..." %>
-
   <turbo-frame id="dashboard_content" class="relative block" data-action="turbo:frame-load->dashboard-filters#hideLoading">
-
     <div data-controller="dashboard-charts"
          data-dashboard-charts-status-data-value="<%= @status_counts.to_json %>"
          data-dashboard-charts-revenue-datasets-value="<%= @chart_datasets.to_json %>"
          data-dashboard-charts-labels-value="<%= @chart_labels.to_json %>"
-         class="animate-fade-in">
-      
-      
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <!-- Card 1: Flujo de Caja Real -->
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-emerald-100/10 dark:shadow-none relative overflow-hidden">
-          <div class="relative flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shrink-0">
-              <i class="fa-solid fa-money-bill-trend-up text-sm"></i>
-            </div>
-            <div class="min-w-0">
-              <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Caja Real (Abonos)</p>
-              <h3 class="text-lg font-black text-emerald-600 dark:text-emerald-400 truncate">$<%= number_to_currency(@actual_cash_in, unit: "", separator: ",", delimiter: ".") %></h3>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 2: Gastos -->
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-rose-100/10 dark:shadow-none relative overflow-hidden">
-          <div class="relative flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-rose-500 flex items-center justify-center text-white shadow-lg shrink-0">
-              <i class="fa-solid fa-file-invoice-dollar text-sm"></i>
-            </div>
-            <div class="min-w-0">
-              <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Gastos Operativos</p>
-              <h3 class="text-lg font-black text-rose-600 dark:text-rose-400 truncate">-$<%= number_to_currency(@total_expenses, unit: "", separator: ",", delimiter: ".") %></h3>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 3: Rentabilidad Neta -->
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-indigo-100/10 dark:shadow-none relative overflow-hidden">
-          <div class="relative flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shrink-0">
-              <i class="fa-solid fa-scale-balanced text-sm"></i>
-            </div>
-            <div class="min-w-0">
-              <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Rentabilidad Neta</p>
-              <h3 class="text-lg font-black text-gray-900 dark:text-white truncate">$<%= number_to_currency(@actual_cash_in - @total_expenses, unit: "", separator: ",", delimiter: ".") %></h3>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 4: Ingresos Teóricos -->
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-slate-100/10 dark:shadow-none relative overflow-hidden">
-          <div class="relative flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-slate-500 flex items-center justify-center text-white shadow-lg shrink-0">
-              <i class="fa-solid fa-calculator text-sm"></i>
-            </div>
-            <div class="min-w-0">
-              <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Ingresos Teóricos</p>
-              <h3 class="text-lg font-black text-gray-500 dark:text-slate-400 truncate">$<%= number_to_currency(@completed_revenue, unit: "", separator: ",", delimiter: ".") %></h3>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        <!-- Card 3 -->
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-amber-100/10 dark:shadow-none relative overflow-hidden">
-          <div class="relative flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white shadow-lg shrink-0">
-              <i class="fa-solid fa-clock-rotate-left text-sm"></i>
-            </div>
-            <div class="min-w-0">
-              <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Pendientes</p>
-              <h3 class="text-lg font-black text-gray-900 dark:text-white truncate"><%= @pending_count %></h3>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-purple-100/10 dark:shadow-none relative overflow-hidden">
-          <div class="relative flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-white shadow-lg shrink-0">
-              <i class="fa-solid fa-list-check text-sm"></i>
-            </div>
-            <div class="min-w-0">
-              <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Total Reservas</p>
-              <h3 class="text-lg font-black text-gray-900 dark:text-white truncate"><%= @total_count %></h3>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        <!-- Revenue Chart -->
-        <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-2xl shadow-indigo-100/5 dark:shadow-none min-h-[450px] flex flex-col">
-          <div class="flex items-center justify-between mb-8">
-            <div>
-              <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Rendimiento por Propiedad</h3>
-              <p class="text-[9px] font-bold text-indigo-500 uppercase tracking-widest">Evolución de ingresos confirmados</p>
-            </div>
-            <i class="fa-solid fa-chart-line text-indigo-100 dark:text-slate-700 text-2xl"></i>
-          </div>
-          <div class="flex-grow">
-            <canvas data-dashboard-charts-target="revenueChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Status Chart -->
-        <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-2xl shadow-indigo-100/5 dark:shadow-none min-h-[450px] flex flex-col">
-          <div class="flex items-center justify-between mb-8 text-center w-full">
-            <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight w-full">Estado General</h3>
-          </div>
-          <div class="flex-grow relative flex items-center justify-center">
-            <canvas data-dashboard-charts-target="statusChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Breakdown -->
-        <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-2xl shadow-indigo-100/5 dark:shadow-none">
-          <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight mb-8">Desglose de Ingresos</h3>
-          <div class="space-y-4">
-            <% if @revenue_by_property.any? %>
-              <% max_revenue = @revenue_by_property.values.max || 1 %>
-              <% @revenue_by_property.sort_by { |_k, v| -v }.each do |name, revenue| %>
-                <% property = current_user.properties.find_by(name: name) %>
-                <% percentage = (revenue.to_f / max_revenue * 100).round %>
-                <div class="group p-4 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-transparent hover:border-indigo-100 dark:hover:border-indigo-900 hover:bg-white dark:hover:bg-slate-700 hover:shadow-lg transition-all">
-                  <div class="flex justify-between items-center mb-3">
-                    <div class="flex items-center gap-3">
-                      <span class="w-3 h-3 rounded-full" style="background-color: <%= property&.color || '#6366f1' %>"></span>
-                      <span class="text-sm font-black text-gray-900 dark:text-slate-200"><%= name %></span>
-                    </div>
-                    <span class="text-sm font-black text-indigo-600 dark:text-indigo-400">$<%= number_to_currency(revenue, unit: "", separator: ",", delimiter: ".") %></span>
-                  </div>
-                  <div class="h-2 w-full bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div class="h-full rounded-full" style="width: <%= percentage %>%; background-color: <%= property&.color || '#6366f1' %>"></div>
-                  </div>
-                </div>
-              <% end %>
-            <% else %>
-              <p class="text-center text-gray-400 italic py-10">Sin datos de ingresos.</p>
-            <% end %>
-          </div>
-        </div>
-
-        <!-- Upcoming -->
-        <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-2xl shadow-indigo-100/5 dark:shadow-none">
-          <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight mb-8">Próximos Arriendos</h3>
-          <div class="space-y-4">
-            <% if @upcoming_arrivals.any? %>
-              <% @upcoming_arrivals.each do |res| %>
-                <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700">
-                  <div class="w-10 h-10 rounded-xl bg-white dark:bg-slate-700 shadow-sm flex flex-col items-center justify-center shrink-0 border border-indigo-50 dark:border-slate-600">
-                    <span class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 leading-none"><%= res.start_time.strftime("%d") %></span>
-                    <span class="text-[8px] font-black text-gray-400 dark:text-slate-400 uppercase"><%= I18n.l(res.start_time, format: "%b") %></span>
-                  </div>
-                  <div class="flex-grow min-w-0">
-                    <h4 class="text-xs font-black text-gray-900 dark:text-slate-200 truncate"><%= res.client_name %></h4>
-                    <p class="text-[9px] font-bold text-gray-400 uppercase truncate" style="color: <%= res.property.color %>"><%= res.property.name %></p>
-                  </div>
-                </div>
-              <% end %>
-            <% else %>
-              <p class="text-center text-gray-400 italic py-10">Sin arriendos próximos.</p>
-            <% end %>
-          </div>
-        </div>
-      </div>
+         class="animate-fade-in space-y-6">
+      <%= render "dashboard/metrics_grid" %>
+      <%= render "dashboard/charts_grid" %>
+      <%= render "dashboard/breakdown_grid" %>
     </div>
   </turbo-frame>
 </div>

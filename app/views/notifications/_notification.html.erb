@@ -1,33 +1,15 @@
+<% is_unread = notification.read_at.nil? %>
 <div id="<%= dom_id(notification) %>" 
      data-controller="notification-item"
-     class="notification-item group relative flex flex-row items-start gap-4 p-5 sm:p-6 transition-all bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-900/50 <%= notification.read_at.nil? ? 'bg-indigo-50/30 dark:bg-indigo-900/20' : 'notification-read' %>">
-  
-  <% if notification.read_at.nil? %>
+     class="notification-item group relative flex flex-row items-start gap-4 p-5 sm:p-6 transition-all rounded-3xl border hover:border-indigo-200 dark:hover:border-indigo-900/50 <%= notification_bg_class(notification) %> <%= is_unread ? '' : 'notification-read' %>">
+  <% if is_unread %>
     <div data-notification-item-target="indicator" class="notification-unread-indicator absolute left-1.5 top-5 bottom-5 w-1.5 bg-indigo-500 rounded-full z-10 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
   <% end %>
-
-  <!-- Icono -->
   <div class="flex-shrink-0 mt-0.5 w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center shadow-sm relative z-20">
-    <% if notification.message.include?('Confirmada') || notification.message.include?('aceptado') %>
-      <i class="fa-solid fa-calendar-check text-emerald-500"></i>
-    <% elsif notification.message.include?('Rechazada') || notification.message.include?('cancelado') %>
-      <i class="fa-solid fa-calendar-xmark text-rose-500"></i>
-    <% else %>
-      <i class="fa-solid fa-bell text-indigo-500"></i>
-    <% end %>
+    <%= notification_icon_tag(notification) %>
   </div>
-
-  <!-- Contenido -->
   <div class="flex-1 min-w-0 relative z-20">
-    <% 
-      target_path = case notification.notifiable
-                    when Payment
-                      reservation_path(notification.notifiable.reservation)
-                    else
-                      notification.notifiable
-                    end
-    %>
-    <%= link_to target_path, class: "block group/link", data: { turbo_frame: "_top" } do %>
+    <%= link_to notification_target_path(notification), class: "block group/link", data: { turbo_frame: "_top" } do %>
       <p class="text-sm font-bold text-gray-900 dark:text-slate-100 group-hover/link:text-indigo-600 dark:group-hover/link:text-indigo-400 transition-colors leading-relaxed">
         <%= notification.message %>
       </p>
@@ -36,16 +18,14 @@
           <i class="fa-regular fa-clock text-[8px]"></i>
           <%= time_ago_in_words(notification.created_at) %> atrás
         </span>
-        <% if notification.read_at.nil? %>
+        <% if is_unread %>
           <span class="px-1.5 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-900/50 text-[7px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Nuevo</span>
         <% end %>
       </div>
     <% end %>
   </div>
-
-  <!-- Acciones -->
   <div class="flex flex-row items-center gap-2 flex-shrink-0 ml-2 mt-0.5 relative z-20">
-    <% if notification.read_at.nil? %>
+    <% if is_unread %>
       <%= button_to notification_path(notification), method: :patch, 
           data: { action: "click->dropdown#stop click->notification-item#markAsRead" },
           class: "w-9 h-9 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-indigo-600 hover:border-indigo-100 dark:hover:text-indigo-400 dark:hover:border-indigo-900 transition-all shadow-sm",
@@ -53,7 +33,6 @@
         <i class="fa-solid fa-check text-xs"></i>
       <% end %>
     <% end %>
-    
     <%= button_to notification_path(notification), method: :delete, 
         data: { action: "click->dropdown#stop click->notification-item#remove" },
         class: "w-9 h-9 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-rose-600 hover:border-rose-100 dark:hover:text-rose-400 dark:hover:border-rose-900 transition-all shadow-sm",

@@ -1,8 +1,5 @@
 <div style="font-family: 'Helvetica', 'Arial', sans-serif; max-width: 800px; margin: 0 auto; color: #1e293b;">
-  
-  <!-- Header Section -->
   <div style="display: table; width: 100%; border-bottom: 3px solid #4f46e5; padding-bottom: 20px; margin-bottom: 30px;">
-    <!-- Company Info (Left) -->
     <div style="display: table-cell; width: 50%; vertical-align: top;">
       <% if @reservation.property.company.present? %>
         <% company = @reservation.property.company %>
@@ -29,8 +26,6 @@
         <p style="margin: 4px 0 0 0; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Plataforma de Reservas</p>
       <% end %>
     </div>
-    
-    <!-- Receipt Info (Right) -->
     <div style="display: table-cell; width: 50%; text-align: right; vertical-align: top;">
       <h1 style="margin: 0; color: #4f46e5; font-size: 32px; font-weight: 900; letter-spacing: -1px;">RECIBO</h1>
       <p style="margin: 5px 0 0 0; font-size: 14px; color: #0f172a; font-weight: bold;">
@@ -39,30 +34,13 @@
       <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">
         Fecha de Emisión: <%= Time.current.strftime("%d/%m/%Y") %>
       </p>
-      
       <div style="margin-top: 15px;">
-        <% 
-          status_colors = {
-            'pending' => 'background-color: #fef3c7; color: #d97706; border: 1px solid #fde68a;',
-            'confirmed' => 'background-color: #d1fae5; color: #059669; border: 1px solid #a7f3d0;',
-            'cancelled' => 'background-color: #fee2e2; color: #e11d48; border: 1px solid #fecaca;',
-            'completed' => 'background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe;'
-          }
-          status_labels = {
-            'pending' => 'Pendiente',
-            'confirmed' => 'Confirmada',
-            'cancelled' => 'Cancelada',
-            'completed' => 'Completada'
-          }
-        %>
-        <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; <%= status_colors[@reservation.status] || status_colors['pending'] %>">
-          Estado: <%= status_labels[@reservation.status] || @reservation.status.titleize %>
+        <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; <%= receipt_status_style(@reservation.status) %>">
+          Estado: <%= receipt_status_label(@reservation.status) %>
         </span>
       </div>
     </div>
   </div>
-
-  <!-- Reservation & Client Details -->
   <div style="display: table; width: 100%; margin-bottom: 30px;">
     <div style="display: table-cell; width: 50%; padding-right: 15px; vertical-align: top;">
       <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; height: 100%;">
@@ -97,8 +75,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Financial Summary -->
   <div style="margin-bottom: 40px;">
     <h3 style="font-size: 14px; margin: 0 0 15px 0; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; font-weight: 900; text-transform: uppercase;">
       Resumen Financiero
@@ -124,8 +100,6 @@
       </tr>
     </table>
   </div>
-
-  <!-- Transactions Table -->
   <% if @reservation.payments.any? %>
     <h3 style="font-size: 14px; margin: 0 0 15px 0; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; font-weight: 900; text-transform: uppercase;">
       Historial de Transacciones
@@ -150,15 +124,7 @@
               </span>
             </td>
             <td style="padding: 12px 15px; font-size: 12px; color: #475569; border-bottom: 1px solid #f1f5f9;">
-              <% 
-                method_label = case payment.payment_method
-                  when 'transfer' then 'Transferencia'
-                  when 'cash' then 'Efectivo'
-                  when 'card' then 'Tarjeta'
-                  else 'Depósito / Otro'
-                end
-              %>
-              <%= method_label %>
+              <%= payment_method_label(payment) %>
               <% if payment.operation_number.present? %>
                 <br>
                 <span style="font-size: 10px; color: #64748b; font-weight: bold;">N° <%= payment.operation_number %></span>
@@ -173,7 +139,6 @@
       </tbody>
     </table>
   <% end %>
-
   <div style="margin-top: 40px; text-align: center; color: #64748b; font-size: 11px;">
     <i>Este documento es un comprobante de transacciones de carácter informativo y no constituye una boleta o factura fiscal.</i>
   </div>

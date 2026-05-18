@@ -69,6 +69,7 @@ Rails.application.routes.draw do
         post "upload_voucher/:payment_id", to: "reservations#upload_voucher", as: :upload_voucher
       end
     end
+    get "buscar-reserva", to: "reservations#search", as: :search_public_reservations
     resources :my_reservations, only: [ :index ], path: "mis-reservas"
   end
 

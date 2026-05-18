@@ -59,37 +59,28 @@
         <% if field[:name] == :amount %>
           <div data-controller="currency" class="relative group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600 font-bold">$</div>
-            <%= f.text_field :amount, 
-                required: true,
-                placeholder: field[:placeholder], 
-                data: field[:data],
-                class: "block w-full pl-8 pr-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+            <%= f.text_field :amount, required: true, placeholder: field[:placeholder], data: field[:data], class: "block w-full pl-8 pr-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
           </div>
         <% elsif field[:name] == :voucher %>
-          <div class="border border-dashed border-gray-200 dark:border-slate-800 rounded-2xl p-4 bg-white dark:bg-slate-900 text-center relative hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-all">
-            <%= f.file_field :voucher, 
-                required: true,
-                class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer" %>
-            <div class="text-gray-400 dark:text-slate-600">
-              <i class="fa-solid fa-cloud-arrow-up text-2xl mb-2"></i>
-              <p class="text-xs font-bold">Haz clic o arrastra para subir tu comprobante</p>
+          <div data-controller="image-preview" class="space-y-4">
+            <div class="border border-dashed border-gray-200 dark:border-slate-800 rounded-2xl p-6 bg-white dark:bg-slate-900 text-center relative hover:bg-indigo-50/10 dark:hover:bg-slate-800/30 transition-all group">
+              <%= f.file_field :voucher, required: true, data: { image_preview_target: "input", action: "change->image-preview#previewImages" }, class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" %>
+              <div class="text-gray-400 dark:text-slate-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl mb-2.5 animate-pulse"></i>
+                <p class="text-xs font-black uppercase tracking-wider mb-1">Cargar Comprobante</p>
+                <p class="text-[10px] text-gray-400 dark:text-slate-500 font-semibold">Haz clic o arrastra tu archivo (Imagen o PDF)</p>
+              </div>
             </div>
+            <div data-image-preview-target="previewContainer" class="flex flex-wrap justify-center gap-3"></div>
           </div>
         <% elsif field[:type] == :text_area %>
-          <%= f.text_area field[:name], 
-              rows: field[:rows],
-              placeholder: field[:placeholder], 
-              class: "block w-full px-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+          <%= f.text_area field[:name], rows: field[:rows], placeholder: field[:placeholder], class: "block w-full px-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
         <% else %>
-          <%= f.text_field field[:name], 
-              required: field[:required],
-              placeholder: field[:placeholder], 
-              class: "block w-full px-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
+          <%= f.text_field field[:name], required: field[:required], placeholder: field[:placeholder], class: "block w-full px-4 py-3 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm" %>
         <% end %>
       </div>
     <% end %>
-    <%= f.submit "Enviar Comprobante", 
-        class: "w-full py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/10 hover:-translate-y-0.5 active:scale-95 cursor-pointer" %>
+    <%= f.submit "Enviar Comprobante", class: "w-full py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/10 hover:-translate-y-0.5 active:scale-95 cursor-pointer" %>
   <% end %>
 <% else %>
   <div class="text-center py-12 bg-emerald-50/30 dark:bg-emerald-950/10 border border-dashed border-emerald-100 dark:border-emerald-900/50 rounded-3xl p-6">

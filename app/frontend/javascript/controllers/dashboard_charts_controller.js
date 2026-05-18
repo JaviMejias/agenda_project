@@ -102,7 +102,7 @@ export default class extends Controller {
       type: 'line',
       data: {
         labels: labels,
-        datasets: datasets.map(ds => ({ ...ds, data: ds.data.map(() => 0) })) // Empezamos en cero
+        datasets: datasets.map(ds => ({ ...ds, data: ds.data.map(() => 0) }))
       },
       options: {
         responsive: true,

@@ -25,7 +25,6 @@ class ApplicationController < ActionController::Base
     ]
 
     is_allowed = allowed_controllers.any? { |c| params[:controller].start_with?(c) } ||
-                 params[:controller] == "public_reservations" ||
                  devise_controller?
 
     unless is_allowed
@@ -48,10 +47,12 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource)
-    if resource.client?
+    if resource.admin?
+      dashboard_path
+    elsif resource.client?
       my_reservations_path
     else
-      dashboard_path
+      properties_path
     end
   end
 

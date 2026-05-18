@@ -7,7 +7,7 @@ class SearchController < ApplicationController
 
     results = []
 
-    clients = Client.search(query).limit(5)
+    clients = policy_scope(Client).search(query).limit(5)
     clients.each do |c|
       results << {
         category: "Clientes",

@@ -5,8 +5,22 @@ class Public::ReservationsController < ApplicationController
   around_action :with_public_flag, only: [ :create ]
   before_action :set_reservation, only: [ :show, :confirm, :reject, :receipt, :add_payment, :delete_payment, :upload_voucher ]
 
+  def search
+    if params[:token].present?
+      token = params[:token].strip
+      @reservation = Reservation.find_by(token: token)
+
+      if @reservation
+        redirect_to public_reservation_path(@reservation.token)
+        return
+      else
+        flash.now[:alert] = "El código ingresado no corresponde a ninguna reserva activa. Por favor, verifica el código e inténtalo de nuevo."
+      end
+    end
+  end
+
   def show
-    @payments = @reservation.payments.with_attached_voucher.order(payment_date: :desc)
+    set_payments
     @new_payment = @reservation.payments.build
   end
 
@@ -24,11 +38,7 @@ class Public::ReservationsController < ApplicationController
     if params[:payment] && params[:payment][:voucher].present?
       @payment.voucher.attach(params[:payment][:voucher])
 
-      Notification.create!(
-        user: @reservation.user,
-        notifiable: @payment,
-        message: "¡Comprobante Actualizado! #{@reservation.client_name} ha cargado el comprobante para el pago de $#{@payment.amount.to_i} en la reserva ##{@reservation.id}."
-      )
+      @payment.notify_admin_of_updated_voucher!
       redirect_to public_reservation_path(@reservation.token), notice: "El comprobante fue subido exitosamente."
     else
       redirect_to public_reservation_path(@reservation.token), alert: "Debes seleccionar un archivo para el comprobante."
@@ -68,7 +78,6 @@ class Public::ReservationsController < ApplicationController
       end
     end
 
-    # 1. Buscar primero por RUT (identificador único nacional) o por email para evitar duplicados y conflictos de unicidad
     @client = @property.user.clients.find_by(rut: params[:client_rut]) ||
               @property.user.clients.find_or_initialize_by(email: params[:client_email])
 
@@ -87,7 +96,6 @@ class Public::ReservationsController < ApplicationController
       return
     end
 
-    # 2. Construir la reserva
     @reservation = @property.reservations.build(reservation_params)
     @reservation.user = @property.user
     @reservation.client = @client
@@ -120,14 +128,10 @@ class Public::ReservationsController < ApplicationController
     @payment.payment_date = Time.current
 
     if @payment.save
-      Notification.create!(
-        user: @reservation.user,
-        notifiable: @payment,
-        message: "¡Nuevo Comprobante! #{@reservation.client_name} ha subido un comprobante de pago para la reserva ##{@reservation.id}."
-      )
+      @payment.notify_admin_of_new_payment!
       redirect_to public_reservation_path(@reservation.token), notice: "El comprobante de pago fue subido exitosamente y está siendo verificado."
     else
-      @payments = @reservation.payments.with_attached_voucher.order(payment_date: :desc)
+      set_payments
       @new_payment = @payment
       render :show, status: :unprocessable_entity
     end
@@ -147,16 +151,22 @@ class Public::ReservationsController < ApplicationController
 
   private
 
+  def set_payments
+    @payments = @reservation.payments.with_attached_voucher.order(payment_date: :desc)
+  end
+
   def set_reservation
     @reservation = Reservation.includes(property: { company: :bank_accounts }).find_by!(token: params[:token])
 
-    # El enlace público expira al finalizar el día de término de la reserva
     if Time.zone.now > @reservation.end_time.end_of_day
       render "public/reservations/expired", status: :gone
       nil
     end
   rescue ActiveRecord::RecordNotFound
-    render plain: "Reserva no encontrada", status: :not_found
+    respond_to do |format|
+      format.html { redirect_to search_public_reservations_path, alert: "El código de reserva no es válido, ha expirado o la reserva no existe." }
+      format.any { render plain: "Reserva no encontrada", status: :not_found }
+    end
   end
 
   def reservation_params

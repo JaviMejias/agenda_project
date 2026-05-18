@@ -4,8 +4,6 @@ export default class extends Controller {
   static targets = ["balanceDisplay"]
 
   connect() {
-    // Si el elemento es un input, necesitamos un hidden input para el valor real (sin puntos)
-    // Esto es útil si el backend espera un entero.
     if (this.inputElement && !this.hiddenInput) {
       this.hiddenInput = document.createElement("input")
       this.hiddenInput.type = "hidden"
@@ -26,11 +24,10 @@ export default class extends Controller {
     if (!inputEl) return
 
     let rawValue = inputEl.value.replace(/\D/g, "")
-    
-    // Aplicar límite si existe
+
     let maxAttr = inputEl.getAttribute("data-currency-max-value")
     let numValue = rawValue !== "" ? parseInt(rawValue, 10) : 0
-    
+
     if (maxAttr && rawValue !== "") {
       let maxValue = parseInt(maxAttr, 10)
       if (numValue > maxValue) {
@@ -59,11 +56,10 @@ export default class extends Controller {
     if (maxAttr) {
       let maxValue = parseInt(maxAttr, 10)
       let remaining = maxValue - currentValue
-      
-      // Formatear el restante
+
       let formattedRemaining = remaining.toLocaleString("es-CL")
       this.balanceDisplayTarget.textContent = "$" + formattedRemaining
-      
+
       if (remaining === 0) {
         this.balanceDisplayTarget.className = "text-emerald-500 dark:text-emerald-400 font-black text-sm tracking-wide"
       } else {

@@ -1,0 +1,36 @@
+<div class="lg:col-span-2">
+  <h4 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest mb-6 flex items-center gap-2">
+    <i class="fa-solid fa-history text-indigo-600 dark:text-indigo-400"></i> Historial de Reservas
+  </h4>
+
+  <%= turbo_frame_tag "client_reservations_history" do %>
+    <% if reservations.any? %>
+      <div class="space-y-3">
+        <% reservations.each do |res| %>
+          <div class="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 group hover:border-indigo-200 dark:hover:border-indigo-900 hover:shadow-md transition-all duration-300">
+            <div class="flex items-center gap-4">
+              <div class="w-1.5 h-8 rounded-full" style="background-color: <%= res.property.color %>"></div>
+              <div>
+                <p class="text-sm font-black text-gray-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"><%= res.property.name %></p>
+                <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">
+                  <%= res.start_time.strftime("%d %b, %Y") %>
+                </p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-black text-gray-900 dark:text-white">$<%= number_with_delimiter(res.total_price.to_i, delimiter: ".") %></p>
+              <span class="text-[9px] font-black uppercase tracking-widest <%= res.status_color_classes.split(' ')[1] %>">
+                <%= res.status_text %>
+              </span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <%= render "shared/pagination" %>
+    <% else %>
+      <div class="py-12 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-gray-200 dark:border-slate-800 text-center">
+        <p class="text-sm text-gray-500 dark:text-slate-400 font-medium">No registra reservas.</p>
+      </div>
+    <% end %>
+  <% end %>
+</div>

@@ -24,7 +24,6 @@ Turbo.config.forms.confirm = (message, element) => {
   })
 }
 
-
 document.addEventListener("turbo:click", () => {
   document.body.classList.add("turbo-loading")
 })

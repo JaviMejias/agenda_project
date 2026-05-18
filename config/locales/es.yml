@@ -24,6 +24,10 @@ es:
         bank_name: "Banco"
         account_type: "Tipo de cuenta"
   enums:
+    user:
+      role:
+        normal: "Colaborador"
+        admin: "Administrador"
     reservation:
       status:
         pending: "Pendiente"

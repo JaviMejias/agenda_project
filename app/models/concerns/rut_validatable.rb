@@ -1,22 +1,43 @@
 module RutValidatable
   extend ActiveSupport::Concern
 
-  included do
-    before_validation :clean_rut
-    validate :rut_must_be_valid
+  class_methods do
+    def validates_rut(*attributes)
+      attributes.each do |attr|
+        before_validation -> { clean_rut_attr(attr) }
+
+        validate -> { rut_attr_must_be_valid(attr) }
+
+        define_method("formatted_#{attr}") do
+          val = send(attr)
+          return "" if val.blank?
+
+          clean = val.to_s.gsub(/[^0-9kK]/, "").upcase
+          return clean if clean.length < 2
+
+          body = clean[0...-1]
+          dv = clean[-1]
+
+          formatted_body = body.reverse.gsub(/(\d{3})(?=\d)/, '\\1.').reverse
+          "#{formatted_body}-#{dv}"
+        end
+      end
+    end
   end
 
   private
 
-  def clean_rut
-    return if rut.blank?
-    self.rut = rut.to_s.gsub(/[^0-9kK]/, "").upcase
+  def clean_rut_attr(attr)
+    val = send(attr)
+    return if val.blank?
+    send("#{attr}=", val.to_s.gsub(/[^0-9kK]/, "").upcase)
   end
 
-  def rut_must_be_valid
-    return if rut.blank?
+  def rut_attr_must_be_valid(attr)
+    val = send(attr)
+    return if val.blank?
 
-    clean_rut_val = rut.gsub(/[^0-9kK]/, "").upcase
+    clean_rut_val = val.to_s.gsub(/[^0-9kK]/, "").upcase
     return if clean_rut_val.length < 2
 
     body = clean_rut_val[0...-1]
@@ -36,6 +57,6 @@ module RutValidatable
     else expected_dv.to_s
     end
 
-    errors.add(:rut, :invalid) if dv != expected_dv
+    errors.add(attr, :invalid) if dv != expected_dv
   end
 end

@@ -1,30 +1,20 @@
 <% content_for :title, "Mis Reservas - Agenda Pro" %>
-
 <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
-  
-  <%= render "shared/index_header",
-      title: "Mis Reservas",
-      icon: "fa-solid fa-receipt",
-      subtitle: "Historial completo de tus reservas activas y pasadas",
-      count: @reservations.count do %>
+  <%= render "shared/index_header", title: "Mis Reservas", icon: "fa-solid fa-receipt", subtitle: "Historial completo de tus reservas activas y pasadas", count: @reservations.count do %>
     <%= link_to public_property_index_path, class: "inline-flex items-center gap-2.5 rounded-2xl bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 text-white py-3.5 px-6 text-xs font-black uppercase tracking-widest shadow-xl shadow-indigo-500/25 dark:shadow-none hover:-translate-y-0.5 active:scale-95 transition-all duration-300" do %>
       <i class="fa-solid fa-house"></i> Buscar Más Espacios
     <% end %>
   <% end %>
-
   <% if @reservations.any? %>
     <div class="grid grid-cols-1 gap-6">
       <% @reservations.each do |reservation| %>
         <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-          
-          <!-- Left: Space details & dates -->
           <div class="flex gap-4 sm:gap-6 items-start">
             <div class="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl shrink-0">
               <i class="fa-solid fa-house-chimney"></i>
             </div>
             <div>
               <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2"><%= reservation.property.name %></h3>
-              
               <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-bold text-gray-500 dark:text-slate-400">
                 <span class="flex items-center gap-1">
                   <i class="fa-solid fa-calendar-day"></i> <%= reservation.start_time.strftime("%d/%m/%Y") %>
@@ -40,8 +30,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Middle: Status badges -->
           <div class="flex flex-wrap items-center gap-3">
             <span class="px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest <%= reservation.status_color_classes %>">
               <%= reservation.status_text %>
@@ -50,14 +38,11 @@
               <%= reservation.payment_state %>
             </span>
           </div>
-
-          <!-- Right: Price and Action buttons -->
           <div class="w-full lg:w-auto flex flex-row sm:flex-col lg:items-end justify-between items-center gap-4 pt-6 lg:pt-0 border-t lg:border-t-0 border-gray-100 dark:border-slate-800">
             <div class="text-left lg:text-right">
               <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">Total</p>
               <p class="text-xl font-black text-indigo-600 dark:text-indigo-400">$<%= number_with_delimiter(reservation.total_price.to_i, delimiter: ".") %></p>
             </div>
-            
             <div class="flex items-center gap-2">
               <%= link_to receipt_public_reservation_path(reservation.token, format: :pdf), target: "_blank", class: "w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 border border-gray-100 dark:border-slate-700 flex items-center justify-center transition-colors shadow-sm active:scale-95", title: "Descargar PDF" do %>
                 <i class="fa-solid fa-file-pdf"></i>
@@ -67,7 +52,6 @@
               <% end %>
             </div>
           </div>
-
         </div>
       <% end %>
     </div>
@@ -83,5 +67,4 @@
       <% end %>
     </div>
   <% end %>
-
 </div>

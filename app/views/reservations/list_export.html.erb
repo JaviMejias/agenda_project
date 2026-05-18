@@ -1,10 +1,9 @@
 <div class="header">
   <h1>Reporte de Reservas</h1>
   <p style="text-transform: uppercase; font-weight: bold; font-size: 8px; color: #6b7280; letter-spacing: 2px;">
-    <%= @reservations.count %> Reservas encontradas
+    <%= @reservations_count %> Reservas encontradas
   </p>
 </div>
-
 <table>
   <thead>
     <tr>
@@ -31,20 +30,10 @@
         </td>
         <td style="text-align: center;">
           <%
-            status_color = case reservation.status
-                           when 'pending' then '#d97706'
-                           when 'confirmed' then '#059669'
-                           when 'cancelled' then '#e11d48'
-                           else '#6b7280'
-                           end
-            status_bg = case reservation.status
-                           when 'pending' then '#fffbeb'
-                           when 'confirmed' then '#f0fdf4'
-                           when 'cancelled' then '#fff1f2'
-                           else '#f9fafb'
-                           end
+            color = reservation_status_pdf_color(reservation.status)
+            bg = reservation_status_pdf_bg(reservation.status)
           %>
-          <span class="status-badge" style="color: <%= status_color %>; background-color: <%= status_bg %>; border: 1px solid <%= status_color %>33;">
+          <span class="status-badge" style="color: <%= color %>; background-color: <%= bg %>; border: 1px solid <%= color %>33;">
             <%= reservation.status_text %>
           </span>
         </td>
@@ -55,9 +44,8 @@
     <% end %>
   </tbody>
 </table>
-
 <div style="margin-top: 30px; text-align: right;">
   <p style="font-size: 12px; font-weight: bold;">
-    Total General: <span style="color: #4f46e5; font-size: 14px;">$<%= number_with_delimiter(@reservations.sum(:total_price).to_i, delimiter: ".") %></span>
+    Total General: <span style="color: #4f46e5; font-size: 14px;">$<%= number_with_delimiter(@total_price.to_i, delimiter: ".") %></span>
   </p>
 </div>

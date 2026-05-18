@@ -19,7 +19,7 @@ class Reservation < ApplicationRecord
   scope :active, -> { where.not(status: :cancelled) }
   scope :active_and_valid, -> {
     where.not(status: :cancelled)
-         .where.not("reservations.status = ? AND reservations.created_at < ?", Reservation.statuses[:pending], 24.hours.ago)
+         .where.not("reservations.status = ? AND reservations.updated_at < ?", Reservation.statuses[:pending], 24.hours.ago)
   }
   scope :upcoming, -> { active.where("start_time >= ?", Time.zone.now).order(start_time: :asc) }
   scope :overlapping_range, ->(start_time, end_time) {
@@ -125,7 +125,7 @@ class Reservation < ApplicationRecord
   end
 
   def confirm_by_client!
-    return { status: :error, message: "Este enlace de confirmación ha expirado por seguridad (límite de 24 horas)." } if created_at < 24.hours.ago
+    return { status: :error, message: "Este enlace de confirmación ha expirado por seguridad (límite de 24 horas)." } if updated_at < 24.hours.ago
     return { status: :info, message: "Esta reserva ya se encuentra confirmada." } if confirmed?
     return { status: :error, message: "No se puede confirmar una reserva que ya ha sido cancelada." } if cancelled?
 
@@ -141,7 +141,7 @@ class Reservation < ApplicationRecord
   end
 
   def reject_by_client!
-    return { status: :error, message: "Este enlace ha expirado por seguridad (límite de 24 horas)." } if created_at < 24.hours.ago
+    return { status: :error, message: "Este enlace ha expirado por seguridad (límite de 24 horas)." } if updated_at < 24.hours.ago
     return { status: :info, message: "Esta reserva ya se encuentra cancelada." } if cancelled?
 
     transaction do

@@ -3,15 +3,10 @@
      role="dialog" 
      aria-modal="true"
      data-omnibar-target="modal">
-  
-  <!-- Backdrop -->
   <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
        data-action="click->omnibar#close"></div>
-
-  <!-- Modal Container -->
   <div class="mx-auto max-w-2xl transform divide-y divide-gray-100 dark:divide-slate-800 overflow-hidden rounded-2xl bg-white/90 dark:bg-slate-900/90 shadow-2xl ring-1 ring-black/5 backdrop-blur-2xl transition-all opacity-0 scale-95 duration-200"
        data-omnibar-target="container">
-    
     <div class="relative">
       <i class="fa-solid fa-magnifying-glass absolute left-6 top-5 text-indigo-500 dark:text-indigo-400"></i>
       <input type="text" 
@@ -19,20 +14,13 @@
              placeholder="¿Qué estás buscando? (Presiona ↑↓ para navegar)"
              data-omnibar-target="input"
              data-action="input->omnibar#search">
-      
       <div class="absolute right-4 top-4 flex items-center gap-2">
         <kbd class="hidden sm:flex h-7 items-center rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 font-sans text-[10px] font-black text-gray-400 uppercase tracking-widest shadow-sm">
           Esc
         </kbd>
       </div>
     </div>
-
-    <!-- Results Area -->
-    <div class="max-h-[60vh] scroll-py-2 overflow-y-auto pb-2" data-omnibar-target="results">
-      <!-- Los resultados se cargan dinámicamente -->
-    </div>
-
-    <!-- Footer -->
+    <div class="max-h-[60vh] scroll-py-2 overflow-y-auto pb-2" data-omnibar-target="results"></div>
     <div class="flex items-center justify-between bg-gray-50/50 dark:bg-slate-800/30 px-6 py-3">
       <div class="flex gap-4">
         <div class="flex items-center gap-1">
@@ -51,7 +39,6 @@
           <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Seleccionar</span>
         </div>
       </div>
-      
       <div class="flex items-center gap-2">
         <span class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Omnibar v1.0</span>
       </div>

@@ -3,6 +3,7 @@ class Client < ApplicationRecord
   has_many :reservations, dependent: :nullify
 
   include RutValidatable
+  validates_rut :rut
 
   validates :name, presence: true
   validates :rut, presence: true, uniqueness: { scope: :user_id }
@@ -18,6 +19,6 @@ class Client < ApplicationRecord
   }
 
   def display_name
-    "#{name} (#{rut})"
+    "#{name} (#{formatted_rut})"
   end
 end

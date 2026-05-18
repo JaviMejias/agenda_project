@@ -3,7 +3,7 @@ class ClientsController < ApplicationController
   before_action :set_client, only: %i[ show edit update destroy ]
 
   def index
-    @clients = Client.all.search(params[:q]).order(name: :asc)
+    @clients = policy_scope(Client).search(params[:q]).order(name: :asc)
     @pagy, @clients = pagy(@clients, limit: 15)
   end
 
@@ -52,8 +52,8 @@ class ClientsController < ApplicationController
   end
 
   def list
-    @clients = Client.all.search(params[:q]).limit(20)
-    render json: @clients.map { |c| { id: c.id, name: c.name, rut: c.rut } }
+    @clients = policy_scope(Client).search(params[:q]).limit(20)
+    render json: @clients.map { |c| { id: c.id, name: c.name, rut: c.formatted_rut } }
   end
 
   def destroy
@@ -65,7 +65,7 @@ class ClientsController < ApplicationController
   private
 
   def set_client
-    @client = Client.find(params[:id])
+    @client = policy_scope(Client).find(params[:id])
   end
 
   def client_params

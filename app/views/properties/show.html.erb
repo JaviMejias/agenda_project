@@ -1,24 +1,8 @@
 <% content_for :title, @property.name %>
-
-<div id="calendar_wrapper_<%= @property.id %>" class="mx-auto px-2 sm:px-6 lg:px-8 py-6 animate-fade-in"
-     data-controller="fullcalendar"
-     data-fullcalendar-mode-value="booking"
-     data-fullcalendar-per-hour-value="<%= @property.per_hour? %>"
-     data-fullcalendar-base-price-value="<%= @property.base_price %>"
-     data-fullcalendar-initial-start-value="<%= @reservation&.start_time&.iso8601 %>"
-     data-fullcalendar-initial-end-value="<%= @reservation&.end_time&.iso8601 %>"
-     data-fullcalendar-events-url-value="<%= reservations_path(property_id: @property.id, format: :json) %>">
-  
+<div id="calendar_wrapper_<%= @property.id %>" class="mx-auto px-2 sm:px-6 lg:px-8 py-6 animate-fade-in" data-controller="fullcalendar" data-fullcalendar-mode-value="booking" data-fullcalendar-per-hour-value="<%= @property.per_hour? %>" data-fullcalendar-base-price-value="<%= @property.base_price %>" data-fullcalendar-initial-start-value="<%= @reservation&.start_time&.iso8601 %>" data-fullcalendar-initial-end-value="<%= @reservation&.end_time&.iso8601 %>" data-fullcalendar-events-url-value="<%= reservations_path(property_id: @property.id, format: :json) %>">
   <%= render "shared/back_button", path: properties_path %>
-
-  <!-- Premium Header Refactored -->
-  <%= render "shared/index_header", 
-      title: @property.name, 
-      icon: "fa-solid fa-house-chimney", 
-      subtitle: "#{@property.address} · #{@property.company&.name}" do %>
-    
+  <%= render "shared/index_header", title: @property.name, icon: "fa-solid fa-house-chimney", subtitle: "#{@property.address} · #{@property.company&.name}" do %>
     <div class="flex flex-wrap items-center justify-end gap-4">
-      <!-- Mini Stats Compactas -->
       <div class="hidden sm:flex items-center gap-4 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md px-4 py-2 rounded-xl border border-indigo-50 dark:border-slate-700 shadow-sm">
         <div class="text-right">
           <p class="text-[8px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest leading-none mb-0.5">Precio</p>
@@ -30,20 +14,15 @@
           <p class="text-xs font-black text-gray-900 dark:text-white leading-none"><%= @property.per_day? ? "Día" : "Hora" %></p>
         </div>
       </div>
-
-      <!-- Acciones de Edición (Solo Iconos) -->
       <% if current_user.admin? %>
         <div class="flex items-center gap-2">
           <%= link_to edit_property_path(@property), class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 text-gray-400 hover:text-indigo-600 border border-gray-100 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm active:scale-90", title: "Editar Propiedad" do %>
             <i class="fa-solid fa-pen-to-square text-xs"></i>
           <% end %>
-
           <%= button_to property_path(@property), method: :delete, data: { turbo_confirm: "¿Estás seguro de eliminar esta propiedad?" }, class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 text-gray-400 hover:text-rose-600 border border-gray-100 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm active:scale-90", title: "Eliminar Propiedad" do %>
             <i class="fa-solid fa-trash-can text-xs"></i>
           <% end %>
         </div>
-
-        <!-- Toggle de Vistas -->
         <div class="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-1 rounded-xl border border-indigo-100 dark:border-slate-700 inline-flex shadow-sm">
           <span class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 tab-active">Agenda</span>
           <%= link_to property_expenses_path(@property), class: "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 text-gray-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400" do %>Gastos<% end %>
@@ -51,7 +30,6 @@
       <% end %>
     </div>
   <% end %>
-
   <div class="bg-white dark:bg-slate-900 shadow-xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 mb-8">
     <div class="p-6 sm:p-10">
       <div class="flex flex-col lg:flex-row gap-8">

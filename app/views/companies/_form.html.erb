@@ -7,12 +7,10 @@
     { name: :phone, label: "Teléfono / WhatsApp", placeholder: "+56 9 1234 5678", type: :text_field, icon: "fa-solid fa-phone" },
     { name: :email, label: "Correo Electrónico", placeholder: "contacto@empresa.com", type: :email_field, icon: "fa-solid fa-envelope" }
   ]
-
   input_class = "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white"
   label_class = "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"
 %>
-
-<%= form_with(model: company, class: "space-y-6", data: { controller: "rut" }) do |f| %>
+<%= form_with(model: company, class: "space-y-6", data: { controller: "rut" }, html: { autocomplete: "off" }) do |f| %>
   <% if company.errors.any? %>
     <div class="p-6 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900 rounded-2xl animate-shake">
       <h2 class="text-rose-800 dark:text-rose-400 text-sm font-black uppercase tracking-widest mb-3 flex items-center gap-2">
@@ -26,7 +24,6 @@
       </ul>
     </div>
   <% end %>
-
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <% form_structure.each do |field| %>
       <div class="space-y-2">
@@ -37,16 +34,15 @@
             placeholder: field[:placeholder], 
             class: input_class, 
             required: field[:required],
+            autocomplete: "off",
             data: field[:data]) %>
       </div>
     <% end %>
   </div>
-
   <div data-controller="image-preview" class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 mt-6">
     <%= f.label :logo, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-4" do %>
       <i class="fa-solid fa-image text-indigo-500 mr-1"></i> Logo de la Empresa
     <% end %>
-    
     <% if company.logo.attached? && company.logo.persisted? %>
       <div id="company_logo_preview" class="mt-2 mb-6 bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm inline-block">
         <p class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">Logo actual:</p>
@@ -63,11 +59,9 @@
         </div>
       </div>
     <% end %>
-
     <div class="mt-2 mb-4">
       <div data-image-preview-target="previewContainer" class="flex flex-wrap gap-3 sm:gap-4"></div>
     </div>
-
     <div class="relative flex items-center justify-center w-full">
       <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-indigo-300 dark:border-indigo-900 border-dashed rounded-xl cursor-pointer bg-indigo-50 dark:bg-indigo-950/20 hover:bg-indigo-100 dark:hover:bg-indigo-950/40 transition-colors">
         <div class="flex flex-col items-center justify-center pt-5 pb-6">
@@ -79,7 +73,6 @@
       </label>
     </div>
   </div>
-
   <div data-controller="nested-form" class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 mt-6">
     <div class="mb-6">
       <h3 class="text-sm font-black text-gray-700 dark:text-slate-300 flex items-center gap-2">
@@ -89,32 +82,24 @@
         Registra las cuentas bancarias que tus clientes verán en su portal público para transferir el pago de sus reservas.
       </p>
     </div>
-
-    <!-- Template for adding new records -->
     <template data-nested-form-target="template">
       <%= f.fields_for :bank_accounts, BankAccount.new, child_index: "NEW_RECORD" do |ba_f| %>
         <%= render "companies/bank_account_fields", ba_f: ba_f %>
       <% end %>
     </template>
-
-    <!-- Target container where new records will be injected -->
     <div data-nested-form-target="target" class="space-y-6">
       <%= f.fields_for :bank_accounts do |ba_f| %>
         <%= render "companies/bank_account_fields", ba_f: ba_f %>
       <% end %>
     </div>
-
-    <!-- Add Account button placed dynamically at the bottom -->
     <div class="mt-6 flex justify-start">
       <button type="button" data-action="click->nested-form#add" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-widest px-5 py-3 rounded-xl transition-all shadow-lg hover:shadow-indigo-500/20 cursor-pointer transform active:scale-95">
         <i class="fa-solid fa-plus text-[10px]"></i> Agregar Cuenta Bancaria
       </button>
     </div>
   </div>
-
   <div class="pt-6 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-start gap-8">
     <%= render "shared/back_button", path: companies_path, form: true %>
-
     <%= f.button type: "submit", class: "w-full sm:w-auto sm:min-w-[200px] flex justify-center items-center py-3.5 px-6 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transform hover:-translate-y-1 transition-all duration-300" do %>
       <i class="fa-solid fa-floppy-disk mr-2"></i> <%= company.new_record? ? "Crear Empresa" : "Actualizar Empresa" %>
     <% end %>

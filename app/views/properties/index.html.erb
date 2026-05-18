@@ -1,15 +1,6 @@
 <% content_for :title, "Mis Propiedades" %>
-
 <div class="mx-auto px-4 sm:px-6 lg:px-8 py-6" data-controller="search">
-  
-  <%= render "shared/index_header", 
-      title: "Mis Propiedades", 
-      icon: "fa-solid fa-hotel", 
-      count: @pagy.count, 
-      count_frame_id: "properties_count", 
-      search_url: properties_path, 
-      search_frame_id: "properties_frame" do %>
-    
+  <%= render "shared/index_header", title: "Mis Propiedades", icon: "fa-solid fa-hotel", count: @pagy.count, count_frame_id: "properties_count", search_url: properties_path, search_frame_id: "properties_frame" do %>
     <% if current_user.admin? %>
       <%= link_to new_property_path, class: "w-full sm:w-auto group flex items-center justify-center gap-3 px-6 py-3.5 bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white rounded-2xl border border-indigo-100 dark:border-transparent hover:bg-indigo-50 dark:hover:bg-indigo-500 transition-all shadow-md shadow-indigo-100/50 dark:shadow-none hover:-translate-y-1 active:scale-95" do %>
         <i class="fa-solid fa-plus-circle text-indigo-500 dark:text-indigo-200 group-hover:rotate-90 transition-transform duration-500"></i>
@@ -17,61 +8,13 @@
       <% end %>
     <% end %>
   <% end %>
-
-  
   <turbo-frame id="properties_frame" class="relative block w-full">
     <%= render "shared/loading_state" %>
     <% if @properties.any? %>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
         <% @properties.each do |property| %>
           <div class="group bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:shadow-indigo-100/50 dark:hover:shadow-indigo-900/20 transition-all duration-500 overflow-hidden flex flex-col">
-            
-            
-            <div class="relative h-48 overflow-hidden group/carousel" data-controller="carousel" data-carousel-index-value="0">
-              <% if property.images.attached? %>
-                <% property.images.each do |image| %>
-                  <div data-carousel-target="slide" class="w-full h-full hidden" data-controller="image-loader">
-                    
-                    <div data-image-loader-target="placeholder" class="absolute inset-0 bg-gray-200 dark:bg-slate-800 animate-pulse flex items-center justify-center">
-                      <i class="fa-solid fa-circle-notch fa-spin text-gray-400 dark:text-slate-600"></i>
-                    </div>
-                    
-                    <%= image_tag property.carousel_variant(image), 
-                        class: "w-full h-full object-cover transition-all duration-700 group-hover:scale-110 opacity-0",
-                        loading: "lazy",
-                        alt: property.name,
-                        data: { 
-                          image_loader_target: "image",
-                          action: "load->image-loader#load"
-                        } %>
-                  </div>
-                <% end %>
-
-                <% if property.images.count > 1 %>
-                  <button data-action="click->carousel#previous" class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 sm:bg-white/20 backdrop-blur-md text-white opacity-100 sm:opacity-0 sm:group-hover/carousel:opacity-100 transition-opacity hover:bg-white/40 flex items-center justify-center z-20">
-                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
-                  </button>
-                  <button data-action="click->carousel#next" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 sm:bg-white/20 backdrop-blur-md text-white opacity-100 sm:opacity-0 sm:group-hover/carousel:opacity-100 transition-opacity hover:bg-white/40 flex items-center justify-center z-20">
-                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                  </button>
-                  <div class="absolute bottom-3 right-3 px-2 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[8px] font-black text-white uppercase tracking-widest z-20">
-                    <span data-carousel-target="counter">1</span> / <%= property.images.size %>
-                  </div>
-                <% end %>
-              <% else %>
-                <div class="w-full h-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-300 dark:text-slate-600">
-                  <i class="fa-solid fa-image text-4xl opacity-20"></i>
-                </div>
-              <% end %>
-              <div class="absolute top-4 right-4 z-20">
-                <span class="px-3 py-1.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-[9px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 rounded-xl shadow-sm border border-white/50 dark:border-slate-700">
-                  <%= property.pricing_model_text %>
-                </span>
-              </div>
-              <div class="absolute bottom-0 left-0 w-full h-1 z-20" style="background-color: <%= property.color || '#4f46e5' %>"></div>
-            </div>
-
-            
+            <%= render "properties/carousel_card_header", property: property %>
             <div class="p-6 flex flex-col flex-grow">
               <div class="mb-4">
                 <h2 class="text-xl font-black text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1 mb-1">
@@ -109,13 +52,9 @@
           </div>
         <% end %>
       </div>
-
-    <%= render "shared/pagination" %>
+      <%= render "shared/pagination" %>
     <% else %>
-      <%= render "shared/empty_state", 
-          icon: "fa-solid fa-house-chimney-window", 
-          title: "No se encontraron propiedades", 
-          subtitle: "Prueba con otros términos de búsqueda o agrega una nueva propiedad." %>
+      <%= render "shared/empty_state", icon: "fa-solid fa-house-chimney-window", title: "No se encontraron propiedades", subtitle: "Prueba con otros términos de búsqueda o agrega una nueva propiedad." %>
     <% end %>
   </turbo-frame>
 </div>

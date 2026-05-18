@@ -5,7 +5,6 @@
     <p style="font-weight: bold; margin: 5px 0;">Folio: #<%= @reservation.id %></p>
     <p style="margin: 5px 0;">Fecha de emisión: <%= Time.current.strftime("%d/%m/%Y") %></p>
   </div>
-
   <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px;">
     <div>
       <h3 style="color: #666; margin-bottom: 5px; text-transform: uppercase; font-size: 12px;">Datos del Cliente</h3>
@@ -21,7 +20,6 @@
       <p style="margin: 5px 0;"><%= @reservation.property.address %></p>
     </div>
   </div>
-
   <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
     <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">Detalles de la Reserva</h3>
     <table style="width: 100%; border-collapse: collapse;">
@@ -43,7 +41,6 @@
       </tr>
     </table>
   </div>
-
   <h3 style="margin-top: 40px; border-bottom: 2px solid #eee; padding-bottom: 10px;">Historial de Pagos</h3>
   <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
     <thead>
@@ -59,7 +56,7 @@
         <tr>
           <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><%= payment.payment_date.strftime("%d/%m/%Y") %></td>
           <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><%= payment.transaction_type.titleize %></td>
-          <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><%= payment.payment_method.titleize %></td>
+          <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;"><%= payment_method_label(payment) %></td>
           <td style="padding: 12px; text-align: right; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: <%= payment.abono? ? '#10b981' : '#ef4444' %>">
             <%= payment.abono? ? '+' : '-' %> $<%= number_to_currency(payment.amount, unit: "", separator: ",", delimiter: ".") %>
           </td>
@@ -67,7 +64,6 @@
       <% end %>
     </tbody>
   </table>
-
   <div style="display: flex; justify-content: flex-end;">
     <div style="width: 300px; background-color: #f8fafc; padding: 20px; border-radius: 8px;">
       <table style="width: 100%;">
@@ -86,5 +82,4 @@
       </table>
     </div>
   </div>
-
 </div>

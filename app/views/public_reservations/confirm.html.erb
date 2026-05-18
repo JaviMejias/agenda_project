@@ -1,8 +1,8 @@
-<div class="min-h-screen flex items-center justify-center bg-[#fcfcfd] px-4">
+<div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 transition-colors duration-500">
   <div class="max-w-lg w-full">
-    <div class="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-10 text-center border border-gray-50 relative overflow-hidden">
-      <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50/50 rounded-full -mr-16 -mt-16 blur-3xl"></div>
-      <div class="relative mb-8 inline-flex items-center justify-center w-20 h-20 rounded-3xl <%= @status == :success ? 'bg-emerald-50 text-emerald-500' : (@status == :info ? 'bg-amber-50 text-amber-500' : 'bg-rose-50 text-rose-500') %> transition-all duration-700 hover:scale-105">
+    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.02)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.25)] p-10 text-center border border-gray-100 dark:border-slate-800/80 relative overflow-hidden transition-colors duration-500">
+      <div class="absolute top-0 right-0 w-32 h-32 <%= confirm_bg_blur_class(@status) %> rounded-full -mr-16 -mt-16 blur-3xl"></div>
+      <div class="relative mb-8 inline-flex items-center justify-center w-20 h-20 rounded-3xl <%= confirm_icon_wrapper_classes(@status) %> transition-all duration-700 hover:scale-105">
         <% if @status == :success %>
           <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
@@ -17,43 +17,42 @@
           </svg>
         <% end %>
       </div>
-      <h2 class="text-3xl font-black text-gray-900 mb-4 tracking-tight">
-        <%= @status == :success ? "¡Todo listo!" : (@status == :info ? "Aviso" : "Algo salió mal") %>
+      <h2 class="text-3xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">
+        <%= confirm_header_title(@status) %>
       </h2>
-      <p class="text-gray-500 font-medium text-lg leading-relaxed mb-10 max-w-[280px] mx-auto">
+      <p class="text-gray-500 dark:text-slate-400 font-medium text-lg leading-relaxed mb-10 max-w-[320px] mx-auto">
         <%= @message %>
       </p>
-      <div class="bg-gray-50/50 rounded-[2rem] p-8 mb-10 text-left border border-gray-100/50">
+      <div class="bg-gray-50/50 dark:bg-slate-800/20 rounded-[2rem] p-8 mb-10 text-left border border-gray-100/50 dark:border-slate-800/40">
         <div class="flex items-center gap-4 mb-6">
-          <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-gray-400 border border-gray-100">
+          <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-gray-400 border border-gray-100 dark:border-slate-700">
             <i class="fa-solid fa-house-chimney text-lg text-emerald-500"></i>
           </div>
           <div>
-            <div class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Propiedad</div>
-            <div class="text-gray-900 font-black text-lg tracking-tight"><%= @reservation.property.name %></div>
+            <div class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">Propiedad</div>
+            <div class="text-gray-900 dark:text-white font-black text-lg tracking-tight"><%= @reservation.property.name %></div>
           </div>
         </div>
-
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-gray-400 border border-gray-100">
+          <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-gray-400 border border-gray-100 dark:border-slate-700">
             <i class="fa-solid fa-calendar-check text-lg text-indigo-500"></i>
           </div>
           <div>
-            <div class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Fecha y Hora</div>
-            <div class="text-gray-900 font-bold text-sm">
+            <div class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">Fecha y Hora</div>
+            <div class="text-gray-900 dark:text-slate-200 font-bold text-sm">
               <%= l(@reservation.start_time, format: :long) %>
             </div>
           </div>
         </div>
       </div>
-      <div class="pt-6 border-top border-gray-100">
-        <p class="text-sm font-bold text-emerald-600 bg-emerald-50 py-3 rounded-2xl">
-          <i class="fa-solid fa-circle-check mr-2"></i> Ya puedes cerrar esta pestaña de forma segura.
+      <div class="pt-6 border-t border-gray-100 dark:border-slate-800/80">
+        <p class="text-sm font-bold <%= confirm_footer_banner_classes(@status) %> py-3 rounded-2xl">
+          <i class="fa-solid <%= confirm_footer_icon_class(@status) %> mr-2"></i> Ya puedes cerrar esta pestaña de forma segura.
         </p>
       </div>
     </div>
     <div class="mt-10 text-center">
-      <div class="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">Powered by Agenda Pro</div>
+      <div class="text-[10px] font-black text-gray-300 dark:text-slate-700 uppercase tracking-[0.3em]">Powered by Agenda Pro</div>
     </div>
   </div>
 </div>

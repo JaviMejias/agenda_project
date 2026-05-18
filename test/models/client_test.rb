@@ -38,7 +38,7 @@ class ClientTest < ActiveSupport::TestCase
   test "display_name should include name and rut" do
     client = clients(:one)
     assert_match client.name, client.display_name
-    assert_match client.rut, client.display_name
+    assert_match client.formatted_rut, client.display_name
   end
 
   test "search scope should find client by name or rut" do

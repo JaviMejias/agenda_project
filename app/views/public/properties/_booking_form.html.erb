@@ -1,6 +1,4 @@
-<% 
-  reservation = local_assigns[:reservation] || @reservation || @property.reservations.build
-%>
+<% reservation = local_assigns[:reservation] || @reservation || @property.reservations.build %>
 <div id="public_reservation_form_container" class="space-y-6">
   <div data-fullcalendar-target="preview" class="hidden animate-fade-in bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/50 rounded-3xl p-6 shadow-inner">
     <div class="flex items-center gap-3 mb-4">
@@ -31,14 +29,7 @@
       </div>
       <h3 class="text-lg font-black text-gray-900 dark:text-white">Datos de Contacto</h3>
     </div>
-    <%= form_with(url: public_property_public_reservations_path(@property), 
-                  method: :post,
-                  class: "space-y-4", 
-                  id: "public-booking-form",
-                  data: { 
-                    controller: "rut guest-booking-validation",
-                    action: "validation:check->guest-booking-validation#check input->guest-booking-validation#check"
-                  }) do |f| %>
+    <%= form_with(url: public_property_public_reservations_path(@property), method: :post, class: "space-y-4", id: "public-booking-form", data: { controller: "rut guest-booking-validation", action: "validation:check->guest-booking-validation#check input->guest-booking-validation#check" }) do |f| %>
       <% if reservation.errors.any? %>
         <div class="p-4 mb-4 text-sm text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 animate-shake">
           <ul class="list-disc pl-5 space-y-1 font-bold text-xs">
@@ -59,7 +50,6 @@
             <p class="text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate mt-0.5"><%= current_user.email %></p>
           </div>
         </div>
-
         <%
           existing_client = Client.find_by(email: current_user.email)
           client_name = current_user.full_name
@@ -73,77 +63,51 @@
         <%= hidden_field_tag :client_rut, client_rut %>
       <% else %>
         <div class="space-y-4">
-          <div>
-            <%= f.label :client_name, "Nombre Completo", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
-                <i class="fa-solid fa-user"></i>
+          <%
+            fields = [
+              { name: :client_name, label: "Nombre Completo", placeholder: "Juan Pérez", icon: "fa-solid fa-user", type: :text_field },
+              { name: :client_email, label: "Correo Electrónico", placeholder: "juan@correo.com", icon: "fa-solid fa-envelope", type: :email_field }
+            ]
+            half_fields = [
+              { name: :client_phone, label: "Teléfono", placeholder: "+56 9 1234 5678", icon: "fa-solid fa-phone", type: :telephone_field },
+              { name: :client_rut, label: "RUT", placeholder: "12.345.678-9", icon: "fa-solid fa-id-card", type: :text_field, rut: true }
+            ]
+            input_class = "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm"
+          %>
+          <% fields.each do |field| %>
+            <div>
+              <%= f.label field[:name], field[:label], class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
+                  <i class="<%= field[:icon] %>"></i>
+                </div>
+                <%= f.send(field[:type], field[:name], required: true, placeholder: field[:placeholder], class: input_class, data: { guest_booking_validation_target: "input" }) %>
               </div>
-              <%= f.text_field :client_name, 
-                  required: true,
-                  placeholder: "Juan Pérez", 
-                  class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm",
-                  data: { guest_booking_validation_target: "input" } %>
             </div>
-          </div>
-          <div>
-            <%= f.label :client_email, "Correo Electrónico", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
-                <i class="fa-solid fa-envelope"></i>
-              </div>
-              <%= f.email_field :client_email, 
-                  required: true,
-                  placeholder: "juan@correo.com", 
-                  class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm",
-                  data: { guest_booking_validation_target: "input" } %>
-            </div>
-          </div>
+          <% end %>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <%= f.label :client_phone, "Teléfono", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
-              <div class="relative group">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
-                  <i class="fa-solid fa-phone"></i>
+            <% half_fields.each do |field| %>
+              <div>
+                <%= f.label field[:name], field[:label], class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
+                <div class="relative group">
+                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
+                    <i class="<%= field[:icon] %>"></i>
+                  </div>
+                  <% if field[:rut] %>
+                    <%= f.send(field[:type], field[:name], required: true, placeholder: field[:placeholder], class: input_class, data: { action: "input->rut#format", rut_target: "input", guest_booking_validation_target: "input" }) %>
+                  <% else %>
+                    <%= f.send(field[:type], field[:name], required: true, placeholder: field[:placeholder], class: input_class, data: { guest_booking_validation_target: "input" }) %>
+                  <% end %>
                 </div>
-                <%= f.telephone_field :client_phone, 
-                    required: true,
-                    placeholder: "+56 9 1234 5678", 
-                    class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm",
-                    data: { guest_booking_validation_target: "input" } %>
               </div>
-            </div>
-            <div>
-              <%= f.label :client_rut, "RUT", class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1 mb-1.5" %>
-              <div class="relative group">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600">
-                  <i class="fa-solid fa-id-card"></i>
-                </div>
-                <%= f.text_field :client_rut, 
-                    required: true,
-                    placeholder: "12.345.678-9", 
-                    class: "block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-slate-800 rounded-2xl sm:text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm",
-                    data: {
-                      action: "input->rut#format",
-                      rut_target: "input",
-                      guest_booking_validation_target: "input"
-                    } %>
-              </div>
-            </div>
+            <% end %>
           </div>
         </div>
       <% end %>
       <%= f.hidden_field :start_time, name: "reservation[start_time]", data: { fullcalendar_target: "startInput" } %>
       <%= f.hidden_field :end_time, name: "reservation[end_time]", data: { fullcalendar_target: "endInput" } %>
       <div class="pt-4">
-        <%= f.submit "Solicitar Reserva", 
-            class: "w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/10 hover:-translate-y-1 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
-            disabled: true,
-            data: { 
-              fullcalendar_target: "submitButton", 
-              guest_booking_validation_target: "submitButton",
-              disable_with: "Enviando Solicitud..." 
-            } %>
+        <%= f.submit "Solicitar Reserva", class: "w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/10 hover:-translate-y-1 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed", disabled: true, data: { fullcalendar_target: "submitButton", guest_booking_validation_target: "submitButton", disable_with: "Enviando Solicitud..." } %>
         <p class="mt-4 text-[10px] text-gray-400 dark:text-slate-500 text-center font-medium leading-relaxed">
           <i class="fa-solid fa-circle-info mr-1"></i> Selecciona fechas en el calendario para habilitar el botón.
         </p>

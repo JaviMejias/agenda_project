@@ -2,38 +2,27 @@ class Public::PropertiesController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
   layout "public"
 
+  before_action :set_property, only: [:show, :booking]
+
   def index
-    @properties = Property.with_attached_images.all
-
-    if params[:query].present?
-      @properties = @properties.where("name LIKE :q OR address LIKE :q OR description LIKE :q", q: "%#{params[:query]}%")
-    end
-
-    if params[:pricing_model].present?
-      @properties = @properties.where(pricing_model: params[:pricing_model])
-    end
+    @properties = property_scope.search_public(params[:query])
+                                .by_pricing_model(params[:pricing_model])
   end
 
   def show
-    @property = Property.with_attached_images.find(params[:id])
   end
 
   def booking
-    @property = Property.with_attached_images.find(params[:id])
-
-    # Si decide continuar como invitado, marcamos la sesión
     if params[:guest] == "true"
       session[:continue_as_guest] = true
       redirect_to booking_public_property_path(@property)
       return
     end
 
-    # Si está logeado o aceptó continuar como invitado, accede al calendario
     if user_signed_in? || session[:continue_as_guest] == true
       @reservation = @property.reservations.build
       render :booking
     else
-      # Guardar la ruta de retorno para redirección de Devise después del login/registro
       session[:user_return_to] = booking_public_property_path(@property)
       render :booking_gateway
     end
@@ -76,5 +65,15 @@ class Public::PropertiesController < ApplicationController
 
       hash
     }
+  end
+
+  private
+
+  def property_scope
+    Property.with_attached_images
+  end
+
+  def set_property
+    @property = property_scope.find(params[:id])
   end
 end

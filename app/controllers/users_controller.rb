@@ -4,7 +4,7 @@ class UsersController < ApplicationController
 
   def index
     authorize User
-    @users = User.search(params[:q]).ordered
+    @users = User.search(params[:q]).ordered.includes(:reservations)
     @pagy, @users = pagy(@users, limit: 10)
   end
 

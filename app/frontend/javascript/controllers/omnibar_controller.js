@@ -14,7 +14,6 @@ export default class extends Controller {
   }
 
   handleKeydown(e) {
-    // Cmd+K or Ctrl+K to open
     if ((e.metaKey || e.ctrlKey) && e.key === "k") {
       e.preventDefault()
       this.open()
@@ -42,7 +41,6 @@ export default class extends Controller {
 
   open() {
     this.modalTarget.classList.remove("hidden")
-    // Trigger animation
     setTimeout(() => {
       this.containerTarget.classList.remove("scale-95", "opacity-0")
       this.containerTarget.classList.add("scale-100", "opacity-100")

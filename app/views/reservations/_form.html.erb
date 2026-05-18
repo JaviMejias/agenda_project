@@ -1,48 +1,87 @@
-<%= form_with(model: reservation, class: "space-y-4") do |form| %>
-  <% if reservation.errors.any? %>
-    <div class="p-4 mb-4 text-sm text-red-800 dark:text-red-400 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900">
-      <h2 class="font-bold">No se pudo guardar la reserva:</h2>
-      <ul class="list-disc pl-5 mt-2">
-        <% reservation.errors.full_messages.each do |message| %>
-          <li><%= sanitize(message, tags: %w(a), attributes: %w(href target class)) %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <div class="sm:col-span-1" data-controller="client-select" data-client-select-url-value="<%= list_clients_path %>">
-      <div class="flex items-center justify-between mb-1">
-        <%= form.label :client_id, "Cliente", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-        <%= link_to new_client_path, class: "text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:text-indigo-800 transition-colors flex items-center gap-1", target: "_blank" do %>
-          <i class="fa-solid fa-plus-circle"></i> Nuevo Cliente
+<%
+  property = reservation.property
+  is_per_hour = property.per_hour?
+  initial_start = reservation.start_time&.iso8601
+  initial_end = reservation.end_time&.iso8601
+  default_view = is_per_hour ? 'timeGridWeek' : 'dayGridMonth'
+%>
+<div data-controller="fullcalendar" 
+     data-fullcalendar-mode-value="booking" 
+     data-fullcalendar-per-hour-value="<%= is_per_hour %>" 
+     data-fullcalendar-base-price-value="<%= property.base_price %>"
+     data-fullcalendar-events-url-value="<%= reservations_path(property_id: property.id, exclude_id: reservation.id || 0, format: :json) %>" 
+     data-fullcalendar-initial-start-value="<%= initial_start %>"
+     data-fullcalendar-initial-end-value="<%= initial_end %>"
+     data-fullcalendar-default-view-value="<%= default_view %>">
+  <%= form_with(model: reservation.new_record? ? [property, reservation] : reservation, class: "space-y-4") do |form| %>
+    <%= hidden_field_tag :from, params[:from] %>
+    <% if reservation.errors.any? %>
+      <div class="p-4 mb-6 text-sm text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 animate-shake">
+        <h2 class="font-black uppercase tracking-widest text-[10px] mb-2 flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+          No se pudo guardar la reserva
+        </h2>
+        <ul class="list-disc pl-5 space-y-1 font-semibold text-xs">
+          <% reservation.errors.full_messages.each do |message| %>
+            <li><%= sanitize(message, tags: %w(a), attributes: %w(href target class)) %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <div class="flex flex-col lg:flex-row gap-8">
+      <div class="lg:w-7/12">
+        <%= render "shared/calendar_container", 
+                   property: property, 
+                   omit_controller: true, 
+                   omit_inputs: true do %>
+          <%= form.hidden_field :start_time, value: initial_start, data: { fullcalendar_target: "startInput" } %>
+          <%= form.hidden_field :end_time, value: initial_end, data: { fullcalendar_target: "endInput" } %>
         <% end %>
       </div>
-      <%= form.select :client_id, 
-          (reservation.client ? [[reservation.client.name, reservation.client.id]] : []), 
-          { include_blank: true }, 
-          { data: { client_select_target: "select" }, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-slate-800 dark:text-white" } %>
-      <p class="mt-1 text-[10px] text-gray-400 dark:text-slate-500">Busca por nombre o RUT</p>
+      <div class="lg:w-5/12">
+        <div class="sticky top-6 space-y-6">
+          <%= render "reservations/selection_summary", previous_reservation: (reservation.new_record? ? nil : reservation) %>
+          <div class="bg-gray-50 dark:bg-slate-800/50 rounded-3xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800 shadow-inner">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg">
+                <i class="fa-solid fa-user-edit"></i>
+              </div>
+              <h3 class="text-lg font-black text-gray-900 dark:text-white">Datos de la Reserva</h3>
+            </div>
+            <div class="space-y-6" data-controller="client-select" data-client-select-url-value="<%= list_clients_path %>">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <%= form.label :client_id, "Cliente", class: "text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" %>
+                  <%= link_to new_client_path, class: "text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:underline flex items-center gap-1", target: "_blank" do %>
+                    <i class="fa-solid fa-plus-circle text-[8px]"></i> Nuevo
+                  <% end %>
+                </div>
+                <%= form.select :client_id, 
+                    (reservation.client ? [[reservation.client.name, reservation.client.id, { 'data-data': { id: reservation.client.id, name: reservation.client.name, rut: reservation.client.rut }.to_json, 'data-rut': reservation.client.rut }]] : []), 
+                    { include_blank: "Buscar cliente..." }, 
+                    { data: { client_select_target: "select" }, class: "w-full" } %>
+              </div>
+              <div>
+                <%= form.label :status, "Estado de la Reserva", class: "text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" %>
+                <%= form.select :status, Reservation.selectable_statuses.map { |s| [I18n.t("enums.reservation.status.#{s}"), s] }, {}, class: "mt-1 block w-full rounded-xl border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-white dark:bg-slate-800 dark:text-white font-bold" %>
+              </div>
+              <div class="pt-4">
+                <%= form.button type: "submit", 
+                    class: "w-full py-4 bg-gray-900 dark:bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black dark:hover:bg-indigo-500 transition-all shadow-xl shadow-gray-200 dark:shadow-none hover:-translate-y-1 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+                    data: { 
+                      fullcalendar_target: "submitButton",
+                      disable_with: "Guardando..." 
+                    } do %>
+                  <i class="fa-solid fa-floppy-disk mr-2"></i> <%= reservation.new_record? ? "Crear Reserva" : "Guardar Cambios" %>
+                <% end %>
+                <p class="mt-4 text-[10px] text-gray-400 dark:text-slate-500 text-center font-medium leading-relaxed">
+                  <i class="fa-solid fa-circle-info mr-1"></i> Se enviará una notificación al cliente si hay cambios en las fechas o el estado.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div>
-      <%= form.label :status, "Estado de la Reserva", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-      <%= form.select :status, Reservation.selectable_statuses.map { |s| [I18n.t("enums.reservation.status.#{s}"), s] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 dark:border-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border bg-white dark:bg-slate-800 dark:text-white" %>
-    </div>
-
-    <div class="sm:col-span-2" data-controller="fullcalendar" data-fullcalendar-mode-value="booking" data-fullcalendar-per-hour-value="<%= reservation.property.per_hour? %>" data-fullcalendar-events-url-value="<%= reservations_path(property_id: reservation.property.id, exclude_id: reservation.id, format: :json) %>" data-fullcalendar-initial-start-value="<%= reservation.start_time&.iso8601 %>" data-fullcalendar-initial-end-value="<%= reservation.end_time&.iso8601 %>">
-      <p class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Modifica tus fechas en el calendario</p>
-      
-      <div data-fullcalendar-target="calendar" class="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-lg shadow-sm w-full py-2"></div>
-      
-      <%= form.hidden_field :start_time, data: { fullcalendar_target: "startInput" }, required: true %>
-      <%= form.hidden_field :end_time, data: { fullcalendar_target: "endInput" }, required: true %>
-      
-      <%= render "reservations/selection_summary" %>
-    </div>
-  </div>
-
-  <div class="pt-4">
-    <%= form.submit (reservation.new_record? ? "Crear Reserva" : "Actualizar Reserva"), class: "w-full inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer" %>
-  </div>
-<% end %>
+  <% end %>
+</div>

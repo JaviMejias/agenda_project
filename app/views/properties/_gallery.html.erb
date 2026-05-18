@@ -2,19 +2,10 @@
   <div class="pb-10 pt-2 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4" data-controller="lightbox">
     <% property.images.each do |image| %>
       <div class="group relative overflow-hidden rounded-2xl shadow-sm border border-gray-200 aspect-video bg-gray-50" data-controller="image-loader">
-        
         <div data-image-loader-target="placeholder" class="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center">
           <i class="fa-solid fa-circle-notch fa-spin text-gray-300"></i>
         </div>
-
-        <%= image_tag property.gallery_variant(image), 
-            class: "w-full h-full object-cover transition-all duration-700 group-hover:scale-110 cursor-zoom-in opacity-0",
-            loading: "lazy",
-            data: { 
-              action: "click->lightbox#open load->image-loader#load",
-              image_loader_target: "image",
-              url: url_for(image)
-            } %>
+        <%= image_tag property.gallery_variant(image), class: "w-full h-full object-cover transition-all duration-700 group-hover:scale-110 cursor-zoom-in opacity-0", loading: "lazy", data: { action: "click->lightbox#open load->image-loader#load", image_loader_target: "image", url: url_for(image) } %>
         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 pointer-events-none"></div>
       </div>
     <% end %>

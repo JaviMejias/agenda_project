@@ -39,8 +39,8 @@ export class SoundManager {
     const gain = this.ctx.createGain()
 
     osc.type = "sine"
-    osc.frequency.setValueAtTime(880, this.ctx.currentTime) // A5
-    osc.frequency.exponentialRampToValueAtTime(1320, this.ctx.currentTime + 0.1) // E6
+    osc.frequency.setValueAtTime(880, this.ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(1320, this.ctx.currentTime + 0.1)
 
     gain.gain.setValueAtTime(0, this.ctx.currentTime)
     gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 0.02)
@@ -58,8 +58,8 @@ export class SoundManager {
     const gain = this.ctx.createGain()
 
     osc.type = "sine"
-    osc.frequency.setValueAtTime(523.25, this.ctx.currentTime) // C5
-    osc.frequency.exponentialRampToValueAtTime(783.99, this.ctx.currentTime + 0.1) // G5
+    osc.frequency.setValueAtTime(523.25, this.ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(783.99, this.ctx.currentTime + 0.1)
 
     gain.gain.setValueAtTime(0, this.ctx.currentTime)
     gain.gain.linearRampToValueAtTime(0.15, this.ctx.currentTime + 0.05)

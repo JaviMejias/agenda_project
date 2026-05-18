@@ -1,0 +1,33 @@
+<div class="relative h-48 overflow-hidden group/carousel" data-controller="carousel" data-carousel-index-value="0">
+  <% if property.images.attached? %>
+    <% property.images.each do |image| %>
+      <div data-carousel-target="slide" class="w-full h-full hidden" data-controller="image-loader">
+        <div data-image-loader-target="placeholder" class="absolute inset-0 bg-gray-200 dark:bg-slate-800 animate-pulse flex items-center justify-center">
+          <i class="fa-solid fa-circle-notch fa-spin text-gray-400 dark:text-slate-600"></i>
+        </div>
+        <%= image_tag property.carousel_variant(image), class: "w-full h-full object-cover transition-all duration-700 group-hover:scale-110 opacity-0", loading: "lazy", alt: property.name, data: { image_loader_target: "image", action: "load->image-loader#load" } %>
+      </div>
+    <% end %>
+    <% if property.images.count > 1 %>
+      <button data-action="click->carousel#previous" class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 sm:bg-white/20 backdrop-blur-md text-white opacity-100 sm:opacity-0 sm:group-hover/carousel:opacity-100 transition-opacity hover:bg-white/40 flex items-center justify-center z-20">
+        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+      </button>
+      <button data-action="click->carousel#next" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 sm:bg-white/20 backdrop-blur-md text-white opacity-100 sm:opacity-0 sm:group-hover/carousel:opacity-100 transition-opacity hover:bg-white/40 flex items-center justify-center z-20">
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+      </button>
+      <div class="absolute bottom-3 right-3 px-2 py-1 bg-black/40 backdrop-blur-md rounded-lg text-[8px] font-black text-white uppercase tracking-widest z-20">
+        <span data-carousel-target="counter">1</span> / <%= property.images.size %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="w-full h-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-300 dark:text-slate-600">
+      <i class="fa-solid fa-image text-4xl opacity-20"></i>
+    </div>
+  <% end %>
+  <div class="absolute top-4 right-4 z-20">
+    <span class="px-3 py-1.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md text-[9px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 rounded-xl shadow-sm border border-white/50 dark:border-slate-700">
+      <%= property.pricing_model_text %>
+    </span>
+  </div>
+  <div class="absolute bottom-0 left-0 w-full h-1 z-20" style="background-color: <%= property.color || '#4f46e5' %>"></div>
+</div>

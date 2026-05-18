@@ -6,7 +6,7 @@ class ReportsController < ApplicationController
   def index
     authorize :report, :index?
 
-    @stats              = ReportStatsService.new(@start_date, @end_date, company_id: @company_id).stats
+    @stats              = ReportStatsService.new(current_user, @start_date, @end_date, company_id: @company_id).stats
     @total_income       = @stats[:total_income]
     @total_loss         = @stats[:total_loss]
     @total_expenses     = @stats[:total_expenses]

@@ -1,11 +1,7 @@
 <% content_for :title, "Listado de Reservas" %>
-
 <div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in" data-controller="search">
-  
-  <!-- Premium Header & Filters Container -->
   <div class="relative mb-8 p-5 sm:p-6 rounded-[2rem] bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border border-indigo-100 dark:border-slate-800 shadow-xl shadow-indigo-100/30 dark:shadow-none overflow-hidden group">
     <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
-    
     <div class="relative flex flex-col xl:flex-row xl:items-center justify-between gap-6">
       <div class="flex items-center gap-4">
         <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-xl">
@@ -20,8 +16,6 @@
           </p>
         </div>
       </div>
-
-      <!-- Filters Row -->
       <div class="flex flex-col md:flex-row items-center gap-4">
         <%= form_with url: list_reservations_path, method: :get, data: { turbo_frame: "list_frame", search_target: "form", action: "input->search#submit" }, class: "flex-grow w-full md:w-auto" do |f| %>
           <div class="flex items-center gap-2">
@@ -29,7 +23,6 @@
               <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 dark:text-slate-500 text-xs"></i>
               <%= f.text_field :q, value: params[:q], placeholder: "Buscar por cliente...", class: "w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-800 border border-indigo-50 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm", data: { action: "search#submit" } %>
             </div>
-            
             <%= f.select :status, 
                 Reservation.selectable_statuses.map { |s| [I18n.t("enums.reservation.status.#{s}"), s] }, 
                 { include_blank: "Todos los estados", selected: params[:status] }, 
@@ -42,7 +35,6 @@
             <% end %>
           </div>
         <% end %>
-
         <div class="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-1 rounded-xl border border-indigo-100 dark:border-slate-700 flex items-center gap-1 shadow-sm">
           <%= link_to list_reservations_path(request.query_parameters.merge(format: :xlsx)), 
               class: "w-9 h-9 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all", 
@@ -57,7 +49,6 @@
             <i class="fa-solid fa-file-pdf"></i>
           <% end %>
         </div>
-
         <div class="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-1 rounded-xl border border-indigo-100 dark:border-slate-700 inline-flex shadow-sm">
            <%= link_to reservations_path, class: "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 text-gray-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400" do %>Agenda<% end %>
            <span class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 tab-active">Listado</span>
@@ -65,8 +56,6 @@
       </div>
     </div>
   </div>
-
-  
   <turbo-frame id="list_frame" class="relative block w-full">
     <%= render "shared/loading_state", text: "Actualizando listado..." %>
     <% if @reservations.any? %>
@@ -74,10 +63,7 @@
         <% @reservations.each do |reservation| %>
           <div class="group bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 flex items-center overflow-hidden">
             <div class="w-2 h-20 self-stretch shrink-0" style="background-color: <%= reservation.property.color || '#4f46e5' %>"></div>
-            
             <div class="flex-grow grid grid-cols-1 md:grid-cols-12 items-center p-4 gap-4">
-              
-              <!-- Columna 1: Cliente/Propiedad -->
               <div class="md:col-span-4 flex items-center gap-4 min-w-0">
                 <div class="w-10 h-10 rounded-full bg-indigo-50 dark:bg-slate-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
                   <i class="fa-solid fa-user text-sm"></i>
@@ -91,8 +77,6 @@
                   </p>
                 </div>
               </div>
-
-              <!-- Columna 2: Fecha -->
               <div class="md:col-span-3 flex items-center gap-3 md:border-l md:border-gray-50 dark:md:border-slate-800 md:pl-6">
                 <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
                   <i class="fa-solid fa-calendar-day text-xs"></i>
@@ -110,21 +94,16 @@
                   </p>
                 </div>
               </div>
-
-              <!-- Columna 3: Precio -->
               <div class="md:col-span-2 md:border-l md:border-gray-50 dark:md:border-slate-800 md:pl-6">
                 <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-tighter leading-none mb-1 md:text-right">Total</p>
                 <p class="text-sm font-black text-indigo-600 dark:text-indigo-400 md:text-right">
                   $<%= number_to_currency(reservation.total_price, unit: "", separator: ",", delimiter: ".") %>
                 </p>
               </div>
-
-              <!-- Columna 4: Estado y Acciones -->
               <div class="md:col-span-3 flex items-center justify-between md:justify-end gap-4 md:border-l md:border-gray-50 dark:md:border-slate-800 md:pl-6">
                 <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border <%= reservation.status_color_classes %>">
                   <%= reservation.status_text %>
                 </span>
-
                 <div class="flex items-center gap-2">
                   <%= link_to reservation_path(reservation, from: 'list'), data: { turbo_frame: "_top" }, class: "w-9 h-9 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-400 hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white transition-all shadow-sm" do %>
                     <i class="fa-solid fa-eye text-xs"></i>
@@ -134,12 +113,10 @@
                   <% end %>
                 </div>
               </div>
-
             </div>
           </div>
         <% end %>
       </div>
-
     <%= render "shared/pagination" %>
     <% else %>
       <%= render "shared/empty_state", 
@@ -149,17 +126,3 @@
     <% end %>
   </turbo-frame>
 </div>
-
-<style>
-  .tab-active {
-    background-color: white !important;
-    color: #4f46e5 !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-    transform: scale(1.02);
-  }
-  html.dark .tab-active {
-    background-color: #1e293b !important;
-    color: #818cf8 !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
-  }
-</style>

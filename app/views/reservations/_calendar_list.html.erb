@@ -22,15 +22,12 @@
                 <% end %>
               </div>
             </div>
-            
             <h4 class="text-xs font-black text-gray-900 dark:text-white truncate mb-1">
               <%= res.client_name %>
             </h4>
-            
             <p class="text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-tighter mb-2">
               <%= res.property.name %>
             </p>
-            
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-1.5 text-[9px] font-bold text-gray-500 dark:text-slate-400">
                 <i class="fa-regular fa-calendar-days text-[8px]"></i>
@@ -50,7 +47,6 @@
           </div>
         </div>
       <% end %>
-
       <%= render "shared/pagination", pagy: pagy, container: false %>
     <% else %>
       <div class="py-10 text-center">

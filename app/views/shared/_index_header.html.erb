@@ -1,17 +1,10 @@
-<%# 
-  Partial: shared/_index_header
-  Renders a premium header for index pages with title, icon, search and actions.
-%>
-
 <div class="relative mb-8 p-5 sm:p-6 rounded-[2rem] bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border border-indigo-100 dark:border-slate-800 shadow-xl shadow-indigo-100/30 dark:shadow-none overflow-hidden group">
   <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
-  
   <div class="relative z-10 flex flex-col <%= local_assigns[:large_form] ? 'lg:flex-row' : 'md:flex-row' %> md:items-center justify-between gap-6">
     <div class="flex items-center gap-4">
       <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-xl lg:text-2xl">
         <i class="<%= local_assigns[:icon] %>"></i>
       </div>
-      
       <% header_content = capture do %>
         <div>
           <h1 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
@@ -22,7 +15,6 @@
           </p>
         </div>
       <% end %>
-
       <% if local_assigns[:count_frame_id].present? %>
         <turbo-frame id="<%= count_frame_id %>">
           <%= header_content %>
@@ -31,7 +23,6 @@
         <%= header_content %>
       <% end %>
     </div>
-
     <div class="flex-grow <%= local_assigns[:large_form] ? 'lg:max-w-5xl' : '' %>">
       <div class="flex flex-col sm:flex-row items-center justify-end gap-4">
         <% if local_assigns[:search_url].present? %>
@@ -45,7 +36,6 @@
             </div>
           <% end %>
         <% end %>
-
         <%= yield %>
       </div>
     </div>

@@ -14,12 +14,10 @@ export default class extends Controller {
   validate() {
     if (!this.hasSubmitButtonTarget) return
 
-    // 1. Check dates (start_time and end_time hidden inputs)
     const startTime = this.element.querySelector('input[name="reservation[start_time]"]')?.value
     const endTime = this.element.querySelector('input[name="reservation[end_time]"]')?.value
     const hasDates = !!(startTime && endTime)
 
-    // 2. Check guest fields
     const guestInputs = this.inputTargets
 
     const guestFieldsFilled = guestInputs.every(input => {

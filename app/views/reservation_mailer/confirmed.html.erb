@@ -1,10 +1,7 @@
 <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #e2e8f0; border-radius: 16px; color: #1e293b;">
   <h2 style="color: #059669; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-top: 0; font-weight: 900; tracking-tight: -0.5px;">¡Reserva Confirmada!</h2>
-  
   <p>Hola <strong><%= @client.name %></strong>,</p>
-  
   <p>Te confirmamos que tu reserva ha sido procesada y confirmada con éxito. A continuación se presentan los detalles del período reservado:</p>
-  
   <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; padding: 20px; border-radius: 12px; margin: 20px 0; font-size: 14px;">
     <p style="margin: 0 0 8px 0;"><strong>Propiedad:</strong> <span style="color: #0f172a; font-weight: bold;"><%= @property.name %></span></p>
     <% if @property.per_day? %>
@@ -14,9 +11,8 @@
       <p style="margin: 0 0 8px 0;"><strong>Desde:</strong> <%= l(@reservation.start_time, format: :long) %> hrs</p>
       <p style="margin: 0 0 8px 0;"><strong>Hasta:</strong> <%= l(@reservation.end_time, format: :long) %> hrs</p>
     <% end %>
+    <p style="margin: 0 0 8px 0;"><strong>Código de Reserva:</strong> <code style="background-color: #e2e8f0; color: #4f46e5; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: bold; letter-spacing: 0.5px;"><%= @reservation.token %></code></p>
     <p style="margin: 0 0 8px 0;"><strong>Estado de Reserva:</strong> <span style="color: #059669; font-weight: bold; text-transform: uppercase;">Confirmada</span></p>
-    
-    <!-- Payment Status Info -->
     <p style="margin: 0 0 8px 0;">
       <strong>Estado de Pago:</strong> 
       <% if @reservation.pending_balance <= 0 %>
@@ -29,12 +25,9 @@
       <p style="margin: 0;"><strong>Monto Pendiente:</strong> <span style="color: #dc2626; font-weight: 900; font-size: 15px;">$<%= number_with_delimiter(@reservation.pending_balance.to_i, delimiter: ".") %></span></p>
     <% end %>
   </div>
-
   <p style="font-size: 13px; color: #475569; display: flex; items-center: center; gap: 6px; margin: 15px 0;">
     📎 <strong>Nota:</strong> Hemos adjuntado el comprobante oficial de tu reserva en formato PDF en este correo.
   </p>
-  
-  <!-- Premium CTA button to public tracking page -->
   <div style="text-align: center; margin: 35px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 25px;">
     <p style="font-size: 13px; color: #475569; margin-top: 0; margin-bottom: 18px; font-weight: bold;">
       ¿Deseas reportar una transferencia, descargar comprobantes adicionales o revisar saldos?
@@ -47,18 +40,15 @@
       (Este enlace de seguimiento estará disponible de forma segura hasta el día de término de tu reserva)
     </p>
   </div>
-  
   <div style="text-align: center; font-size: 12px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
     <a href="<%= reject_public_reservation_url(@reservation.token) %>" 
        style="color: #e11d48; text-decoration: none; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
       ❌ Cancelar o Rechazar esta reserva
     </a>
   </div>
-  
   <p style="font-size: 11px; color: #94a3b8; margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 15px; text-align: center; font-style: italic;">
     Este es un mensaje automático generado por el sistema. Por favor, no respondas a este correo.
   </p>
-  
   <p style="margin-top: 20px; font-size: 13px; color: #64748b; text-align: center;">
     Gracias por preferirnos.<br>
     <strong>El equipo de <%= @property.company&.name || "Agenda Pro" %></strong>

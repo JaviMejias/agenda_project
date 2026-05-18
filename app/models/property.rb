@@ -11,6 +11,12 @@ class Property < ApplicationRecord
   validates :base_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   scope :search, ->(query) { where("name ILIKE ?", "%#{query}%") if query.present? }
+  scope :search_public, ->(query) {
+    if query.present?
+      where("name LIKE :q OR address LIKE :q OR description LIKE :q", q: "%#{query}%")
+    end
+  }
+  scope :by_pricing_model, ->(model) { where(pricing_model: model) if model.present? }
   scope :available_for_selector, ->(user, query: nil) {
     base = user.admin? ? all : user.properties
     base = base.search(query) if query.present?

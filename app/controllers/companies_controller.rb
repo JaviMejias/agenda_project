@@ -4,7 +4,7 @@ class CompaniesController < ApplicationController
 
   def index
     authorize Company
-    @companies = Company.with_attached_logo.includes(:properties).search(params[:q]).ordered
+    @companies = policy_scope(Company).with_attached_logo.includes(:properties).search(params[:q]).ordered
     @pagy, @companies = pagy(@companies, limit: 10)
   end
 
@@ -78,7 +78,7 @@ class CompaniesController < ApplicationController
   private
 
   def set_company
-    @company = Company.find(params[:id])
+    @company = policy_scope(Company).find(params[:id])
   end
 
   def company_params

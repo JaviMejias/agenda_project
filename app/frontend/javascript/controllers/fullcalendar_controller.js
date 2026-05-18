@@ -30,7 +30,7 @@ export default class extends Controller {
       this.calendar.destroy()
       this.calendar = null
     }
-    
+
     if (this.modeValue === 'dashboard') {
       this.initDashboard()
     } else if (this.modeValue === 'booking') {
@@ -91,7 +91,6 @@ export default class extends Controller {
           info.jsEvent.preventDefault()
           const Turbo = window.Turbo
           if (Turbo) {
-            // Determine origin for back navigation
             const from = this.modeValue === 'booking' ? 'property' : (new URL(window.location).pathname.includes('list') ? 'list' : 'calendar')
             const url = new URL(info.event.url, window.location.origin)
             url.searchParams.set('from', from)
@@ -139,10 +138,10 @@ export default class extends Controller {
       selectable: true,
       selectMirror: true,
       unselectAuto: false,
-      editable: false, // No permitimos mover ni redimensionar reservas existentes
+      editable: false,
       longPressDelay: 100,
       eventOverlap: false,
-      selectOverlap: false, // Previene seleccionar rangos que se crucen con reservas existentes
+      selectOverlap: false,
       slotMinTime: '08:00:00',
       slotMaxTime: '22:00:00',
       allDaySlot: false,
@@ -199,9 +198,6 @@ export default class extends Controller {
         let startStr = info.startStr
         let endStr = info.endStr
 
-
-
-
         if (startStr.length === 10) startStr += 'T00:00:00'
         if (endStr.length === 10) endStr += 'T00:00:00'
 
@@ -211,7 +207,6 @@ export default class extends Controller {
 
 
         if (!this.perHourValue) {
-
           const manualEndDate = new Date(endStr.substring(0, 10) + 'T12:00:00')
           manualEndDate.setDate(manualEndDate.getDate() - 1)
           const manualEndStr = manualEndDate.toISOString().substring(0, 10)
@@ -241,7 +236,6 @@ export default class extends Controller {
     this.initJumpDatePicker()
 
     if (initialStart && initialEnd) {
-      // Allow browser paint and FullCalendar layout to settle before programmatic selection
       setTimeout(() => {
         try {
           if (this.calendar) {
@@ -269,7 +263,6 @@ export default class extends Controller {
     let startStr = info.event.startStr
     let endStr = info.event.endStr || startStr
 
-    // Si es por día, FullCalendar a veces no incluye la T00:00:00
     if (startStr.length === 10) startStr += 'T00:00:00'
     if (endStr.length === 10) endStr += 'T00:00:00'
 
@@ -302,7 +295,6 @@ export default class extends Controller {
     if (this.hasSubmitButtonTarget) {
       this.submitButtonTarget.disabled = !(this.startInputTarget.value && this.endInputTarget.value)
 
-      // Notify other controllers that validation might need to be re-run
       this.submitButtonTarget.dispatchEvent(new CustomEvent("validation:check", { bubbles: true }))
     }
   }
@@ -444,12 +436,10 @@ export default class extends Controller {
   formatDateDisplay(dateStr, isEnd = false) {
     if (!dateStr) return "---"
 
-
     let date
     if (dateStr.includes('T')) {
       date = new Date(dateStr)
     } else {
-
       const [year, month, day] = dateStr.split('-').map(Number)
       date = new Date(year, month - 1, day)
     }
@@ -476,8 +466,6 @@ export default class extends Controller {
 
     return date.toLocaleDateString('es-CL', options)
   }
-
-
 
   prev() {
     this.calendar.prev()
@@ -542,7 +530,6 @@ export default class extends Controller {
   showList(event) {
 
   }
-
 
   _setViewParam(value) {
     const url = new URL(window.location)

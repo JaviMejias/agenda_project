@@ -325,3 +325,49 @@ html.dark .tab-active {
   color: #818cf8 !important;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
 }
+
+/* ── FullCalendar Compact & Custom Layouts ── */
+.fc .fc-toolbar-title { font-size: 1.1rem !important; }
+.fc .fc-button { padding: 0.4rem 0.6rem !important; font-size: 0.8rem !important; }
+.fc-col-header-cell { padding: 8px 0 !important; }
+.fc-daygrid-day-number { font-size: 0.8rem !important; padding: 4px !important; }
+.fc-event-title { font-size: 0.7rem !important; }
+#calendar-header-container { padding-bottom: 0.5rem !important; margin-bottom: 0.5rem !important; }
+.fc { --fc-border-color: #f3f4f6; font-family: inherit; }
+.fc-theme-standard .fc-scrollgrid { border: none !important; }
+.fc-theme-standard td, .fc-theme-standard th { border: 1px solid #f9fafb !important; }
+html.dark .fc { --fc-border-color: #1e293b; }
+html.dark .fc-theme-standard td, html.dark .fc-theme-standard th { border: 1px solid #0f172a !important; }
+.fc-view-harness {
+  background: white;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  border: 1px solid #f3f4f6;
+}
+html.dark .fc-view-harness { background: #0f172a; border-color: #1e293b; }
+.fc-col-header-cell {
+  background: #fcfcfd;
+  padding: 12px 0 !important;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  font-weight: 900;
+  color: #9ca3af;
+}
+html.dark .fc-col-header-cell { background: #1e293b; color: #64748b; }
+.fc-header-toolbar { padding: 0 0 1rem 0 !important; margin-bottom: 1.5rem !important; border-bottom: 1px solid #f3f4f6; }
+html.dark .fc-header-toolbar { border-color: #1e293b; }
+.fc-event { 
+  border-radius: 8px !important; 
+  padding: 4px 8px !important; 
+  border: none !important; 
+  font-weight: 800 !important; 
+  font-size: 0.75rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+@media (max-width: 640px) {
+  .fc-toolbar-title { font-size: 1.1rem !important; }
+  .fc-col-header-cell-cushion { font-size: 9px; }
+  .fc-timegrid-slot-label-cushion { font-size: 10px; }
+  #calendar-header-container { gap: 1rem !important; }
+}

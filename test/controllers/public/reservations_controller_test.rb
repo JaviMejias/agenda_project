@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PublicReservationsControllerTest < ActionDispatch::IntegrationTest
+class Public::ReservationsControllerTest < ActionDispatch::IntegrationTest
   setup do
     # Use reservation 'two' which is pending (status 0)
     @reservation = reservations(:two)
@@ -70,17 +70,35 @@ class PublicReservationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not confirm expired reservation" do
-    @reservation.update!(created_at: 25.hours.ago)
+    @reservation.update_columns(created_at: 25.hours.ago, updated_at: 25.hours.ago)
     get confirm_public_reservation_url(token: "token123")
     assert_response :success
     assert_match "ha expirado", response.body
     assert_not @reservation.reload.confirmed?
   end
 
-  test "should return 404 for invalid token" do
+  test "should redirect to search for invalid token on html request" do
     get confirm_public_reservation_url(token: "invalid")
-    assert_response :not_found
-    assert_match "Reserva no encontrada", response.body
+    assert_redirected_to search_public_reservations_url
+    follow_redirect!
+    assert_match "El código de reserva no es válido", response.body
+  end
+
+  test "should get search page" do
+    get search_public_reservations_url
+    assert_response :success
+    assert_match "Sigue tu Reserva", response.body
+  end
+
+  test "should redirect to reservation show when valid token is searched" do
+    get search_public_reservations_url, params: { token: "token123" }
+    assert_redirected_to public_reservation_url("token123")
+  end
+
+  test "should show alert on search page when invalid token is searched" do
+    get search_public_reservations_url, params: { token: "invalid" }
+    assert_response :success
+    assert_match "El código ingresado no corresponde a ninguna reserva activa", response.body
   end
 
   test "should delete payment from reservation" do

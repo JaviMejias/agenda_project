@@ -15,7 +15,6 @@ export default class extends Controller {
   }
 
   activateTab(tabName) {
-    // Actualizar Botones
     this.tabTargets.forEach(tab => {
       if (tab.dataset.tab === tabName) {
         tab.classList.add("tab-active")
@@ -26,7 +25,6 @@ export default class extends Controller {
       }
     })
 
-    // Actualizar Paneles
     this.panelTargets.forEach(panel => {
       if (panel.dataset.panel === tabName) {
         panel.classList.remove("hidden")
@@ -35,7 +33,6 @@ export default class extends Controller {
       }
     })
 
-    // Dispatch resize for fullcalendar just in case
     window.dispatchEvent(new Event('resize'))
   }
 }

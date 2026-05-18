@@ -13,8 +13,5 @@ export default class extends Controller {
 
   remove(event) {
     this.element.classList.add("notification-removing")
-    
-    // We don't prevent default, the form will still submit
-    // The animation is fast enough that it looks good before the turbo-stream removes it
   }
 }

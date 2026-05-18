@@ -3,7 +3,7 @@ class ExpensesController < ApplicationController
   before_action :set_expense, only: [ :edit, :update, :destroy ]
 
   def index
-    authorize @property, :show?
+    authorize Expense.new(property: @property), :index?
     @pagy, @expenses = pagy(:offset, @property.expenses.with_attached_vouchers.order(expense_date: :desc), limit: 15)
   end
 

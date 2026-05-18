@@ -21,14 +21,11 @@ wb.styles do |style|
   wb.add_worksheet(name: "Reporte de Gestión", tab_color: project_color) do |sheet|
     sheet.page_setup.orientation = :landscape
 
-    # Fila 1
     sheet.add_row [ "REPORTE DE GESTIÓN INMOBILIARIA" ], style: title_style
     sheet.merge_cells "A1:E1"
 
-    # Fila 2
     sheet.add_row [ "Periodo de Análisis:", "#{@start_date.strftime('%d/%m/%Y')} al #{@end_date.strftime('%d/%m/%Y')}" ], style: [ date_style, date_style ]
 
-    # Fila 3 (Opcional Empresa)
     if @company_id.present?
       company = Company.find_by(id: @company_id)
       sheet.add_row [ "Empresa:", company&.name || "N/A" ], style: [ date_style, date_style ]
@@ -36,14 +33,11 @@ wb.styles do |style|
       sheet.add_row []
     end
 
-    # Fila 4: RESUMEN EJECUTIVO
     sheet.add_row [ "RESUMEN EJECUTIVO", "" ], style: [ header_style, header_style ]
     sheet.merge_cells "A4:B4"
 
-    # Fila 5: Header
     sheet.add_row [ "Métrica", "Valor Actual" ], style: sub_header_style
 
-    # Filas 6-11
     sheet.add_row [ "Ingresos Teóricos (Reservas)", @total_income ], style: [ cell_style, money_style ]
     sheet.add_row [ "Caja Real (Abonos Recibidos)", @actual_cash_in ], style: [ cell_style, money_style ]
     sheet.add_row [ "Gastos Operativos", @total_expenses ], style: [ cell_style, money_loss_style ]
@@ -51,14 +45,11 @@ wb.styles do |style|
     sheet.add_row [ "Reservas Realizadas", @reservations_count.to_i ], style: [ cell_style, number_style ]
     sheet.add_row [ "Pérdida por Bloqueo", @total_loss ], style: [ cell_style, money_loss_style ]
 
-    # Fila 12: Espacio
     sheet.add_row []
 
-    # Fila 13: ANÁLISIS DETALLADO POR PROPIEDAD
     sheet.add_row [ "ANÁLISIS DETALLADO POR PROPIEDAD", "", "", "", "" ], style: [ header_style, header_style, header_style, header_style, header_style ]
     sheet.merge_cells "A13:E13"
 
-    # Fila 14: Header Detalle
     sheet.add_row [ "Propiedad", "Ingresos Reales", "Pérdida Bloqueo", "Ocupación", "Reservas" ], style: sub_header_style
 
     start_row_table = 15
@@ -75,7 +66,6 @@ wb.styles do |style|
 
     sheet.add_row []
 
-    # Fila TENDENCIA (Dinámica)
     trend_header_row = sheet.rows.size + 1
     sheet.add_row [ "TENDENCIA MENSUAL", "" ], style: [ header_style, header_style ]
     sheet.merge_cells "A#{trend_header_row}:B#{trend_header_row}"
@@ -87,10 +77,6 @@ wb.styles do |style|
 
     sheet.column_widths 35, 20, 20, 20, 20
 
-    # No frozen panes to keep the view clean as requested
-
-
-    # Gráfico ajustado
     sheet.add_chart(Axlsx::Bar3DChart, start_at: "G4", end_at: "M20", title: "Ingresos por Propiedad") do |chart|
       chart.add_series data: sheet["B#{start_row_table}:B#{end_row_table}"],
                        labels: sheet["A#{start_row_table}:A#{end_row_table}"],

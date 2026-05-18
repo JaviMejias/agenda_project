@@ -1,0 +1,21 @@
+<div class="lg:col-span-1">
+  <h4 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest mb-6 flex items-center gap-2">
+    <i class="fa-solid fa-address-book text-indigo-600 dark:text-indigo-400"></i> Información de Contacto
+  </h4>
+  <div class="space-y-4">
+    <div class="bg-gray-50/50 dark:bg-slate-800/50 p-5 rounded-2xl border border-gray-100 dark:border-slate-800 group hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-100 dark:hover:border-indigo-900 hover:shadow-lg transition-all duration-300">
+      <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">Teléfono</p>
+      <p class="text-sm font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+        <i class="fa-solid fa-phone text-emerald-500"></i>
+        <%= client.phone.present? ? client.phone : "No registrado" %>
+      </p>
+    </div>
+    <div class="bg-gray-50/50 dark:bg-slate-800/50 p-5 rounded-2xl border border-gray-100 dark:border-slate-800 group hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-100 dark:hover:border-indigo-900 hover:shadow-lg transition-all duration-300">
+      <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">Email</p>
+      <p class="text-sm font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+        <i class="fa-solid fa-envelope text-rose-500"></i>
+        <%= client.email.present? ? client.email : "Sin correo" %>
+      </p>
+    </div>
+  </div>
+</div>

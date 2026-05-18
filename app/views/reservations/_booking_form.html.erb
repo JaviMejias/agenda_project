@@ -1,10 +1,8 @@
 <% 
   reservation = local_assigns[:reservation] || property.reservations.build
 %>
-
 <div id="reservation_form_container" class="space-y-6">
   <%= render "reservations/selection_summary" %>
-  
   <div class="bg-gray-50 dark:bg-slate-800/50 rounded-3xl p-6 sm:p-8 border border-gray-100 dark:border-slate-800 shadow-inner">
     <div class="flex items-center gap-3 mb-6">
       <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg">
@@ -12,7 +10,6 @@
       </div>
       <h3 class="text-lg font-black text-gray-900 dark:text-white">Nueva Reserva</h3>
     </div>
-
     <%= form_with(model: [property, reservation], 
                   class: "space-y-5", 
                   id: "booking-form", 
@@ -20,7 +17,6 @@
                     controller: "booking-toggle",
                     action: "validation:check->booking-toggle#handleValidationCheck"
                   }) do |f| %>
-      
       <% if reservation.errors.any? %>
         <div class="p-4 mb-4 text-sm text-red-800 dark:text-red-400 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 animate-shake">
           <h2 class="font-black uppercase tracking-widest text-[10px] mb-2 flex items-center gap-2">
@@ -33,8 +29,6 @@
           </ul>
         </div>
       <% end %>
-
-      <!-- Toggle Tipo -->
       <div class="grid grid-cols-2 gap-2 p-1.5 bg-gray-100 dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-inner">
         <label class="cursor-pointer">
           <%= f.radio_button :status, "pending", checked: true, class: "peer hidden", data: { action: "change->booking-toggle#toggle" } %>
@@ -53,7 +47,6 @@
           </div>
         </label>
       </div>
-
       <div data-booking-toggle-target="clientSection" data-controller="client-select" data-client-select-url-value="<%= list_clients_path %>">
         <div class="flex items-center justify-between mb-2">
           <%= f.label :client_id, "Cliente", class: "text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" %>
@@ -73,10 +66,8 @@
               class: "w-full" 
             } %>
       </div>
-
       <%= f.hidden_field :start_time, data: { fullcalendar_target: "startInput" } %>
       <%= f.hidden_field :end_time, data: { fullcalendar_target: "endInput" } %>
-
       <div class="pt-2">
         <%= f.submit "Crear Reserva", 
             class: "w-full py-4 bg-gray-900 dark:bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black dark:hover:bg-indigo-500 transition-all shadow-xl shadow-gray-200 dark:shadow-none hover:-translate-y-1 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",

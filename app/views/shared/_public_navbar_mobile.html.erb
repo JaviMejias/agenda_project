@@ -1,0 +1,68 @@
+<div data-mobile-menu-target="menu" class="sm:hidden hidden border-t border-gray-100/50 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl transition-all duration-300">
+  <div class="space-y-1.5 px-4 py-6">
+    <div class="px-5 mb-2">
+      <span class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Navegación</span>
+    </div>
+    <%= link_to public_property_index_path, class: "flex items-center rounded-2xl px-5 py-4 text-base font-black transition-all #{current_page?(public_property_index_path) || current_page?(root_path) ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
+      <i class="fa-solid fa-house-chimney mr-4 w-6 text-center <%= current_page?(public_property_index_path) || current_page?(root_path) ? 'text-indigo-500' : 'text-gray-400' %>"></i> Explorar Espacios
+    <% end %>
+    <%= link_to search_public_reservations_path, class: "flex items-center rounded-2xl px-5 py-4 text-base font-black transition-all #{current_page?(search_public_reservations_path) ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
+      <i class="fa-solid fa-magnifying-glass mr-4 w-6 text-center <%= current_page?(search_public_reservations_path) ? 'text-indigo-500' : 'text-gray-400' %>"></i> Buscar Reserva
+    <% end %>
+    <% if user_signed_in? %>
+      <% if current_user.client? %>
+        <%= link_to my_reservations_path, class: "flex items-center rounded-2xl px-5 py-4 text-base font-black transition-all #{current_page?(my_reservations_path) ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
+          <i class="fa-solid fa-calendar-days mr-4 w-6 text-center <%= current_page?(my_reservations_path) ? 'text-indigo-500' : 'text-gray-400' %>"></i> Mis Reservas
+        <% end %>
+      <% else %>
+        <%= link_to dashboard_path, class: "flex items-center rounded-2xl px-5 py-4 text-base font-black transition-all #{current_page?(dashboard_path) ? 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-900/30' : 'text-gray-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-slate-800'}" do %>
+          <i class="fa-solid fa-gauge-high mr-4 w-6 text-center <%= current_page?(dashboard_path) ? 'text-indigo-500' : 'text-gray-400' %>"></i> Mi Panel
+        <% end %>
+      <% end %>
+    <% end %>
+    <div class="px-5 mt-6 mb-2">
+      <span class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Apariencia</span>
+    </div>
+    <div data-controller="theme" class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/80 mx-5 p-1.5 rounded-2xl border border-gray-100 dark:border-slate-700">
+      <button data-action="click->theme#setTheme" data-theme-value="light" class="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all hover:bg-white dark:hover:bg-slate-750 text-gray-500 dark:text-slate-400">
+        <i class="fa-solid fa-sun text-sm"></i>
+        <span class="text-[9px] font-black uppercase tracking-tighter">Claro</span>
+      </button>
+      <button data-action="click->theme#setTheme" data-theme-value="system" class="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all hover:bg-white dark:hover:bg-slate-750 text-gray-500 dark:text-slate-400">
+        <i class="fa-solid fa-desktop text-sm"></i>
+        <span class="text-[9px] font-black uppercase tracking-tighter">Sistema</span>
+      </button>
+      <button data-action="click->theme#setTheme" data-theme-value="dark" class="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all hover:bg-white dark:hover:bg-slate-750 text-gray-500 dark:text-slate-400">
+        <i class="fa-solid fa-moon text-sm"></i>
+        <span class="text-[9px] font-black uppercase tracking-tighter">Oscuro</span>
+      </button>
+    </div>
+    <div class="pt-6 mt-6 border-t border-gray-100 dark:border-slate-800">
+      <% if user_signed_in? %>
+        <div class="flex items-center justify-between px-2">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white font-black shadow-md">
+              <%= current_user.email[0].upcase %>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Mi Cuenta</span>
+              <span class="text-sm font-bold text-gray-700 dark:text-slate-300 truncate max-w-[180px]"><%= current_user.email %></span>
+            </div>
+          </div>
+          <%= link_to destroy_user_session_path, data: { turbo: false }, class: "flex items-center justify-center w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/20 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900 cursor-pointer" do %>
+            <i class="fa-solid fa-power-off"></i>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="grid grid-cols-2 gap-4 px-2">
+          <%= link_to new_user_session_path, class: "flex items-center justify-center rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 py-4 text-base font-black shadow-sm hover:bg-gray-50 dark:hover:bg-slate-750 transition-colors" do %>
+            <i class="fa-solid fa-right-to-bracket mr-2"></i> Iniciar Sesión
+          <% end %>
+          <%= link_to new_user_registration_path, class: "flex items-center justify-center rounded-2xl bg-indigo-600 dark:bg-indigo-500 text-white py-4 text-base font-black shadow-sm hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors" do %>
+            <i class="fa-solid fa-user-plus mr-2"></i> Crear Cuenta
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -5,7 +5,11 @@ class ReservationsController < ApplicationController
 
   def index
     respond_to do |format|
-      format.html
+      format.html do
+        current_month_reservations = Reservation.in_range(Time.zone.now.all_month)
+        @current_month_count = current_month_reservations.count
+        @current_month_earnings = current_month_reservations.confirmed.sum(:total_price)
+      end
       format.json {
         @reservations = Reservation.for_calendar(
           property_id: params[:property_id],
@@ -20,6 +24,8 @@ class ReservationsController < ApplicationController
   def list
     authorize Reservation
     @reservations = Reservation.all.for_list(query: params[:q], status: params[:status])
+    @reservations_count = @reservations.count
+    @total_price = @reservations.sum(:total_price)
     @filename = "reservas_#{Time.current.strftime('%Y%m%d_%H%M')}"
 
     respond_to do |format|

@@ -14,7 +14,7 @@
         label: "Rol del Usuario", 
         type: :select, 
         icon: "fa-solid fa-shield-halved",
-        options: User.roles.keys.map { |r| [I18n.t("enums.user.role.#{r}", default: r.humanize), r] }
+        options: User.roles.keys.reject { |r| r == "client" }.map { |r| [I18n.t("enums.user.role.#{r}", default: r.humanize), r] }
       }
     ],
     right_column: [
@@ -29,125 +29,87 @@
       }
     ]
   }
-
   input_class = "w-full px-5 py-4 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all focus:bg-white dark:focus:bg-slate-900 dark:text-white placeholder:text-gray-300 dark:placeholder:text-slate-600"
   label_class = "text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest"
 %>
-
-<%= form_with(model: user, class: "space-y-8") do |f| %>
-  <div class="bg-white dark:bg-slate-900 shadow-2xl rounded-[2.5rem] border border-gray-100 dark:border-slate-800 overflow-hidden animate-fade-in-up">
-    <div class="relative p-6 sm:p-10 bg-gradient-to-br from-white to-indigo-50 dark:from-slate-900 dark:to-slate-950 border-b border-indigo-100 dark:border-slate-800 overflow-hidden">
-      <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
-      
-      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div class="flex items-center gap-4">
-          <div class="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-3xl">
-            <i class="fa-solid <%= user.new_record? ? 'fa-user-plus' : 'fa-user-pen' %>"></i>
-          </div>
-          <div>
-            <h3 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
-              <%= user.new_record? ? "Nuevo Usuario" : "Editar Usuario" %>
-            </h3>
-            <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-widest opacity-80">
-              <%= user.new_record? ? "Completa los datos para dar acceso" : "Actualiza la información de #{user.email}" %>
-            </p>
-          </div>
-        </div>
-
-        <% if user.persisted? %>
-          <div class="relative z-10 px-4 py-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md rounded-xl border border-indigo-100 dark:border-slate-700 shadow-sm">
-            <span class="text-[9px] font-black text-indigo-400 uppercase tracking-widest block mb-1">ID Usuario</span>
-            <span class="text-sm font-bold text-gray-900 dark:text-white">#<%= user.id %></span>
-          </div>
-        <% end %>
+<%= form_with(model: user, class: "space-y-8", html: { autocomplete: "off" }) do |f| %>
+  <% if user.errors.any? %>
+    <div class="p-5 mb-10 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 flex items-start gap-4 animate-shake">
+      <i class="fa-solid fa-circle-exclamation text-red-500 text-xl mt-1"></i>
+      <div>
+        <h3 class="text-sm font-black text-red-900 dark:text-red-400 uppercase tracking-widest mb-1">Error al guardar</h3>
+        <ul class="text-xs text-red-700 dark:text-red-500 font-bold list-disc pl-4 space-y-1">
+          <% user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
       </div>
     </div>
-
-    <div class="px-6 py-10 sm:px-10">
-      <% if user.errors.any? %>
-        <div class="p-5 mb-10 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 flex items-start gap-4 animate-shake">
-          <i class="fa-solid fa-circle-exclamation text-red-500 text-xl mt-1"></i>
-          <div>
-            <h3 class="text-sm font-black text-red-900 dark:text-red-400 uppercase tracking-widest mb-1">Error al guardar</h3>
-            <ul class="text-xs text-red-700 dark:text-red-500 font-bold list-disc pl-4 space-y-1">
-              <% user.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
-              <% end %>
-            </ul>
-          </div>
-        </div>
-      <% end %>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-        <% [:left_column, :right_column].each do |column| %>
-          <div class="space-y-6">
-            <% form_structure[column].each do |item| %>
-              <% if item[:type] == :group %>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <% item[:fields].each do |field| %>
-                    <div>
-                      <div class="flex items-center justify-between mb-2 ml-1">
-                        <%= f.label field[:name], field[:label], class: label_class %>
-                      </div>
-                      <%= f.send(field[:type], field[:name], placeholder: field[:placeholder], class: input_class) %>
-                    </div>
-                  <% end %>
-                </div>
-              <% else %>
+  <% end %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+    <% [:left_column, :right_column].each do |column| %>
+      <div class="space-y-6">
+        <% form_structure[column].each do |item| %>
+          <% if item[:type] == :group %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <% item[:fields].each do |field| %>
                 <div>
                   <div class="flex items-center justify-between mb-2 ml-1">
-                    <div class="flex items-center gap-2">
-                      <%= f.label item[:name], item[:label], class: label_class %>
-                      <% if item[:optional] %>
-                        <span class="text-[9px] text-indigo-500 font-black italic normal-case bg-indigo-50 dark:bg-indigo-950/30 px-2 py-0.5 rounded-lg border border-indigo-100 dark:border-indigo-900">Opcional</span>
-                      <% end %>
-                    </div>
-                    <% if item[:icon] %>
-                      <i class="<%= item[:icon] %> text-gray-300 dark:text-slate-700"></i>
-                    <% end %>
+                    <%= f.label field[:name], field[:label], class: label_class %>
                   </div>
-                  
-                  <% if item[:type] == :select %>
-                    <div class="relative">
-                      <%= f.select item[:name], item[:options], {}, class: "#{input_class} cursor-pointer appearance-none" %>
-                      <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                        <i class="fa-solid fa-chevron-down text-xs"></i>
-                      </div>
-                    </div>
-                  <% else %>
-                    <%= f.send(item[:type], item[:name], placeholder: item[:placeholder], class: input_class) %>
-                  <% end %>
-                  
-                  <% if item[:note] %>
-                    <p class="mt-2 text-[10px] text-gray-400 dark:text-slate-500 font-medium italic ml-1"><%= item[:note] %></p>
-                  <% end %>
+                  <%= f.send(field[:type], field[:name], placeholder: field[:placeholder], class: input_class, autocomplete: "off") %>
                 </div>
               <% end %>
-            <% end %>
-
-            <% if column == :right_column %>
-              <div class="flex items-center justify-center p-6 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-3xl border border-indigo-100/50 dark:border-indigo-900/30 border-dashed">
-                <div class="text-center">
-                  <i class="fa-solid fa-user-shield text-indigo-200 dark:text-indigo-900 text-3xl mb-3"></i>
-                  <p class="text-[10px] text-indigo-400 dark:text-indigo-600 font-bold uppercase tracking-widest leading-relaxed">
-                    Seguridad de Acceso<br>
-                    <span class="normal-case font-medium opacity-80">La contraseña debe tener al menos 6 caracteres.</span>
-                  </p>
+            </div>
+          <% else %>
+            <div>
+              <div class="flex items-center justify-between mb-2 ml-1">
+                <div class="flex items-center gap-2">
+                  <%= f.label item[:name], item[:label], class: label_class %>
+                  <% if item[:optional] %>
+                    <span class="text-[9px] text-indigo-500 font-black italic normal-case bg-indigo-50 dark:bg-indigo-950/30 px-2 py-0.5 rounded-lg border border-indigo-100 dark:border-slate-700 shadow-sm">Opcional</span>
+                  <% end %>
                 </div>
+                <% if item[:icon] %>
+                  <i class="<%= item[:icon] %> text-gray-300 dark:text-slate-700"></i>
+                <% end %>
               </div>
-            <% end %>
+              
+              <% if item[:type] == :select %>
+                <div class="relative">
+                  <%= f.select item[:name], item[:options], {}, class: "#{input_class} cursor-pointer appearance-none", autocomplete: "off" %>
+                  <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                  </div>
+                </div>
+              <% else %>
+                <%= f.send(item[:type], item[:name], placeholder: item[:placeholder], class: input_class, autocomplete: (item[:type] == :password_field ? "new-password" : "off")) %>
+              <% end %>
+              <% if item[:note] %>
+                <p class="mt-2 text-[10px] text-gray-400 dark:text-slate-500 font-medium italic ml-1"><%= item[:note] %></p>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+        <% if column == :right_column %>
+          <div class="flex items-center justify-center p-6 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-3xl border border-indigo-100/50 dark:border-indigo-900/30 border-dashed">
+            <div class="text-center">
+              <i class="fa-solid fa-user-shield text-indigo-200 dark:text-indigo-900 text-3xl mb-3"></i>
+              <p class="text-[10px] text-indigo-400 dark:text-indigo-600 font-bold uppercase tracking-widest leading-relaxed">
+                Seguridad de Acceso<br>
+                <span class="normal-case font-medium opacity-80">La contraseña debe tener al menos 6 caracteres.</span>
+              </p>
+            </div>
           </div>
         <% end %>
       </div>
-    </div>
-
-    <div class="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 px-6 py-6 sm:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <%= render "shared/back_button", path: users_path, form: true %>
-      
-      <button type="submit" class="w-full sm:w-auto min-w-[200px] flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-4 text-xs font-black text-white shadow-lg hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:-translate-y-1 uppercase tracking-widest cursor-pointer">
-        <i class="fa-solid <%= user.new_record? ? 'fa-check' : 'fa-save' %> mr-2"></i>
-        <%= user.new_record? ? "Crear Usuario" : "Guardar Cambios" %>
-      </button>
-    </div>
+    <% end %>
+  </div>
+  <div class="pt-6 mt-8 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <%= render "shared/back_button", path: users_path, form: true %>
+    <button type="submit" class="w-full sm:w-auto min-w-[200px] flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-4 text-xs font-black text-white shadow-lg hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:-translate-y-1 uppercase tracking-widest cursor-pointer">
+      <i class="fa-solid <%= user.new_record? ? 'fa-check' : 'fa-save' %> mr-2"></i>
+      <%= user.new_record? ? "Crear Usuario" : "Guardar Cambios" %>
+    </button>
   </div>
 <% end %>

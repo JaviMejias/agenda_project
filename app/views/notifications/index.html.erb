@@ -1,12 +1,9 @@
 <% content_for :title, "Historial de Notificaciones" %>
-
 <div class="mx-auto px-4 sm:px-6 lg:px-8 py-6">
-  
   <%= render "shared/index_header", 
       title: "Notificaciones", 
       icon: "fa-solid fa-bell", 
       subtitle: "Historial de Actividad" do %>
-    
     <% if @notifications.any? %>
       <%= button_to mark_all_as_read_notifications_path, method: :post, 
           class: "w-full sm:w-auto group flex items-center justify-center gap-3 px-6 py-3.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-white rounded-2xl border border-indigo-100 dark:border-transparent hover:bg-indigo-50 dark:hover:bg-indigo-500 transition-all shadow-md shadow-indigo-100/50 dark:shadow-none hover:-translate-y-1 active:scale-95" do %>
@@ -15,7 +12,6 @@
       <% end %>
     <% end %>
   <% end %>
-
   <div class="space-y-4">
     <div id="notifications_full_list" class="space-y-4">
       <%= render @notifications %>
@@ -29,7 +25,6 @@
         </div>
       <% end %>
     </div>
-
     <%= render "shared/pagination" %>
   </div>
 </div>

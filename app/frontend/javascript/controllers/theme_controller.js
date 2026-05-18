@@ -5,12 +5,19 @@ export default class extends Controller {
 
   connect() {
     this.applyTheme()
-    // Escuchar cambios del sistema en tiempo real
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
-      if (localStorage.getItem("theme") === "system" || !localStorage.getItem("theme")) {
+    this.themeQuery = window.matchMedia("(prefers-color-scheme: dark)")
+    this.themeQueryListener = () => {
+      if (localStorage.getItem("theme") === "system") {
         this.applyTheme()
       }
-    })
+    }
+    this.themeQuery.addEventListener("change", this.themeQueryListener)
+  }
+
+  disconnect() {
+    if (this.themeQuery && this.themeQueryListener) {
+      this.themeQuery.removeEventListener("change", this.themeQueryListener)
+    }
   }
 
   setTheme(event) {
@@ -20,7 +27,7 @@ export default class extends Controller {
   }
 
   applyTheme() {
-    const theme = localStorage.getItem("theme") || "system"
+    const theme = localStorage.getItem("theme") || "dark"
     const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
     const isDark = theme === "dark" || (theme === "system" && systemPrefersDark)
 

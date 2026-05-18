@@ -1,8 +1,3 @@
-<%# 
-  Partial: shared/_pagination
-  Standardizes the look of Pagy pagination across the app.
-%>
-
 <% pagy_obj = local_assigns[:pagy] || @pagy %>
 <% use_container = local_assigns.fetch(:container, true) %>
 <% if pagy_obj && pagy_obj.pages > 1 %>

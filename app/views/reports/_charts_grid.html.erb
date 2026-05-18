@@ -1,0 +1,30 @@
+<% unless params[:format] == 'pdf' %>
+  <% if @reservations_count > 0 %>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm">
+        <h3 class="text-lg font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+          <i class="fa-solid fa-chart-simple text-indigo-500"></i> Ingresos por Propiedad
+        </h3>
+        <div class="h-64">
+          <canvas data-reports-charts-target="incomeChart"></canvas>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm">
+        <h3 class="text-lg font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-emerald-500"></i> Tasa de Ocupación (%)
+        </h3>
+        <div class="h-64">
+          <canvas data-reports-charts-target="occupancyChart"></canvas>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-white dark:bg-slate-900 p-12 rounded-3xl border border-dashed border-gray-200 dark:border-slate-800 mb-8 flex flex-col items-center justify-center text-center">
+      <div class="w-16 h-16 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-400 dark:text-slate-500 mb-4">
+        <i class="fa-solid fa-chart-area text-2xl"></i>
+      </div>
+      <h4 class="text-lg font-black text-gray-900 dark:text-white">Sin datos para este periodo</h4>
+      <p class="text-gray-500 dark:text-slate-400 text-sm max-w-xs mx-auto mt-2">No se encontraron reservas confirmadas o bloqueos en las fechas seleccionadas para generar los gráficos.</p>
+    </div>
+  <% end %>
+<% end %>

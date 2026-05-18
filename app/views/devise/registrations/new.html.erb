@@ -1,10 +1,16 @@
+<%
+  form_structure = [
+    { name: :first_name, label: "Nombre", placeholder: "Juan", type: :text_field, icon: "fa-regular fa-user", required: true, autofocus: true, col_span: "col-span-1" },
+    { name: :last_name, label: "Apellido", placeholder: "Pérez", type: :text_field, icon: "fa-regular fa-user", required: true, col_span: "col-span-1" },
+    { name: :email, label: "Correo electrónico", placeholder: "tu@correo.com", type: :email_field, icon: "fa-regular fa-envelope", autocomplete: "email", required: true, col_span: "col-span-2" },
+    { name: :password, label: "Contraseña", placeholder: "Crea tu contraseña", type: :password_field, icon: "fa-solid fa-lock", autocomplete: "new-password", required: true, min_length_label: true, col_span: "col-span-2" },
+    { name: :password_confirmation, label: "Confirma tu contraseña", placeholder: "Repite tu contraseña", type: :password_field, icon: "fa-solid fa-check-circle", autocomplete: "new-password", required: true, col_span: "col-span-2" }
+  ]
+%>
 <div class="flex-1 flex items-center justify-center p-4 sm:p-8 animate-fade-in">
   <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-slate-800 overflow-hidden relative group">
-    
-    <%# Decorative Gradient Orbs %>
     <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-full -mr-16 -mt-16 blur-3xl transition-all duration-700 group-hover:scale-110"></div>
     <div class="absolute bottom-0 left-0 w-32 h-32 bg-purple-50/50 dark:bg-purple-900/10 rounded-full -ml-16 -mb-16 blur-3xl transition-all duration-700 group-hover:scale-110"></div>
-    
     <div class="px-6 py-8 sm:px-10 sm:py-12 relative">
       <div class="text-center mb-10">
         <div class="mx-auto h-20 w-20 bg-gradient-to-tr from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-3xl flex items-center justify-center mb-6 shadow-inner border border-indigo-100/50 dark:border-indigo-900/50 transform -rotate-3 group-hover:rotate-0 transition-transform duration-500">
@@ -13,80 +19,32 @@
         <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Crea tu cuenta</h2>
         <p class="mt-3 text-sm font-bold text-gray-500 dark:text-slate-400">Únete para empezar a gestionar tus reservas</p>
       </div>
-
       <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6" }) do |f| %>
         <%= render "devise/shared/error_messages", resource: resource %>
-        
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <%= f.label :first_name, class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" do %>
-              Nombre
-            <% end %>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600 group-focus-within:text-indigo-600 transition-colors">
-                <i class="fa-regular fa-user"></i>
+          <% form_structure.each do |field| %>
+            <div class="space-y-2 <%= field[:col_span] == 'col-span-2' ? 'sm:col-span-2' : '' %>">
+              <%= f.label field[:name], class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" do %>
+                <%= field[:label] %>
+                <% if field[:min_length_label] && @minimum_password_length %>
+                  <span class="lowercase text-[10px] font-bold text-indigo-500 dark:text-indigo-400">(mín. <%= @minimum_password_length %> caracteres)</span>
+                <% end %>
+              <% end %>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600 group-focus-within:text-indigo-600 transition-colors">
+                  <i class="<%= field[:icon] %>"></i>
+                </div>
+                <%= f.public_send(field[:type], field[:name],
+                    autofocus: field[:autofocus],
+                    autocomplete: field[:autocomplete],
+                    placeholder: field[:placeholder],
+                    required: field[:required],
+                    class: "block w-full pl-11 pr-4 py-4 border border-gray-200/80 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50/50 dark:bg-slate-800/20 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm"
+                ) %>
               </div>
-              <%= f.text_field :first_name, autofocus: true, required: true, placeholder: "Juan",
-                class: "block w-full pl-11 pr-4 py-4 border border-gray-200/80 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50/50 dark:bg-slate-800/20 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm" %>
             </div>
-          </div>
-
-          <div class="space-y-2">
-            <%= f.label :last_name, class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" do %>
-              Apellido
-            <% end %>
-            <div class="relative group">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600 group-focus-within:text-indigo-600 transition-colors">
-                <i class="fa-regular fa-user"></i>
-              </div>
-              <%= f.text_field :last_name, required: true, placeholder: "Pérez",
-                class: "block w-full pl-11 pr-4 py-4 border border-gray-200/80 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50/50 dark:bg-slate-800/20 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm" %>
-            </div>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <%= f.label :email, class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" do %>
-            Correo electrónico
           <% end %>
-          <div class="relative group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600 group-focus-within:text-indigo-600 transition-colors">
-              <i class="fa-regular fa-envelope"></i>
-            </div>
-            <%= f.email_field :email, autocomplete: "email", placeholder: "tu@correo.com", required: true,
-              class: "block w-full pl-11 pr-4 py-4 border border-gray-200/80 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50/50 dark:bg-slate-800/20 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm" %>
-          </div>
         </div>
-
-        <div class="space-y-2">
-          <%= f.label :password, class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" do %>
-            Contraseña
-            <% if @minimum_password_length %>
-              <span class="lowercase text-[10px] font-bold text-indigo-500 dark:text-indigo-400">(mín. <%= @minimum_password_length %> caracteres)</span>
-            <% end %>
-          <% end %>
-          <div class="relative group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600 group-focus-within:text-indigo-600 transition-colors">
-              <i class="fa-solid fa-lock"></i>
-            </div>
-            <%= f.password_field :password, autocomplete: "new-password", placeholder: "Crea tu contraseña", required: true,
-              class: "block w-full pl-11 pr-4 py-4 border border-gray-200/80 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50/50 dark:bg-slate-800/20 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm" %>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <%= f.label :password_confirmation, class: "block text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-1" do %>
-            Confirma tu contraseña
-          <% end %>
-          <div class="relative group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-slate-600 group-focus-within:text-indigo-600 transition-colors">
-              <i class="fa-solid fa-check-circle"></i>
-            </div>
-            <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Repite tu contraseña", required: true,
-              class: "block w-full pl-11 pr-4 py-4 border border-gray-200/80 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50/50 dark:bg-slate-800/20 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm" %>
-          </div>
-        </div>
-
         <div class="pt-2">
           <%= button_tag type: "submit", class: "w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl shadow-lg shadow-indigo-500/10 dark:shadow-none text-sm font-black text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transform hover:-translate-y-0.5 transition-all duration-300" do %>
             <span>Crear Cuenta</span>
@@ -94,14 +52,12 @@
           <% end %>
         </div>
       <% end %>
-      
       <div class="mt-8 pt-6 border-t border-gray-50 dark:border-slate-800 text-center">
         <p class="text-xs font-bold text-gray-400 dark:text-slate-500">
           ¿Ya tienes una cuenta? 
           <%= link_to "Inicia sesión", new_session_path(resource_name), class: "text-indigo-600 dark:text-indigo-400 hover:underline ml-1" %>
         </p>
       </div>
-
     </div>
   </div>
 </div>

@@ -13,8 +13,7 @@ export default class extends Controller {
       this.clientSectionTarget.classList.add("hidden")
       this.submitButtonTarget.value = "Bloquear Propiedad"
       if (this.hasTotalLabelTarget) this.totalLabelTarget.textContent = "Pérdida Estimada"
-      
-      // Clear client if blocking
+
       if (this.hasClientIdTarget) {
         const tomSelect = this.clientIdTarget.tomselect
         if (tomSelect) tomSelect.clear()
@@ -55,8 +54,5 @@ export default class extends Controller {
     }
 
     this.submitButtonTarget.disabled = !isValid
-    
-    // Also update fullcalendar button if it exists and is different
-    // (fullcalendar_controller also tries to toggle it, we want to win)
   }
 }

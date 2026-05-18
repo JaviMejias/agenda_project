@@ -1,11 +1,8 @@
 <% content_for :title, "Agenda de Reservas" %>
-
 <div class="mx-auto px-2 sm:px-6 lg:px-8 py-6"
      data-controller="fullcalendar" 
      data-fullcalendar-mode-value="dashboard" 
      data-fullcalendar-events-url-value="<%= reservations_path(format: :json) %>">
-     
-  
   <%= render "shared/index_header", 
       title: "Agenda de Reservas", 
       icon: "fa-solid fa-calendar-check", 
@@ -15,27 +12,20 @@
        <%= link_to list_reservations_path, class: "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 text-gray-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400" do %>Listado<% end %>
     </div>
   <% end %>
-
   <div class="flex flex-col lg:flex-row gap-6">
-    <!-- Columna Izquierda: Calendario Compacto -->
     <div class="lg:w-8/12 xl:w-9/12">
       <div id="calendar-view" data-fullcalendar-target="calendarView" class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl shadow-indigo-100 dark:shadow-none border border-gray-100 dark:border-slate-800 p-2 sm:p-4 overflow-hidden">
         <%= render "shared/calendar_header", mode: 'dashboard' %>
-        <%# Altura reducida para que quepa en pantalla sin scroll %>
         <div data-fullcalendar-target="calendar" class="min-h-[400px] sm:min-h-[480px]"></div>
       </div>
     </div>
-
-    <!-- Columna Derecha: Lista Dinámica Turbo -->
     <div class="lg:w-4/12 xl:w-3/12">
       <div class="sticky top-6 space-y-4">
         <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 shadow-xl p-5 overflow-hidden relative">
           <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
-          
           <h2 class="relative z-10 text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
             <i class="fa-solid fa-list-ul text-[8px]"></i> Reservas del Periodo
           </h2>
-
           <div class="relative z-10">
             <%= turbo_frame_tag "reservations_list_frame" do %>
               <div class="py-10 text-center">
@@ -47,8 +37,6 @@
             <% end %>
           </div>
         </div>
-
-        <!-- Mini Stats Card Compacta -->
         <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2rem] p-5 text-white shadow-lg shadow-indigo-200/50 dark:shadow-none">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-[9px] font-black uppercase tracking-widest opacity-80">Mes Actual</h3>
@@ -56,11 +44,11 @@
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <p class="text-xl font-black"><%= Reservation.in_range(Time.zone.now.all_month).count %></p>
+              <p class="text-xl font-black"><%= @current_month_count %></p>
               <p class="text-[8px] font-bold uppercase opacity-70">Reservas</p>
             </div>
             <div>
-              <p class="text-lg font-black">$<%= number_to_currency(Reservation.in_range(Time.zone.now.all_month).confirmed.sum(:total_price), unit: "", separator: ",", delimiter: ".") %></p>
+              <p class="text-lg font-black">$<%= number_to_currency(@current_month_earnings, unit: "", separator: ",", delimiter: ".") %></p>
               <p class="text-[8px] font-bold uppercase opacity-70">Ingresos</p>
             </div>
           </div>
@@ -69,72 +57,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  /* Estilos para compactar el calendario */
-  .fc .fc-toolbar-title { font-size: 1.1rem !important; }
-  .fc .fc-button { padding: 0.4rem 0.6rem !important; font-size: 0.8rem !important; }
-  .fc-col-header-cell { padding: 8px 0 !important; }
-  .fc-daygrid-day-number { font-size: 0.8rem !important; padding: 4px !important; }
-  .fc-event-title { font-size: 0.7rem !important; }
-  
-  /* Reducir gaps en el header */
-  #calendar-header-container { padding-bottom: 0.5rem !important; margin-bottom: 0.5rem !important; }
-  
-  .fc { --fc-border-color: #f3f4f6; font-family: inherit; }
-  .fc-theme-standard .fc-scrollgrid { border: none !important; }
-  .fc-theme-standard td, .fc-theme-standard th { border: 1px solid #f9fafb !important; }
-  
-  html.dark .fc { --fc-border-color: #1e293b; }
-  html.dark .fc-theme-standard td, html.dark .fc-theme-standard th { border: 1px solid #0f172a !important; }
-
-  .fc-view-harness {
-    background: white;
-    border-radius: 1.5rem;
-    overflow: hidden;
-    border: 1px solid #f3f4f6;
-  }
-  html.dark .fc-view-harness { background: #0f172a; border-color: #1e293b; }
-
-  .fc-col-header-cell {
-    background: #fcfcfd;
-    padding: 12px 0 !important;
-    text-transform: uppercase;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    font-weight: 900;
-    color: #9ca3af;
-  }
-  html.dark .fc-col-header-cell { background: #1e293b; color: #64748b; }
-
-  .fc-header-toolbar { padding: 0 0 1rem 0 !important; margin-bottom: 1.5rem !important; border-bottom: 1px solid #f3f4f6; }
-  html.dark .fc-header-toolbar { border-color: #1e293b; }
-  
-  .fc-event { 
-    border-radius: 8px !important; 
-    padding: 4px 8px !important; 
-    border: none !important; 
-    font-weight: 800 !important; 
-    font-size: 0.75rem !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  }
-
-  .tab-active {
-    background-color: white !important;
-    color: #4f46e5 !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-    transform: scale(1.02);
-  }
-  html.dark .tab-active {
-    background-color: #1e293b !important;
-    color: #818cf8 !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
-  }
-
-  @media (max-width: 640px) {
-    .fc-toolbar-title { font-size: 1.1rem !important; }
-    .fc-col-header-cell-cushion { font-size: 9px; }
-    .fc-timegrid-slot-label-cushion { font-size: 10px; }
-    #calendar-header-container { gap: 1rem !important; }
-  }
-</style>

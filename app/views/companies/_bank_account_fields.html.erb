@@ -2,21 +2,16 @@
   input_class = "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3 border bg-gray-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 transition-colors dark:text-white"
   label_class = "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-1"
 %>
-
 <div data-nested-form-wrapper class="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm relative group animate-fade-in space-y-4">
-  <!-- Hidden field to handle Rails nested deletion -->
   <%= ba_f.hidden_field :_destroy %>
-
   <div class="flex justify-between items-center border-b border-gray-100 dark:border-slate-700/60 pb-3">
     <span class="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
       <i class="fa-solid fa-university"></i> Datos de Cuenta
     </span>
-    
     <button type="button" data-action="click->nested-form#remove" class="text-xs font-black text-red-500 hover:text-red-700 flex items-center gap-1.5 cursor-pointer transition-colors bg-red-50 dark:bg-red-950/20 px-3 py-1.5 rounded-xl border border-red-100 dark:border-red-900/30">
       <i class="fa-solid fa-trash-can"></i> Quitar Cuenta
     </button>
   </div>
-
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div>
       <%= ba_f.label :bank_name, class: label_class do %>
@@ -34,28 +29,27 @@
       <%= ba_f.label :account_number, class: label_class do %>
         Número de Cuenta
       <% end %>
-      <%= ba_f.text_field :account_number, placeholder: "Ej: 123456789", class: input_class, required: true %>
+      <%= ba_f.text_field :account_number, placeholder: "Ej: 123456789", class: input_class, required: true, autocomplete: "off" %>
     </div>
   </div>
-
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div>
       <%= ba_f.label :holder_name, class: label_class do %>
         Nombre Titular
       <% end %>
-      <%= ba_f.text_field :holder_name, placeholder: "Ej: Prueba Empresa S.A.", class: input_class, required: true %>
+      <%= ba_f.text_field :holder_name, placeholder: "Ej: Prueba Empresa S.A.", class: input_class, required: true, autocomplete: "off" %>
     </div>
     <div>
       <%= ba_f.label :holder_rut, class: label_class do %>
         RUT Titular
       <% end %>
-      <%= ba_f.text_field :holder_rut, placeholder: "Ej: 76.543.210-K", class: input_class, required: true, data: { action: "input->rut#format" } %>
+      <%= ba_f.text_field :holder_rut, placeholder: "Ej: 76.543.210-K", class: input_class, required: true, autocomplete: "off", data: { action: "input->rut#format" } %>
     </div>
     <div>
       <%= ba_f.label :holder_email, class: label_class do %>
         Correo de Aviso
       <% end %>
-      <%= ba_f.email_field :holder_email, placeholder: "Ej: pagos@empresa.com", class: input_class, required: true %>
+      <%= ba_f.email_field :holder_email, placeholder: "Ej: pagos@empresa.com", class: input_class, required: true, autocomplete: "off" %>
     </div>
   </div>
 </div>

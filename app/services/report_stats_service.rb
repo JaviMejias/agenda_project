@@ -1,12 +1,13 @@
 class ReportStatsService
-  def initialize(start_date, end_date, company_id: nil)
+  def initialize(user, start_date, end_date, company_id: nil)
+    @user = user
     @start_date = start_date
     @end_date = end_date
     @company_id = company_id
     @range = @start_date.beginning_of_day..@end_date.end_of_day
 
-    @reservations_in_range = Reservation.in_range(@range)
-    @properties = Property.all
+    @reservations_in_range = user.reservations.in_range(@range)
+    @properties = user.properties
 
     if @company_id.present?
       @reservations_in_range = @reservations_in_range.joins(:property).where(properties: { company_id: @company_id })
@@ -56,8 +57,7 @@ class ReportStatsService
       )
 
     # Ocupación requiere datos por reserva; cargamos aparte solo las activas
-    active_reservations = Reservation.active.in_range(@range)
-    active_reservations = active_reservations.joins(:property).where(properties: { company_id: @company_id }) if @company_id.present?
+    active_reservations = @reservations_in_range.active
     reservations_by_property = active_reservations.group_by(&:property_id)
 
     aggregated.map do |p|
@@ -76,7 +76,7 @@ class ReportStatsService
   def monthly_trend
     six_months_ago = 5.months.ago.beginning_of_month.beginning_of_day
 
-    scope = Reservation.confirmed.where("start_time >= ?", six_months_ago)
+    scope = @user.reservations.confirmed.where("start_time >= ?", six_months_ago)
     scope = scope.joins(:property).where(properties: { company_id: @company_id }) if @company_id.present?
 
     reservations = scope.select(:id, :start_time, :total_price)
@@ -95,7 +95,7 @@ class ReportStatsService
   end
 
   def monthly_income_scope(range)
-    scope = Reservation.confirmed.in_range(range)
+    scope = @user.reservations.confirmed.in_range(range)
     @company_id.present? ? scope.joins(:property).where(properties: { company_id: @company_id }) : scope
   end
 

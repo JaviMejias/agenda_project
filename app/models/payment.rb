@@ -13,6 +13,22 @@ class Payment < ApplicationRecord
   before_validation :purge_voucher_if_requested
   before_save :clean_operation_data
 
+  def notify_admin_of_new_payment!
+    Notification.create!(
+      user: reservation.user,
+      notifiable: self,
+      message: "¡Nuevo Comprobante! #{reservation.client_name} ha subido un comprobante de pago para la reserva ##{reservation.id}."
+    )
+  end
+
+  def notify_admin_of_updated_voucher!
+    Notification.create!(
+      user: reservation.user,
+      notifiable: self,
+      message: "¡Comprobante Actualizado! #{reservation.client_name} ha cargado el comprobante para el pago de $#{amount.to_i} en la reserva ##{reservation.id}."
+    )
+  end
+
   private
 
   def purge_voucher_if_requested

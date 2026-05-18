@@ -1,9 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import Swal from "sweetalert2"
 
-
-
-
 export default class extends Controller {
   static values = {
     title: { type: String, default: "¿Estás seguro?" },
@@ -15,7 +12,7 @@ export default class extends Controller {
 
   confirm(event) {
     event.preventDefault()
-    
+
     Swal.fire({
       title: this.titleValue,
       text: this.textValue,
@@ -35,18 +32,14 @@ export default class extends Controller {
         if (this.element.tagName === "FORM") {
           this.element.requestSubmit()
         } else if (this.element.tagName === "A" || this.element.tagName === "BUTTON") {
-          
-          
-          
         }
       }
     })
   }
 
-  
   showToast(event) {
     if (event) event.preventDefault()
-    
+
     Swal.fire({
       toast: true,
       position: 'top-end',

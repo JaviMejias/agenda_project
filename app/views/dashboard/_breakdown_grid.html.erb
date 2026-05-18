@@ -1,0 +1,49 @@
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-2xl shadow-indigo-100/5 dark:shadow-none">
+    <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight mb-8">Desglose de Ingresos</h3>
+    <div class="space-y-4">
+      <% if @revenue_by_property.any? %>
+        <% max_revenue = @revenue_by_property.values.max || 1 %>
+        <% @revenue_by_property.sort_by { |_k, v| -v }.each do |name, revenue| %>
+          <% property = current_user.properties.find_by(name: name) %>
+          <% percentage = (revenue.to_f / max_revenue * 100).round %>
+          <div class="group p-4 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-transparent hover:border-indigo-100 dark:hover:border-indigo-900 hover:bg-white dark:hover:bg-slate-700 hover:shadow-lg transition-all">
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center gap-3">
+                <span class="w-3 h-3 rounded-full" style="background-color: <%= property&.color || '#6366f1' %>"></span>
+                <span class="text-sm font-black text-gray-900 dark:text-slate-200"><%= name %></span>
+              </div>
+              <span class="text-sm font-black text-indigo-600 dark:text-indigo-400">$<%= number_to_currency(revenue, unit: "", separator: ",", delimiter: ".") %></span>
+            </div>
+            <div class="h-2 w-full bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div class="h-full rounded-full" style="width: <%= percentage %>%; background-color: <%= property&.color || '#6366f1' %>"></div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="text-center text-gray-400 italic py-10">Sin datos de ingresos.</p>
+      <% end %>
+    </div>
+  </div>
+  <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-2xl shadow-indigo-100/5 dark:shadow-none">
+    <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight mb-8">Próximos Arriendos</h3>
+    <div class="space-y-4">
+      <% if @upcoming_arrivals.any? %>
+        <% @upcoming_arrivals.each do |res| %>
+          <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700">
+            <div class="w-10 h-10 rounded-xl bg-white dark:bg-slate-700 shadow-sm flex flex-col items-center justify-center shrink-0 border border-indigo-50 dark:border-slate-600">
+              <span class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 leading-none"><%= res.start_time.strftime("%d") %></span>
+              <span class="text-[8px] font-black text-gray-400 dark:text-slate-400 uppercase"><%= I18n.l(res.start_time, format: "%b") %></span>
+            </div>
+            <div class="flex-grow min-w-0">
+              <h4 class="text-xs font-black text-gray-900 dark:text-slate-200 truncate"><%= res.client_name %></h4>
+              <p class="text-[9px] font-bold text-gray-400 uppercase truncate" style="color: <%= res.property.color %>"><%= res.property.name %></p>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="text-center text-gray-400 italic py-10">Sin arriendos próximos.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

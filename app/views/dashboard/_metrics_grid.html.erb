@@ -1,0 +1,70 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-emerald-100/10 dark:shadow-none relative overflow-hidden">
+    <div class="relative flex items-center gap-4">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shrink-0">
+        <i class="fa-solid fa-money-bill-trend-up text-sm"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Caja Real (Abonos)</p>
+        <h3 class="text-lg font-black text-emerald-600 dark:text-emerald-400 truncate">$<%= number_to_currency(@actual_cash_in, unit: "", separator: ",", delimiter: ".") %></h3>
+      </div>
+    </div>
+  </div>
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-rose-100/10 dark:shadow-none relative overflow-hidden">
+    <div class="relative flex items-center gap-4">
+      <div class="w-10 h-10 rounded-xl bg-rose-500 flex items-center justify-center text-white shadow-lg shrink-0">
+        <i class="fa-solid fa-file-invoice-dollar text-sm"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Gastos Operativos</p>
+        <h3 class="text-lg font-black text-rose-600 dark:text-rose-400 truncate">-$<%= number_to_currency(@total_expenses, unit: "", separator: ",", delimiter: ".") %></h3>
+      </div>
+    </div>
+  </div>
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-indigo-100/10 dark:shadow-none relative overflow-hidden">
+    <div class="relative flex items-center gap-4">
+      <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shrink-0">
+        <i class="fa-solid fa-scale-balanced text-sm"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Rentabilidad Neta</p>
+        <h3 class="text-lg font-black text-gray-900 dark:text-white truncate">$<%= number_to_currency(@actual_cash_in - @total_expenses, unit: "", separator: ",", delimiter: ".") %></h3>
+      </div>
+    </div>
+  </div>
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-slate-100/10 dark:shadow-none relative overflow-hidden">
+    <div class="relative flex items-center gap-4">
+      <div class="w-10 h-10 rounded-xl bg-slate-500 flex items-center justify-center text-white shadow-lg shrink-0">
+        <i class="fa-solid fa-calculator text-sm"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Ingresos Teóricos</p>
+        <h3 class="text-lg font-black text-gray-500 dark:text-slate-400 truncate">$<%= number_to_currency(@completed_revenue, unit: "", separator: ",", delimiter: ".") %></h3>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-amber-100/10 dark:shadow-none relative overflow-hidden">
+    <div class="relative flex items-center gap-4">
+      <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white shadow-lg shrink-0">
+        <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Pendientes</p>
+        <h3 class="text-lg font-black text-gray-900 dark:text-white truncate"><%= @pending_count %></h3>
+      </div>
+    </div>
+  </div>
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl shadow-purple-100/10 dark:shadow-none relative overflow-hidden">
+    <div class="relative flex items-center gap-4">
+      <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-white shadow-lg shrink-0">
+        <i class="fa-solid fa-list-check text-sm"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Total Reservas</p>
+        <h3 class="text-lg font-black text-gray-900 dark:text-white truncate"><%= @total_count %></h3>
+      </div>
+    </div>
+  </div>
+</div>
