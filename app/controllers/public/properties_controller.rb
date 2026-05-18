@@ -2,7 +2,7 @@ class Public::PropertiesController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
   layout "public"
 
-  before_action :set_property, only: [:show, :booking]
+  before_action :set_property, only: [ :show, :booking ]
 
   def index
     @properties = property_scope.search_public(params[:query])

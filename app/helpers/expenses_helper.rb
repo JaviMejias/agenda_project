@@ -2,12 +2,12 @@ module ExpensesHelper
   def expense_category_badge(expense)
     category_label = Expense.translated_categories[expense.category] || expense.category.to_s.titleize
     color_classes = case expense.category
-                    when 'maintenance' then 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border-amber-200/30'
-                    when 'services' then 'bg-sky-50 text-sky-700 dark:bg-sky-950/30 dark:text-sky-400 border-sky-200/30'
-                    when 'supplies' then 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400 border-indigo-200/30'
-                    when 'taxes' then 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400 border-rose-200/30'
-                    else 'bg-gray-50 text-gray-700 dark:bg-slate-800 dark:text-slate-400 border-gray-200/30'
-                    end
+    when "maintenance" then "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border-amber-200/30"
+    when "services" then "bg-sky-50 text-sky-700 dark:bg-sky-950/30 dark:text-sky-400 border-sky-200/30"
+    when "supplies" then "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400 border-indigo-200/30"
+    when "taxes" then "bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400 border-rose-200/30"
+    else "bg-gray-50 text-gray-700 dark:bg-slate-800 dark:text-slate-400 border-gray-200/30"
+    end
     content_tag(:span, category_label, class: "px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border #{color_classes} inline-block")
   end
 
@@ -18,7 +18,7 @@ module ExpensesHelper
     avatar_class = size == :sm ? "w-6 h-6" : "w-8 h-8"
     font_size = size == :sm ? "text-[6px]" : "text-[8px]"
     plus_font_size = size == :sm ? "text-[7px]" : "text-[9px]"
-    img_variant_limit = [60, 60]
+    img_variant_limit = [ 60, 60 ]
 
     vouchers_array = expense.vouchers.to_a
     taken = vouchers_array.take(3)

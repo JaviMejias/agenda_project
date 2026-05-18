@@ -11,7 +11,7 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     sign_in @admin
     get search_url, params: { q: "Diego" }
     assert_response :success
-    
+
     results = JSON.parse(response.body)["results"]
     assert_not_nil results
     assert results.any? { |r| r["category"] == "Clientes" && r["title"] == @client_one.name }

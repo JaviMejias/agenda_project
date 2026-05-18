@@ -12,7 +12,7 @@ class Public::ReservationsController < ApplicationController
 
       if @reservation
         redirect_to public_reservation_path(@reservation.token)
-        return
+        nil
       else
         flash.now[:alert] = "El código ingresado no corresponde a ninguna reserva activa. Por favor, verifica el código e inténtalo de nuevo."
       end
