@@ -132,7 +132,7 @@ class ReservationTest < ActiveSupport::TestCase
     reservation = reservations(:one)
     reservation.update!(status: :confirmed)
     reservation.update_columns(pending_status_set_at: nil)
-    
+
     reservation.update!(status: :pending)
     assert_not_nil reservation.pending_status_set_at
     assert_in_delta Time.current, reservation.pending_status_set_at, 2.seconds
@@ -142,7 +142,7 @@ class ReservationTest < ActiveSupport::TestCase
     reservation = reservations(:one)
     reservation.update!(status: :confirmed)
     reservation.update_columns(pending_status_set_at: nil)
-    
+
     # Change date which triggers automatic status reset to pending
     reservation.update!(start_time: 12.days.from_now.change(hour: 10), end_time: 13.days.from_now.change(hour: 10))
     assert reservation.pending?
@@ -154,7 +154,7 @@ class ReservationTest < ActiveSupport::TestCase
     reservation = reservations(:two) # pending
     initial_timestamp = 2.hours.ago
     reservation.update_columns(pending_status_set_at: initial_timestamp)
-    
+
     reservation.update!(client_name: "Nuevo Nombre")
     assert_equal initial_timestamp.to_i, reservation.reload.pending_status_set_at.to_i
   end
