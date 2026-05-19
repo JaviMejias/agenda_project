@@ -51,4 +51,20 @@ class PaymentsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to reservation_url(@reservation)
   end
+
+  test "should approve payment" do
+    @payment.update!(payment_method: :transfer, status: :pending)
+    patch approve_reservation_payment_url(@reservation, @payment)
+    assert_redirected_to reservation_url(@reservation)
+    @payment.reload
+    assert @payment.approved?
+  end
+
+  test "should reject payment" do
+    @payment.update!(payment_method: :transfer, status: :pending)
+    patch reject_reservation_payment_url(@reservation, @payment)
+    assert_redirected_to reservation_url(@reservation)
+    @payment.reload
+    assert @payment.rejected?
+  end
 end

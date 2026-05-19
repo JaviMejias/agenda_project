@@ -15,6 +15,7 @@ begin
 
   WickedPdf.configure do |config|
     config.exe_path = bin_path.to_s
+    config.enable_local_file_access = true
   end
 rescue StandardError => e
   Rails.logger.error "Error configurando wkhtmltopdf: #{e.message}"

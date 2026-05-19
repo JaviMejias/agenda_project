@@ -1,6 +1,6 @@
 class PaymentsController < ApplicationController
   before_action :set_reservation
-  before_action :set_payment, only: [ :edit, :update, :destroy ]
+  before_action :set_payment, only: [ :edit, :update, :destroy, :approve, :reject ]
 
   def new
     @payment = @reservation.payments.build
@@ -36,6 +36,24 @@ class PaymentsController < ApplicationController
     authorize @payment
     @payment.destroy
     redirect_to reservation_path(@reservation), notice: "Transacción eliminada exitosamente."
+  end
+
+  def approve
+    authorize @payment
+    if @payment.update(status: :approved)
+      redirect_to reservation_path(@reservation), notice: "El pago de $#{@payment.amount.to_i} fue aprobado exitosamente."
+    else
+      redirect_to reservation_path(@reservation), alert: "No se pudo aprobar el pago."
+    end
+  end
+
+  def reject
+    authorize @payment
+    if @payment.update(status: :rejected)
+      redirect_to reservation_path(@reservation), notice: "El pago fue rechazado exitosamente."
+    else
+      redirect_to reservation_path(@reservation), alert: "No se pudo rechazar el pago."
+    end
   end
 
   private

@@ -31,8 +31,10 @@
                 </label>
               <% end %>
             <% end %>
-            <%= button_to delete_payment_public_reservation_path(reservation.token, payment_id: payment.id), method: :delete, class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-red-600 transition-colors shadow-sm cursor-pointer", title: "Eliminar Transacción", data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este registro de pago?" } do %>
-              <i class="fa-solid fa-trash-can"></i>
+            <% if reservation.pending? %>
+              <%= button_to delete_payment_public_reservation_path(reservation.token, payment_id: payment.id), method: :delete, class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-red-600 transition-colors shadow-sm cursor-pointer", title: "Eliminar Transacción", data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este registro de pago?" } do %>
+                <i class="fa-solid fa-trash-can"></i>
+              <% end %>
             <% end %>
           </div>
         </div>

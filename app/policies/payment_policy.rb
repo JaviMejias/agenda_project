@@ -10,4 +10,12 @@ class PaymentPolicy < ApplicationPolicy
   def destroy?
     record.reservation.user_id == user.id || user.admin?
   end
+
+  def approve?
+    update?
+  end
+
+  def reject?
+    update?
+  end
 end

@@ -77,6 +77,14 @@ class Public::ReservationsControllerTest < ActionDispatch::IntegrationTest
     assert_not @reservation.reload.confirmed?
   end
 
+  test "should not confirm expired reservation even if updated_at is recent" do
+    @reservation.update_columns(pending_status_set_at: 25.hours.ago, updated_at: 10.minutes.ago)
+    get confirm_public_reservation_url(token: "token123")
+    assert_response :success
+    assert_match "ha expirado", response.body
+    assert_not @reservation.reload.confirmed?
+  end
+
   test "should redirect to search for invalid token on html request" do
     get confirm_public_reservation_url(token: "invalid")
     assert_redirected_to search_public_reservations_url
@@ -111,9 +119,21 @@ class Public::ReservationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to public_reservation_url("token123")
   end
 
+  test "should not delete payment from reservation if not pending" do
+    payment = payments(:one)
+    payment.update!(reservation_id: @reservation.id)
+    @reservation.update!(status: :confirmed)
+
+    assert_no_difference("Payment.count") do
+      delete delete_payment_public_reservation_url(token: "token123", payment_id: payment.id)
+    end
+    assert_redirected_to public_reservation_url("token123")
+    assert_not_nil flash[:alert]
+  end
+
   test "should not add payment if already fully paid" do
     @reservation.payments.destroy_all
-    @reservation.payments.create!(amount: @reservation.total_price, payment_method: :transfer, transaction_type: :abono, payment_date: Time.current)
+    @reservation.payments.create!(amount: @reservation.total_price, payment_method: :transfer, status: :approved, transaction_type: :abono, payment_date: Time.current)
 
     assert_no_difference("Payment.count") do
       post add_payment_public_reservation_url(token: "token123"), params: {

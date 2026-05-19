@@ -5,8 +5,14 @@
         <% company = @reservation.property.company %>
         <% if company.logo.attached? %>
           <div style="margin-bottom: 15px;">
-            <% image_base64 = Base64.strict_encode64(company.logo.download) %>
-            <img src="data:<%= company.logo.content_type %>;base64,<%= image_base64 %>" style="max-height: 60px; max-width: 150px; object-fit: contain;" />
+            <% begin %>
+              <% logo_variant = company.logo.variant(resize_to_limit: [300, 300], format: :png).processed %>
+              <% image_base64 = Base64.strict_encode64(logo_variant.download) %>
+              <img src="data:<%= logo_variant.content_type %>;base64,<%= image_base64 %>" width="150" alt="<%= company.name %> Logo" />
+            <% rescue => e %>
+              <% image_base64 = Base64.strict_encode64(company.logo.download) %>
+              <img src="data:<%= company.logo.content_type %>;base64,<%= image_base64 %>" width="150" alt="<%= company.name %> Logo" />
+            <% end %>
           </div>
         <% end %>
         <h2 style="margin: 0; color: #111827; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px;">

@@ -19,7 +19,7 @@ class Reservation < ApplicationRecord
   scope :active, -> { where.not(status: :cancelled) }
   scope :active_and_valid, -> {
     where.not(status: :cancelled)
-         .where.not("reservations.status = ? AND reservations.updated_at < ?", Reservation.statuses[:pending], 24.hours.ago)
+         .where.not("reservations.status = ? AND COALESCE(reservations.pending_status_set_at, reservations.updated_at) < ?", Reservation.statuses[:pending], 24.hours.ago)
   }
   scope :upcoming, -> { active.where("start_time >= ?", Time.zone.now).order(start_time: :asc) }
   scope :overlapping_range, ->(start_time, end_time) {
@@ -53,6 +53,7 @@ class Reservation < ApplicationRecord
   before_validation :handle_blocked_reservation
   before_save :calculate_total_price
   before_save :reset_status_if_details_changed
+  before_save :set_pending_status_timestamp
   after_commit :send_status_notifications, on: [ :create, :update ]
   after_commit :schedule_reminder_job, on: [ :create, :update ]
 
@@ -76,11 +77,12 @@ class Reservation < ApplicationRecord
 
   def total_paid
     if payments.loaded?
-      abonos = payments.select(&:abono?).sum(&:amount)
-      reembolsos = payments.select(&:reembolso?).sum(&:amount)
+      approved_payments = payments.select(&:approved?)
+      abonos = approved_payments.select(&:abono?).sum(&:amount)
+      reembolsos = approved_payments.select(&:reembolso?).sum(&:amount)
       abonos - reembolsos
     else
-      payments.abono.sum(:amount) - payments.reembolso.sum(:amount)
+      payments.approved.abono.sum(:amount) - payments.approved.reembolso.sum(:amount)
     end
   end
 
@@ -125,7 +127,8 @@ class Reservation < ApplicationRecord
   end
 
   def confirm_by_client!
-    return { status: :error, message: "Este enlace de confirmación ha expirado por seguridad (límite de 24 horas)." } if updated_at < 24.hours.ago
+    limit_time = pending_status_set_at || updated_at
+    return { status: :error, message: "Este enlace de confirmación ha expirado por seguridad (límite de 24 horas)." } if limit_time < 24.hours.ago
     return { status: :info, message: "Esta reserva ya se encuentra confirmada." } if confirmed?
     return { status: :error, message: "No se puede confirmar una reserva que ya ha sido cancelada." } if cancelled?
 
@@ -141,7 +144,8 @@ class Reservation < ApplicationRecord
   end
 
   def reject_by_client!
-    return { status: :error, message: "Este enlace ha expirado por seguridad (límite de 24 horas)." } if updated_at < 24.hours.ago
+    limit_time = pending_status_set_at || updated_at
+    return { status: :error, message: "Este enlace ha expirado por seguridad (límite de 24 horas)." } if limit_time < 24.hours.ago
     return { status: :info, message: "Esta reserva ya se encuentra cancelada." } if cancelled?
 
     transaction do
@@ -238,6 +242,12 @@ class Reservation < ApplicationRecord
 
     if start_time_changed? || end_time_changed?
       self.status = :pending
+    end
+  end
+
+  def set_pending_status_timestamp
+    if status == "pending" && (new_record? || status_changed?)
+      self.pending_status_set_at = Time.current
     end
   end
 

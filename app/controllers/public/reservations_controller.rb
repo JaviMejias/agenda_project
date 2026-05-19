@@ -25,6 +25,11 @@ class Public::ReservationsController < ApplicationController
   end
 
   def delete_payment
+    unless @reservation.pending?
+      redirect_to public_reservation_path(@reservation.token), alert: "No se puede eliminar un comprobante de pago una vez que la reserva ha sido procesada o confirmada."
+      return
+    end
+
     @payment = @reservation.payments.find(params[:payment_id])
     if @payment.destroy
       redirect_to public_reservation_path(@reservation.token), notice: "El comprobante de pago fue eliminado exitosamente."

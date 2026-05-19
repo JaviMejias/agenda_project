@@ -53,4 +53,28 @@ class PaymentTest < ActiveSupport::TestCase
 
     assert_not @payment.reload.voucher.attached?
   end
+
+  test "should default to pending for transfer" do
+    payment = Payment.new(
+      reservation: reservations(:one),
+      amount: 1000,
+      payment_date: Time.current,
+      payment_method: "transfer",
+      transaction_type: "abono"
+    )
+    payment.valid?
+    assert payment.pending?
+  end
+
+  test "should auto-approve cash or card payment" do
+    payment = Payment.new(
+      reservation: reservations(:one),
+      amount: 1000,
+      payment_date: Time.current,
+      payment_method: "cash",
+      transaction_type: "abono"
+    )
+    payment.valid?
+    assert payment.approved?
+  end
 end

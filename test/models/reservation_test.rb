@@ -113,4 +113,81 @@ class ReservationTest < ActiveSupport::TestCase
     assert_includes active_reservations, reservations(:two)
     assert_not_includes active_reservations, reservations(:three)
   end
+
+  test "should set pending_status_timestamp on creation of pending reservation" do
+    reservation = Reservation.new(
+      property: @property,
+      user: @user,
+      client: @client,
+      start_time: 5.days.from_now.change(hour: 10),
+      end_time: 6.days.from_now.change(hour: 10),
+      status: :pending
+    )
+    reservation.save!
+    assert_not_nil reservation.pending_status_set_at
+    assert_in_delta Time.current, reservation.pending_status_set_at, 2.seconds
+  end
+
+  test "should set pending_status_timestamp when confirmed reservation is changed back to pending" do
+    reservation = reservations(:one)
+    reservation.update!(status: :confirmed)
+    reservation.update_columns(pending_status_set_at: nil)
+    
+    reservation.update!(status: :pending)
+    assert_not_nil reservation.pending_status_set_at
+    assert_in_delta Time.current, reservation.pending_status_set_at, 2.seconds
+  end
+
+  test "should set pending_status_timestamp when confirmed reservation dates are changed" do
+    reservation = reservations(:one)
+    reservation.update!(status: :confirmed)
+    reservation.update_columns(pending_status_set_at: nil)
+    
+    # Change date which triggers automatic status reset to pending
+    reservation.update!(start_time: 12.days.from_now.change(hour: 10), end_time: 13.days.from_now.change(hour: 10))
+    assert reservation.pending?
+    assert_not_nil reservation.pending_status_set_at
+    assert_in_delta Time.current, reservation.pending_status_set_at, 2.seconds
+  end
+
+  test "should not update pending_status_timestamp when other details of pending reservation change" do
+    reservation = reservations(:two) # pending
+    initial_timestamp = 2.hours.ago
+    reservation.update_columns(pending_status_set_at: initial_timestamp)
+    
+    reservation.update!(client_name: "Nuevo Nombre")
+    assert_equal initial_timestamp.to_i, reservation.reload.pending_status_set_at.to_i
+  end
+
+  test "total_paid should only sum approved payments" do
+    reservation = reservations(:one)
+    reservation.payments.destroy_all
+
+    # 1. Approved payment
+    reservation.payments.create!(
+      amount: 1000,
+      payment_date: Time.current,
+      payment_method: :cash,
+      transaction_type: :abono
+    )
+
+    # 2. Pending payment
+    reservation.payments.create!(
+      amount: 500,
+      payment_date: Time.current,
+      payment_method: :transfer,
+      transaction_type: :abono
+    )
+
+    # 3. Rejected payment
+    rejected = reservation.payments.create!(
+      amount: 300,
+      payment_date: Time.current,
+      payment_method: :transfer,
+      transaction_type: :abono
+    )
+    rejected.update_columns(status: 2)
+
+    assert_equal 1000, reservation.total_paid
+  end
 end

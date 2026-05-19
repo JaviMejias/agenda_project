@@ -27,7 +27,12 @@ Rails.application.routes.draw do
     end
   end
   resources :reservations, except: [ :new, :create ] do
-    resources :payments, except: [ :index, :show ]
+    resources :payments, except: [ :index, :show ] do
+      member do
+        patch :approve
+        patch :reject
+      end
+    end
     member do
       get :receipt
     end

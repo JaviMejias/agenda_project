@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_17_150700) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_19_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -110,6 +110,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_150700) do
     t.datetime "payment_date"
     t.integer "payment_method"
     t.bigint "reservation_id", null: false
+    t.integer "status", default: 0, null: false
     t.integer "transaction_type"
     t.datetime "updated_at", null: false
     t.index ["reservation_id"], name: "index_payments_on_reservation_id"
@@ -135,6 +136,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_150700) do
     t.string "client_name"
     t.datetime "created_at", null: false
     t.datetime "end_time"
+    t.datetime "pending_status_set_at"
     t.bigint "property_id", null: false
     t.datetime "start_time"
     t.integer "status", default: 0
