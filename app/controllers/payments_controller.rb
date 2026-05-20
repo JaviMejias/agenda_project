@@ -61,7 +61,7 @@ class PaymentsController < ApplicationController
 
   def check_reservation_cancelled
     if @reservation.cancelled?
-      if action_name.in?(["new", "create"])
+      if action_name.in?([ "new", "create" ])
         if action_name == "create" && params.dig(:payment, :transaction_type) != "reembolso"
           redirect_to reservation_path(@reservation), alert: "En una reserva cancelada solo puedes registrar reembolsos."
         end

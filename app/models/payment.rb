@@ -5,7 +5,7 @@ class Payment < ApplicationRecord
   attr_accessor :purge_voucher
 
   enum :status, { pending: 0, approved: 1, rejected: 2 }
-  
+
   attr_accessor :audit_author_name
   enum :payment_method, { transfer: 0, cash: 1, card: 2, other: 3 }
   enum :transaction_type, { abono: 0, reembolso: 1 }
@@ -16,7 +16,7 @@ class Payment < ApplicationRecord
   before_validation :auto_approve_non_transfers
   before_validation :purge_voucher_if_requested
   before_save :clean_operation_data
-  after_commit :create_reservation_audit_log, on: [:create, :update, :destroy]
+  after_commit :create_reservation_audit_log, on: [ :create, :update, :destroy ]
 
   def notify_admin_of_new_payment!
     Notification.create!(
