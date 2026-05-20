@@ -7,7 +7,8 @@
       label: "Tipo de Transacción", 
       icon: "fa-exchange-alt", 
       type: :select, 
-      options: [['Abono / Pago Total', 'abono'], ['Reembolso / Devolución', 'reembolso']] 
+      options: @reservation.cancelled? ? [['Reembolso / Devolución', 'reembolso']] : [['Abono / Pago Total', 'abono'], ['Reembolso / Devolución', 'reembolso']],
+      data: { payment_form_target: "typeSelect", action: "change->payment-form#toggleMaxAmount" }
     },
     { 
       name: :payment_method, 
@@ -57,16 +58,24 @@
         <% when :select %>
           <%= f.select field[:name], field[:options], { selected: field[:selected] }, { class: input_class, data: field[:data] } %>
         <% when :currency %>
-          <% max_allowed = @payment.new_record? ? @reservation.pending_balance : (@reservation.pending_balance + @payment.amount) %>
+          <% max_abono = @payment.new_record? ? @reservation.pending_balance : (@reservation.pending_balance + (@payment.abono? ? @payment.amount : 0)) %>
+          <% max_reembolso = @payment.new_record? ? @reservation.total_paid : (@reservation.total_paid + (@payment.reembolso? ? @payment.amount : 0)) %>
+          <% default_val = @payment.amount.present? ? number_with_delimiter(@payment.amount.to_i, delimiter: ".") : (@reservation.cancelled? ? number_with_delimiter(max_reembolso.to_i, delimiter: ".") : (@reservation.pending_balance > 0 ? number_with_delimiter(@reservation.pending_balance.to_i, delimiter: ".") : "")) %>
           <%= f.text_field :amount, 
-              value: (@payment.amount.present? ? number_with_delimiter(@payment.amount.to_i, delimiter: ".") : (@reservation.pending_balance > 0 ? number_with_delimiter(@reservation.pending_balance.to_i, delimiter: ".") : "")), 
+              value: default_val, 
               placeholder: field[:placeholder], 
               class: input_class, 
               required: true, 
               autocomplete: "off",
-              data: { action: "input->currency#format", currency_max_value: max_allowed.to_i } %>
+              data: { 
+                payment_form_target: "amountInput",
+                action: "input->currency#format", 
+                currency_max_value: (@reservation.cancelled? ? max_reembolso : max_abono).to_i,
+                max_abono: max_abono.to_i,
+                max_reembolso: max_reembolso.to_i
+              } %>
           <div class="mt-2 text-xs font-bold text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800/50 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 flex justify-between items-center shadow-inner">
-            <span>Saldo Restante:</span>
+            <span>Disponible:</span>
             <span data-currency-target="balanceDisplay" class="text-indigo-600 dark:text-indigo-400 font-black text-sm tracking-wide">--</span>
           </div>
         <% when :datepicker %>

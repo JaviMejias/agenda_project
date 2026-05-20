@@ -143,13 +143,13 @@ class Public::ReservationsController < ApplicationController
   end
 
   def confirm
-    result = @reservation.confirm_by_client!
+    result = Reservations::ConfirmService.call(@reservation)
     @message = result[:message]
     @status = result[:status]
   end
 
   def reject
-    result = @reservation.reject_by_client!
+    result = Reservations::RejectService.call(@reservation)
     @message = result[:message]
     @status = result[:status]
   end

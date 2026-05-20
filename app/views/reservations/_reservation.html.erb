@@ -38,7 +38,7 @@
       </p>
     </div>
     <div class="md:col-span-3 flex items-center justify-between md:justify-end gap-4 md:border-l md:border-gray-50 dark:md:border-slate-800 md:pl-6">
-      <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border <%= reservation.status_color_classes %>">
+      <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border <%= reservation_status_color_classes(reservation.status) %>">
         <%= reservation.status_text %>
       </span>
       <div class="flex items-center gap-2">

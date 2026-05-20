@@ -1,6 +1,7 @@
 class PaymentsController < ApplicationController
   before_action :set_reservation
   before_action :set_payment, only: [ :edit, :update, :destroy, :approve, :reject ]
+  before_action :check_reservation_cancelled
 
   def new
     @payment = @reservation.payments.build
@@ -57,6 +58,18 @@ class PaymentsController < ApplicationController
   end
 
   private
+
+  def check_reservation_cancelled
+    if @reservation.cancelled?
+      if action_name.in?(["new", "create"])
+        if action_name == "create" && params.dig(:payment, :transaction_type) != "reembolso"
+          redirect_to reservation_path(@reservation), alert: "En una reserva cancelada solo puedes registrar reembolsos."
+        end
+      else
+        redirect_to reservation_path(@reservation), alert: "No se pueden modificar pagos de una reserva cancelada."
+      end
+    end
+  end
 
   def set_reservation
     @reservation = Reservation.find(params[:reservation_id])

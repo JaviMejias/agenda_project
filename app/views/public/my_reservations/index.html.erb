@@ -31,10 +31,10 @@
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-3">
-            <span class="px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest <%= reservation.status_color_classes %>">
+            <span class="px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest <%= reservation_status_color_classes(reservation.status) %>">
               <%= reservation.status_text %>
             </span>
-            <span class="px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest <%= reservation.payment_state_color_classes %>">
+            <span class="px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest <%= reservation_payment_state_color_classes(reservation.payment_state) %>">
               <%= reservation.payment_state %>
             </span>
           </div>

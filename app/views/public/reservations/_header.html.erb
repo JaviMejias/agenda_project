@@ -17,7 +17,7 @@
       <p class="text-sm text-gray-500 dark:text-slate-400 font-medium">Propiedad: <span class="font-bold text-gray-700 dark:text-slate-300"><%= reservation.property.name %></span></p>
     </div>
     <div class="flex items-center gap-3">
-      <span class="px-5 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest <%= reservation.status_color_classes %>">
+      <span class="px-5 py-2.5 rounded-2xl border text-xs font-black uppercase tracking-widest <%= reservation_status_color_classes(reservation.status) %>">
         <i class="fa-solid fa-circle-info mr-1.5"></i> <%= reservation.status_text %>
       </span>
     </div>

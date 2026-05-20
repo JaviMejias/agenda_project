@@ -8,7 +8,7 @@
           
           <div class="p-3 flex-grow">
             <div class="flex items-center justify-between mb-1">
-              <span class="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md <%= res.status_color_classes %>">
+              <span class="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md <%= reservation_status_color_classes(res.status) %>">
                 <%= I18n.t("enums.reservation.status.#{res.status}") %>
               </span>
               <div class="flex items-center gap-1">

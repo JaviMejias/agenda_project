@@ -44,26 +44,38 @@ Este documento detalla el progreso actual del proyecto y los próximos pasos.
 - **Estandarización de Interfaz (¡NUEVO!):** Implementación de componentes compartidos (`back_button`, `empty_state`, `loading_state`) para una UI consistente y mantenible.
 - **Confirmación Pública (¡NUEVO!):** Corrección del flujo de confirmación/rechazo por parte del cliente mediante tokens seguros, reparando el acceso a métodos privados en el modelo.
 
+### 🏢 Portal de Clientes & Autogestión (¡NUEVO!)
+- **Usuarios Tipo Cliente:** Creación de rol externo que permite a los clientes gestionar sus propias reservas.
+- **Reservas Públicas:** Flujo para crear reservas tanto para usuarios logueados como visitantes anónimos.
+- **Portal de Pagos:** Interfaz dedicada para que los clientes adjunten y envíen sus comprobantes (vouchers) de transferencia.
+- **Validación Administrativa:** Sistema financiero para que los administradores revisen, aprueben o rechacen los comprobantes subidos por los clientes.
+
+### 🏛️ Arquitectura & Escalabilidad (¡NUEVO!)
+- **Separación de Responsabilidades (Service Objects):** Lógica compleja de negocio extraída de los modelos hacia objetos de servicio (`ConfirmService`, `RejectService`).
+- **Refactorización MVC:** Limpieza de código HTML y clases CSS incrustadas en modelos y validaciones, delegándolos a Helpers dedicados de presentación.
+- **Optimización de Consultas (N+1):** Precarga inteligente (`.includes`) de transacciones en vistas de lista y calendario para evitar saturación de la base de datos.
+- **Herramientas DevTools:** Integración de `bullet` para monitoreo de consultas en tiempo real y `annotate` para documentación automática de modelos.
+
+### 💰 Gestión Financiera & Facturación (¡NUEVO!)
+- **Recibos PDF:** Generación automática de comprobantes de pago (vouchers en PDF) actualizados en tiempo real según el estado de la reserva.
+- **Control de Abonos:** Registro de pagos parciales, saldos pendientes y validación de transacciones (aprobadas/rechazadas).
+- **Gastos Operativos:** Registro de facturas de luz, agua, mantenimiento y otros (tabla `expenses`) vinculados a cada propiedad para cálculo de rentabilidad.
+
 ---
 
 ## 🟡 Próximos Pasos (Sugeridos)
 
-1. **💰 Gestión Financiera & Facturación**:
-   - **Recibos PDF:** Generación automática de comprobantes de pago y facturas proforma al completar una reserva.
-   - **Control de Abonos:** Registro de pagos parciales y seguimiento de saldos pendientes por cliente.
-   - **Gastos Operativos:** Registro de facturas de luz, agua o mantenimiento por propiedad para cálculo de rentabilidad neta.
-
-2. **🔧 Gestión Operativa & Checklists**:
+1. **🔧 Gestión Operativa & Checklists**:
    - **Checklists de Entrada/Salida:** Listas de tareas dinámicas (Limpieza, Llaves, Inventario) vinculadas al flujo de la reserva.
    - **Auditoría (Timeline):** Registro histórico de cambios ("X cambió el estado de la reserva a Confirmada hace 2 horas").
    - **Gestión de Incidencias:** Reporte de roturas o problemas técnicos encontrados durante la estancia.
 
-3. **👤 CRM & Fidelización**:
+2. **👤 CRM & Fidelización**:
    - **Perfil 360° del Cliente:** Historial de estancias, ingresos totales generados (LTV) y notas privadas de comportamiento.
    - **Etiquetado Inteligente:** Segmentación de clientes (VIP, Recurrente, Conflictivo).
 
-4. **📑 Gestión Documental**:
+3. **📑 Gestión Documental**:
    - **Almacenamiento Seguro:** Subida de fotos de contratos firmados, documentos de identidad o fotos del estado de la propiedad antes/después.
 
 ---
-*Última actualización: 09 de Mayo, 2026 - 15:05 (Sesión de Estabilización Docker y Refactorización)*
+*Última actualización: 19 de Mayo, 2026 - 20:25 (Implementación de Portal de Clientes y Refactorización Arquitectónica)*

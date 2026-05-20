@@ -1,10 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["methodSelect", "operationFields"]
+  static targets = ["methodSelect", "operationFields", "typeSelect", "amountInput"]
 
   connect() {
     this.toggleFields()
+    this.toggleMaxAmount()
   }
 
   toggleFields() {
@@ -19,10 +20,27 @@ export default class extends Controller {
       
       const inputs = this.operationFieldsTarget.querySelectorAll("input")
       inputs.forEach(input => {
-        if (input.type !== "hidden") {
+        if (input.type !== "hidden" && input.type !== "file") {
           input.value = ""
         }
       })
     }
+  }
+
+  toggleMaxAmount() {
+    if (!this.hasTypeSelectTarget || !this.hasAmountInputTarget) return
+
+    const type = this.typeSelectTarget.value
+    const amountInput = this.amountInputTarget
+    
+    const maxAbono = amountInput.dataset.maxAbono
+    const maxReembolso = amountInput.dataset.maxReembolso
+
+    let newMax = type === "reembolso" ? maxReembolso : maxAbono
+    
+    amountInput.setAttribute("data-currency-max-value", newMax)
+
+    const event = new Event("input", { bubbles: true })
+    amountInput.dispatchEvent(event)
   }
 }

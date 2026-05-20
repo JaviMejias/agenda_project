@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="flex items-center gap-3 relative z-10">
-          <span class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest <%= @reservation.status_color_classes %>">
+          <span class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest <%= reservation_status_color_classes(@reservation.status) %>">
             Estado Actual: <%= @reservation.status_text %>
           </span>
         </div>

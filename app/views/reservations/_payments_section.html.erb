@@ -3,15 +3,22 @@
     <div class="px-6 py-8 sm:px-10 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
       <div>
         <h4 class="text-2xl font-black text-gray-900 dark:text-white">Estado Financiero</h4>
-        <span class="mt-2 inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border shadow-sm <%= reservation.payment_state_color_classes %>">
+        <span class="mt-2 inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border shadow-sm <%= reservation_payment_state_color_classes(reservation.payment_state) %>">
           <%= reservation.payment_state %>
         </span>
       </div>
       <div class="sm:text-right bg-gray-50 dark:bg-slate-800/50 p-4 sm:p-0 sm:bg-transparent rounded-xl border border-gray-100 dark:border-slate-700 sm:border-0">
-        <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">Saldo Pendiente</p>
-        <p class="text-3xl font-black <%= reservation.pending_balance <= 0 ? 'text-emerald-500' : 'text-amber-500' %>">
-          $<%= number_to_currency(reservation.pending_balance, unit: "", separator: ",", delimiter: ".") %>
-        </p>
+        <% if reservation.cancelled? %>
+          <p class="text-[10px] font-black text-rose-400 dark:text-rose-500 uppercase tracking-widest mb-1">Monto Reembolsable / Abonado</p>
+          <p class="text-3xl font-black text-rose-500">
+            $<%= number_to_currency(reservation.total_paid, unit: "", separator: ",", delimiter: ".") %>
+          </p>
+        <% else %>
+          <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">Saldo Pendiente</p>
+          <p class="text-3xl font-black <%= reservation.pending_balance <= 0 ? 'text-emerald-500' : 'text-amber-500' %>">
+            $<%= number_to_currency(reservation.pending_balance, unit: "", separator: ",", delimiter: ".") %>
+          </p>
+        <% end %>
       </div>
     </div>
     <div class="px-6 py-6 sm:px-10">
@@ -73,17 +80,23 @@
                   </td>
                   <td class="px-4 py-4 whitespace-nowrap">
                     <% if payment.pending? %>
-                      <div class="flex items-center gap-2">
+                      <% if reservation.cancelled? %>
                         <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30">
                           Pendiente
                         </span>
-                        <%= button_to approve_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-6 h-6 rounded bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50 transition-colors shadow-sm cursor-pointer", title: "Aprobar Pago" do %>
-                          <i class="fa-solid fa-check text-[10px]"></i>
-                        <% end %>
-                        <%= button_to reject_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-6 h-6 rounded bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-450 dark:hover:bg-rose-900/50 transition-colors shadow-sm cursor-pointer", title: "Rechazar Pago" do %>
-                          <i class="fa-solid fa-xmark text-[10px]"></i>
-                        <% end %>
-                      </div>
+                      <% else %>
+                        <div class="flex items-center gap-2">
+                          <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30">
+                            Pendiente
+                          </span>
+                          <%= button_to approve_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-6 h-6 rounded bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50 transition-colors shadow-sm cursor-pointer", title: "Aprobar Pago" do %>
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                          <% end %>
+                          <%= button_to reject_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-6 h-6 rounded bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-450 dark:hover:bg-rose-900/50 transition-colors shadow-sm cursor-pointer", title: "Rechazar Pago" do %>
+                            <i class="fa-solid fa-xmark text-[10px]"></i>
+                          <% end %>
+                        </div>
+                      <% end %>
                     <% elsif payment.approved? %>
                       <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">
                         Aprobado
@@ -98,14 +111,16 @@
                     <%= payment.abono? ? '+' : '-' %> $<%= number_to_currency(payment.amount, unit: "", separator: ",", delimiter: ".") %>
                   </td>
                   <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div class="flex justify-end gap-2">
-                      <%= link_to edit_reservation_payment_path(reservation, payment), class: "flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 transition-colors", title: "Editar" do %>
-                        <i class="fa-solid fa-pen text-xs"></i>
-                      <% end %>
-                      <%= button_to reservation_payment_path(reservation, payment), method: :delete, data: { turbo_confirm: "¿Eliminar transacción?" }, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-900/50 transition-colors", title: "Eliminar" do %>
-                        <i class="fa-solid fa-trash-can text-xs"></i>
-                      <% end %>
-                    </div>
+                    <% unless reservation.cancelled? %>
+                      <div class="flex justify-end gap-2">
+                        <%= link_to edit_reservation_payment_path(reservation, payment), class: "flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 transition-colors", title: "Editar" do %>
+                          <i class="fa-solid fa-pen text-xs"></i>
+                        <% end %>
+                        <%= button_to reservation_payment_path(reservation, payment), method: :delete, data: { turbo_confirm: "¿Eliminar transacción?" }, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-900/50 transition-colors", title: "Eliminar" do %>
+                          <i class="fa-solid fa-trash-can text-xs"></i>
+                        <% end %>
+                      </div>
+                    <% end %>
                   </td>
                 </tr>
               <% end %>
@@ -178,19 +193,21 @@
                   <%= payment.abono? ? '+' : '-' %> $<%= number_to_currency(payment.amount, unit: "", separator: ",", delimiter: ".") %>
                 </div>
                 <div class="flex justify-end gap-2">
-                  <% if payment.pending? %>
-                    <%= button_to approve_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30 dark:hover:bg-emerald-900/50 transition-colors shadow-sm cursor-pointer", title: "Aprobar Pago" do %>
-                      <i class="fa-solid fa-check text-xs"></i>
+                  <% unless reservation.cancelled? %>
+                    <% if payment.pending? %>
+                      <%= button_to approve_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30 dark:hover:bg-emerald-900/50 transition-colors shadow-sm cursor-pointer", title: "Aprobar Pago" do %>
+                        <i class="fa-solid fa-check text-xs"></i>
+                      <% end %>
+                      <%= button_to reject_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-450 dark:border-rose-900/30 dark:hover:bg-rose-900/50 transition-colors shadow-sm cursor-pointer", title: "Rechazar Pago" do %>
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                      <% end %>
                     <% end %>
-                    <%= button_to reject_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-450 dark:border-rose-900/30 dark:hover:bg-rose-900/50 transition-colors shadow-sm cursor-pointer", title: "Rechazar Pago" do %>
-                      <i class="fa-solid fa-xmark text-xs"></i>
+                    <%= link_to edit_reservation_payment_path(reservation, payment), class: "flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-gray-200 dark:border-slate-600 hover:border-indigo-200 transition-colors shadow-sm", title: "Editar" do %>
+                      <i class="fa-solid fa-pen text-xs"></i>
                     <% end %>
-                  <% end %>
-                  <%= link_to edit_reservation_payment_path(reservation, payment), class: "flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-gray-200 dark:border-slate-600 hover:border-indigo-200 transition-colors shadow-sm", title: "Editar" do %>
-                    <i class="fa-solid fa-pen text-xs"></i>
-                  <% end %>
-                  <%= button_to reservation_payment_path(reservation, payment), method: :delete, data: { turbo_confirm: "¿Eliminar transacción?" }, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-gray-400 hover:text-rose-600 dark:hover:text-rose-450 border border-gray-200 dark:border-slate-600 hover:border-rose-200 transition-colors shadow-sm", title: "Eliminar" do %>
-                    <i class="fa-solid fa-trash-can text-xs"></i>
+                    <%= button_to reservation_payment_path(reservation, payment), method: :delete, data: { turbo_confirm: "¿Eliminar transacción?" }, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-gray-400 hover:text-rose-600 dark:hover:text-rose-450 border border-gray-200 dark:border-slate-600 hover:border-rose-200 transition-colors shadow-sm", title: "Eliminar" do %>
+                      <i class="fa-solid fa-trash-can text-xs"></i>
+                    <% end %>
                   <% end %>
                 </div>
               </div>
@@ -205,7 +222,11 @@
       <% end %>
       <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
-          <% if reservation.pending_balance > 0 %>
+          <% if reservation.cancelled? %>
+            <%= link_to new_reservation_payment_path(reservation), class: "w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-rose-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg hover:bg-rose-500 transition-all duration-200" do %>
+              <i class="fa-solid fa-arrow-rotate-left mr-2"></i> Registrar Reembolso
+            <% end %>
+          <% elsif reservation.pending_balance > 0 %>
             <%= link_to new_reservation_payment_path(reservation), class: "w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg hover:bg-indigo-500 transition-all duration-200" do %>
               <i class="fa-solid fa-plus mr-2"></i> Registrar Transacción
             <% end %>

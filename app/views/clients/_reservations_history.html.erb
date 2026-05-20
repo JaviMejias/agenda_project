@@ -19,7 +19,7 @@
             </div>
             <div class="text-right">
               <p class="text-sm font-black text-gray-900 dark:text-white">$<%= number_with_delimiter(res.total_price.to_i, delimiter: ".") %></p>
-              <span class="text-[9px] font-black uppercase tracking-widest <%= res.status_color_classes.split(' ')[1] %>">
+              <span class="text-[9px] font-black uppercase tracking-widest <%= reservation_status_color_classes(res.status).split(' ')[1] %>">
                 <%= res.status_text %>
               </span>
             </div>
