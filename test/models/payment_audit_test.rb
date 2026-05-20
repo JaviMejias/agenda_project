@@ -133,10 +133,10 @@ class PaymentAuditTest < ActiveSupport::TestCase
       payment_method: "transfer",
       transaction_type: "abono"
     )
-    
+
     # Reload needed to clear previously_changed flags from create!
     payment.reload
-    
+
     assert_difference "@reservation.reservation_audits.count", 1 do
       payment.destroy
     end
