@@ -138,7 +138,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_20_003341) do
     t.jsonb "details"
     t.bigint "reservation_id", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
+    t.bigint "user_id"
     t.index ["reservation_id"], name: "index_reservation_audits_on_reservation_id"
     t.index ["user_id"], name: "index_reservation_audits_on_user_id"
   end

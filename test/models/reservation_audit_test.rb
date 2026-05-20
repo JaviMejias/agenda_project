@@ -20,7 +20,7 @@ class ReservationAuditTest < ActiveSupport::TestCase
   test "requiere una reserva" do
     audit = ReservationAudit.new(action: "creación")
     assert_not audit.valid?
-    assert_includes audit.errors[:reservation], "must exist"
+    assert_includes audit.errors[:reservation], "debe existir"
   end
 
   test "requiere una acción" do
@@ -51,9 +51,9 @@ class ReservationAuditTest < ActiveSupport::TestCase
 
   test "se destruye al destruir la reserva" do
     reservation = reservations(:two)
-    # Crear un audit manualmente
+    # Crear un audit manualmente, sumado al que ya existe por el fixture 'two' = 2 audits
     reservation.reservation_audits.create!(action: "test_action")
-    assert_difference "ReservationAudit.count", -1 do
+    assert_difference "ReservationAudit.count", -2 do
       reservation.reservation_audits.destroy_all
     end
   end

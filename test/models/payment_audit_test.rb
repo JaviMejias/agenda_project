@@ -42,7 +42,13 @@ class PaymentAuditTest < ActiveSupport::TestCase
   # ── Actualización con cambios ─────────────────────────────────────────
 
   test "actualizar el monto genera un audit con acción payment_updated" do
-    payment = payments(:one)
+    payment = @reservation.payments.create!(
+      amount: 50_000,
+      payment_date: Time.current,
+      payment_method: "transfer",
+      transaction_type: "abono",
+      status: :pending
+    )
     assert_difference "@reservation.reservation_audits.count", 1 do
       payment.update!(amount: 99_999)
     end
@@ -51,20 +57,32 @@ class PaymentAuditTest < ActiveSupport::TestCase
   end
 
   test "el audit de actualización incluye los valores anteriores y nuevos" do
-    payment = payments(:one)
+    payment = @reservation.payments.create!(
+      amount: 50_000,
+      payment_date: Time.current,
+      payment_method: "transfer",
+      transaction_type: "abono",
+      status: :pending
+    )
     monto_anterior = payment.amount
     payment.update!(amount: 75_000)
 
     audit = @reservation.reservation_audits.last
     assert_equal "payment_updated", audit.action
     # El detalle del cambio de amount tiene la forma [antes, despues]
-    assert_equal [monto_anterior.to_s, "75000.0"], audit.details["amount"].map(&:to_s)
+    assert_equal [ monto_anterior.to_s, "75000.0" ], audit.details["amount"].map(&:to_s)
   end
 
   # ── Actualización SIN cambios (el bug corregido) ──────────────────────
 
   test "actualizar un pago sin cambiar nada NO genera un nuevo audit" do
-    payment = payments(:one)
+    payment = @reservation.payments.create!(
+      amount: 50_000,
+      payment_date: Time.current,
+      payment_method: "transfer",
+      transaction_type: "abono",
+      status: :pending
+    )
     count_antes = @reservation.reservation_audits.count
     # Guardamos con los mismos valores
     payment.update!(
@@ -115,6 +133,10 @@ class PaymentAuditTest < ActiveSupport::TestCase
       payment_method: "transfer",
       transaction_type: "abono"
     )
+    
+    # Reload needed to clear previously_changed flags from create!
+    payment.reload
+    
     assert_difference "@reservation.reservation_audits.count", 1 do
       payment.destroy
     end

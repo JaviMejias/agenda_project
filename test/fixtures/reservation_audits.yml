@@ -5,11 +5,11 @@ one:
   user: one
   author_name: MyString
   action: MyString
-  details: 
+  details: {}
 
 two:
   reservation: two
-  user: two
+  user: admin
   author_name: MyString
   action: MyString
-  details: 
+  details: {}
