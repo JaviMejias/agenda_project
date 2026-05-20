@@ -1,0 +1,51 @@
+<div class="mb-3">
+  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border <%= icon_cfg[:badge] %>">
+    <%= audit_action_label(audit.action) %>
+  </span>
+</div>
+<% unless local_assigns[:hide_meta] %>
+  <div class="flex flex-col gap-0.5 mb-3">
+    <p class="text-[11px] font-bold text-gray-400 dark:text-slate-500 flex items-center gap-1.5">
+      <i class="fa-regular fa-clock"></i>
+      <%= audit.created_at.strftime("%d %b %Y, %H:%M") %>
+    </p>
+    <% if audit.user %>
+      <span class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+        <i class="fa-solid fa-user-shield"></i>
+        <%= audit.user.full_name %>
+        <span class="font-normal text-gray-400">(Admin)</span>
+      </span>
+    <% else %>
+      <span class="text-[11px] font-black text-amber-600 dark:text-amber-500 flex items-center gap-1.5">
+        <i class="fa-solid fa-user"></i>
+        <%= audit.author_name %>
+      </span>
+    <% end %>
+  </div>
+<% end %>
+<% visible_details = audit_visible_details(audit) %>
+<% if visible_details.any? %>
+  <div class="pt-3 border-t border-gray-200/60 dark:border-slate-700/50 space-y-1.5">
+    <% visible_details.each do |key, values| %>
+      <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs">
+        <span class="font-black text-gray-400 dark:text-slate-500 uppercase tracking-wider shrink-0">
+          <%= audit_translate_key(key) %>:
+        </span>
+
+        <% if values.is_a?(Array) && values.size == 2 %>
+          <span class="line-through text-rose-400 dark:text-rose-500 opacity-80">
+            <%= audit_format_value(key, values[0]) %>
+          </span>
+          <i class="fa-solid fa-arrow-right text-gray-300 dark:text-slate-600 text-[9px]"></i>
+          <span class="font-bold text-emerald-600 dark:text-emerald-400">
+            <%= audit_format_value(key, values[1]) %>
+          </span>
+        <% else %>
+          <span class="font-bold text-gray-700 dark:text-slate-300">
+            <%= audit_format_value(key, values) %>
+          </span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

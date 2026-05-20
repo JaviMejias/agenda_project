@@ -1,0 +1,67 @@
+<%# Renderizado siempre dentro del modal — la policy se verifica en show.html.erb %>
+
+<% if reservation.reservation_audits.empty? %>
+  <div class="py-16 text-center">
+    <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4 text-gray-300 dark:text-slate-600 text-2xl">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+    </div>
+    <p class="text-sm font-bold text-gray-400 dark:text-slate-500">No hay registros de auditoría todavía.</p>
+  </div>
+<% else %>
+
+  <div class="relative">
+    <%# Línea vertical centrada — desktop %>
+    <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gray-100 dark:bg-slate-800 -translate-x-1/2"></div>
+    <%# Línea vertical izquierda — mobile %>
+    <div class="md:hidden absolute left-4 top-0 bottom-0 w-0.5 bg-gray-100 dark:bg-slate-800"></div>
+
+    <div class="space-y-6 pb-2">
+      <% reservation.reservation_audits.order(created_at: :desc).each_with_index do |audit, index| %>
+        <% cfg = audit_icon_config(audit.action) %>
+
+        <div class="relative flex items-start md:items-center">
+
+          <%# ── Mobile: columna única a la izquierda ── %>
+          <div class="md:hidden flex items-start gap-4 pl-10 w-full">
+            <div class="absolute left-0 top-1 w-8 h-8 rounded-full bg-white dark:bg-slate-900 border-2 border-gray-200 dark:border-slate-700 ring-4 <%= cfg[:ring] %> flex items-center justify-center shadow-sm z-10 <%= cfg[:color] %>">
+              <i class="fa-solid <%= cfg[:icon] %> text-[10px]"></i>
+            </div>
+            <div class="flex-1 bg-gray-50/60 dark:bg-slate-800/40 rounded-2xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm">
+              <%= render "reservations/timeline_card", audit: audit, icon_cfg: cfg %>
+            </div>
+          </div>
+
+          <%# ── Desktop: dos columnas alternas ── %>
+          <div class="hidden md:grid md:grid-cols-2 md:gap-8 w-full">
+            <% if index.even? %>
+              <div class="flex flex-col items-end justify-center pr-8 text-right">
+                <%= render "reservations/timeline_meta", audit: audit, align: "right" %>
+              </div>
+              <div class="pl-8">
+                <div class="bg-gray-50/60 dark:bg-slate-800/40 rounded-2xl p-5 border border-gray-100 dark:border-slate-700 shadow-sm">
+                  <%= render "reservations/timeline_card", audit: audit, icon_cfg: cfg, hide_meta: true %>
+                </div>
+              </div>
+            <% else %>
+              <div class="pr-8">
+                <div class="bg-gray-50/60 dark:bg-slate-800/40 rounded-2xl p-5 border border-gray-100 dark:border-slate-700 shadow-sm">
+                  <%= render "reservations/timeline_card", audit: audit, icon_cfg: cfg, hide_meta: true %>
+                </div>
+              </div>
+              <div class="flex flex-col items-start justify-center pl-8">
+                <%= render "reservations/timeline_meta", audit: audit, align: "left" %>
+              </div>
+            <% end %>
+
+            <%# Punto central %>
+            <div class="absolute left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-white dark:bg-slate-900 border-2 border-gray-200 dark:border-slate-700 ring-4 <%= cfg[:ring] %> flex items-center justify-center shadow-md z-10 <%= cfg[:color] %>">
+              <i class="fa-solid <%= cfg[:icon] %> text-xs"></i>
+            </div>
+          </div>
+
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+<% end %>

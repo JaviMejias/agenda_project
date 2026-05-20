@@ -1,0 +1,29 @@
+<%#
+  Partial: reservations/_timeline_meta
+  Muestra la fecha y el autor del audit para la columna opuesta en desktop.
+  Locals:
+    audit  - ReservationAudit
+    align  - "left" | "right"
+%>
+
+<% justify = align == "right" ? "justify-end" : "justify-start" %>
+
+<p class="text-xs font-bold text-gray-400 dark:text-slate-500 flex items-center gap-1.5 <%= justify %>">
+  <i class="fa-regular fa-clock"></i>
+  <%= audit.created_at.strftime("%d %b %Y, %H:%M") %>
+</p>
+
+<div class="mt-1">
+  <% if audit.user %>
+    <span class="text-xs font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 <%= justify %>">
+      <i class="fa-solid fa-user-shield"></i>
+      <%= audit.user.full_name %>
+      <span class="font-normal text-gray-400">(Admin)</span>
+    </span>
+  <% else %>
+    <span class="text-xs font-black text-amber-600 dark:text-amber-500 flex items-center gap-1.5 <%= justify %>">
+      <i class="fa-solid fa-user"></i>
+      <%= audit.author_name %>
+    </span>
+  <% end %>
+</div>

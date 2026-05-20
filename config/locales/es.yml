@@ -23,6 +23,55 @@ es:
       bank_account:
         bank_name: "Banco"
         account_type: "Tipo de cuenta"
+  audit:
+    actions:
+      creación: "Reserva Creada"
+      actualización: "Reserva Actualizada"
+      confirmed: "Reserva Confirmada"
+      status_changed_to_confirmed: "Reserva Confirmada"
+      cancelled: "Reserva Cancelada"
+      status_changed_to_cancelled: "Reserva Cancelada"
+      payment_added: "Pago Añadido"
+      payment_approved: "Pago Aprobado"
+      payment_rejected: "Pago Rechazado"
+      payment_deleted: "Pago Eliminado"
+      payment_updated: "Pago Actualizado"
+    field_keys:
+      amount: "Monto"
+      total_price: "Monto"
+      method: "Método"
+      payment_method: "Método"
+      type: "Tipo"
+      transaction_type: "Tipo"
+      start_time: "Inicio"
+      end_time: "Fin"
+      status: "Estado"
+      client_name: "Cliente"
+      client_id: "ID Cliente"
+    field_values:
+      method:
+        cash: "Efectivo"
+        transfer: "Transferencia"
+        card: "Tarjeta"
+        other: "Otro"
+      payment_method:
+        cash: "Efectivo"
+        transfer: "Transferencia"
+        card: "Tarjeta"
+        other: "Otro"
+      type:
+        abono: "Abono"
+        reembolso: "Reembolso"
+      transaction_type:
+        abono: "Abono"
+        reembolso: "Reembolso"
+      status:
+        pending: "Pendiente"
+        confirmed: "Confirmada"
+        approved: "Aprobado"
+        cancelled: "Cancelada"
+        rejected: "Rechazado"
+        blocked: "Bloqueado"
   enums:
     user:
       role:

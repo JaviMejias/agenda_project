@@ -169,4 +169,70 @@ module ReservationsHelper
     else status.to_s.titleize
     end
   end
+
+  def reservation_status_color_classes(status)
+    case status
+    when "pending" then "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50"
+    when "confirmed" then "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50"
+    when "cancelled" then "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/50"
+    when "blocked" then "bg-slate-700 text-white border-slate-800 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 shadow-sm"
+    else "bg-gray-50 text-gray-700 border-gray-100 dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700/50"
+    end
+  end
+
+  def reservation_payment_state_color_classes(payment_state)
+    case payment_state
+    when "Pagado" then "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50"
+    when "Abonado" then "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-emerald-900/50"
+    when "No pagado" then "bg-gray-50 text-gray-500 border-gray-100 dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700/50"
+    else "bg-gray-50 text-gray-500 border-gray-100 dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700/50"
+    end
+  end
+
+  def audit_visible_details(audit)
+    audit.details.reject { |k, _| %w[updated_at created_at payment_id id].include?(k) }
+  end
+
+  def audit_action_label(action)
+    I18n.t("audit.actions.#{action}", default: action.to_s.humanize)
+  end
+
+  def audit_icon_config(action)
+    case action.to_s
+    when "creación"
+      { icon: "fa-plus",           color: "text-emerald-500", ring: "ring-emerald-200 dark:ring-emerald-800", badge: "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400" }
+    when "confirmed", "status_changed_to_confirmed"
+      { icon: "fa-check",          color: "text-indigo-500",  ring: "ring-indigo-200 dark:ring-indigo-800",   badge: "bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400" }
+    when "cancelled", "status_changed_to_cancelled"
+      { icon: "fa-ban",            color: "text-rose-500",    ring: "ring-rose-200 dark:ring-rose-800",       badge: "bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400" }
+    when "payment_added"
+      { icon: "fa-money-bill-wave", color: "text-emerald-500", ring: "ring-emerald-200 dark:ring-emerald-800", badge: "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400" }
+    when "payment_approved"
+      { icon: "fa-check-double",   color: "text-blue-500",    ring: "ring-blue-200 dark:ring-blue-800",       badge: "bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400" }
+    when "payment_rejected"
+      { icon: "fa-xmark",          color: "text-rose-500",    ring: "ring-rose-200 dark:ring-rose-800",       badge: "bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400" }
+    when "payment_deleted"
+      { icon: "fa-trash",          color: "text-gray-400",    ring: "ring-gray-200 dark:ring-gray-700",       badge: "bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400" }
+    when "actualización"
+      { icon: "fa-pen",            color: "text-amber-500",   ring: "ring-amber-200 dark:ring-amber-800",     badge: "bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400" }
+    else
+      { icon: "fa-circle-dot",     color: "text-gray-400",    ring: "ring-gray-200 dark:ring-gray-700",       badge: "bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400" }
+    end
+  end
+
+  def audit_translate_key(key)
+    I18n.t("audit.field_keys.#{key}", default: key.to_s.humanize)
+  end
+
+  def audit_format_value(key, value)
+    return "n/a" if value.blank?
+
+    if %w[amount total_price].include?(key.to_s)
+      number_to_currency(value, unit: "$", separator: ",", delimiter: ".", format: "%u%n", precision: 0)
+    elsif %w[start_time end_time].include?(key.to_s)
+      Time.zone.parse(value.to_s).strftime("%d %b %Y, %H:%M") rescue value.to_s
+    else
+      I18n.t("audit.field_values.#{key}.#{value}", default: value.to_s)
+    end
+  end
 end
