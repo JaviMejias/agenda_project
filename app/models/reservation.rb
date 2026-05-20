@@ -3,8 +3,9 @@ class Reservation < ApplicationRecord
   belongs_to :user
   belongs_to :client, optional: true
   has_many :payments, dependent: :destroy
+  has_many :reservation_audits, dependent: :destroy
 
-  attr_accessor :skip_notifications
+  attr_accessor :skip_notifications, :audit_author_name
 
   enum :status, { pending: 0, confirmed: 1, cancelled: 2, blocked: 3 }
 
@@ -44,7 +45,7 @@ class Reservation < ApplicationRecord
   scope :ordered, -> { order(start_time: :desc) }
 
   scope :for_list, ->(query: nil, status: nil) {
-    list = includes(:property).search(query).ordered
+    list = includes(:property, :payments).search(query).ordered
     list = list.where(status: status) if status.present?
     list
   }
@@ -56,6 +57,7 @@ class Reservation < ApplicationRecord
   before_save :set_pending_status_timestamp
   after_commit :send_status_notifications, on: [ :create, :update ]
   after_commit :schedule_reminder_job, on: [ :create, :update ]
+  after_commit :create_audit_log, on: [ :create, :update ]
 
   def destroyable?
     blocked?
@@ -65,15 +67,6 @@ class Reservation < ApplicationRecord
     I18n.t("enums.reservation.status.#{status}", default: status.humanize)
   end
 
-  def status_color_classes
-    case status
-    when "pending" then "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50"
-    when "confirmed" then "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50"
-    when "cancelled" then "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/50"
-    when "blocked" then "bg-slate-700 text-white border-slate-800 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 shadow-sm"
-    else "bg-gray-50 text-gray-700 border-gray-100 dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700/50"
-    end
-  end
 
   def total_paid
     if payments.loaded?
@@ -101,17 +94,9 @@ class Reservation < ApplicationRecord
     end
   end
 
-  def payment_state_color_classes
-    case payment_state
-    when "Pagado" then "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50"
-    when "Abonado" then "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50"
-    when "No pagado" then "bg-gray-50 text-gray-500 border-gray-100 dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700/50"
-    else "bg-gray-50 text-gray-500 border-gray-100 dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700/50"
-    end
-  end
 
   def self.for_calendar(property_id: nil, start_date_str: nil, end_date_str: nil, exclude_id: nil)
-    query = Reservation.active_and_valid.joins(:property).includes(:property)
+    query = Reservation.active_and_valid.joins(:property).includes(:property, :payments)
     query = query.where(property_id: property_id) if property_id.present?
 
     if start_date_str.present? && end_date_str.present?
@@ -126,39 +111,6 @@ class Reservation < ApplicationRecord
     query.order(start_time: :asc)
   end
 
-  def confirm_by_client!
-    limit_time = pending_status_set_at || updated_at
-    return { status: :error, message: "Este enlace de confirmación ha expirado por seguridad (límite de 24 horas)." } if limit_time < 24.hours.ago
-    return { status: :info, message: "Esta reserva ya se encuentra confirmada." } if confirmed?
-    return { status: :error, message: "No se puede confirmar una reserva que ya ha sido cancelada." } if cancelled?
-
-    transaction do
-      update!(status: :confirmed)
-      Notification.create!(
-        user: user,
-        notifiable: self,
-        message: "¡Reserva Confirmada! #{client_name} ha aceptado la reserva para #{property.name}."
-      )
-    end
-    { status: :success, message: "¡Gracias! Tu reserva ha sido confirmada exitosamente." }
-  end
-
-  def reject_by_client!
-    limit_time = pending_status_set_at || updated_at
-    return { status: :error, message: "Este enlace ha expirado por seguridad (límite de 24 horas)." } if limit_time < 24.hours.ago
-    return { status: :info, message: "Esta reserva ya se encuentra cancelada." } if cancelled?
-
-    transaction do
-      self.skip_notifications = true
-      update!(status: :cancelled)
-      Notification.create!(
-        user: user,
-        notifiable: self,
-        message: "Reserva Rechazada: #{client_name} ha cancelado la solicitud para #{property.name}."
-      )
-    end
-    { status: :success, message: "La reserva ha sido rechazada y cancelada." }
-  end
 
   private
 
@@ -209,16 +161,15 @@ class Reservation < ApplicationRecord
 
     if overlapping
       format = property.per_hour? ? "%d-%m-%Y %H:%M" : "%d-%m-%Y"
-      client_display = overlapping.blocked? ? "<b>BLOQUEO DE FECHA</b>" : "<b>#{overlapping.client_name}</b>"
+      client_display = overlapping.blocked? ? "BLOQUEO DE FECHA" : "#{overlapping.client_name}"
 
       message = "La propiedad ya está #{overlapping.blocked? ? 'bloqueada' : 'reservada'} en estas fechas por " \
                 "#{client_display}, desde el " \
                 "#{overlapping.start_time.strftime(format)} al " \
                 "#{overlapping.property.per_day? ? (overlapping.end_time - 1.day).strftime(format) : overlapping.end_time.strftime(format)} " \
-                "(<a href='/reservations/#{overlapping.id}' " \
-                "target='_blank' class='underline font-semibold " \
-                "hover:text-red-900'>Ver #{overlapping.blocked? ? 'Bloqueo' : 'Reserva'} ##{overlapping.id}</a>)."
+                "(Ref: #{overlapping.id})."
       errors.add(:base, message)
+      errors.add(:overlapping_id, overlapping.id) if errors.respond_to?(:add)
     end
   end
 
@@ -274,5 +225,25 @@ class Reservation < ApplicationRecord
     return unless saved_change_to_start_time? || saved_change_to_status?
 
     ReservationReminderJob.set(wait_until: start_time - 24.hours).perform_later(self, start_time)
+  end
+
+  def create_audit_log
+    changes = saved_changes.except("updated_at", "created_at", "token", "pending_status_set_at")
+    return if changes.empty? && !id_previously_changed?
+
+    action_name = id_previously_changed? ? "creación" : "actualización"
+    if saved_change_to_status?
+      action_name = status
+    end
+
+    # Evitamos registrar duplicados si el servicio ya registró
+    return if @audit_manually_created
+
+    reservation_audits.create!(
+      user_id: Current.user&.id,
+      author_name: audit_author_name || (Current.user ? nil : "Sistema / Externo"),
+      action: action_name,
+      details: changes
+    )
   end
 end

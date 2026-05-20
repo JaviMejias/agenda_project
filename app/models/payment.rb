@@ -5,6 +5,8 @@ class Payment < ApplicationRecord
   attr_accessor :purge_voucher
 
   enum :status, { pending: 0, approved: 1, rejected: 2 }
+  
+  attr_accessor :audit_author_name
   enum :payment_method, { transfer: 0, cash: 1, card: 2, other: 3 }
   enum :transaction_type, { abono: 0, reembolso: 1 }
 
@@ -14,6 +16,7 @@ class Payment < ApplicationRecord
   before_validation :auto_approve_non_transfers
   before_validation :purge_voucher_if_requested
   before_save :clean_operation_data
+  after_commit :create_reservation_audit_log, on: [:create, :update, :destroy]
 
   def notify_admin_of_new_payment!
     Notification.create!(
@@ -48,5 +51,40 @@ class Payment < ApplicationRecord
       voucher.purge if voucher.attached?
       self.operation_number = nil
     end
+  end
+
+  def create_reservation_audit_log
+    # En updates: si no cambió nada relevante, no registrar
+    if !id_previously_changed? && !destroyed?
+      relevant_changes = saved_changes.except("updated_at")
+      return if relevant_changes.empty?
+    end
+
+    action_name = "payment_added"   if id_previously_changed?
+    action_name ||= "payment_deleted" if destroyed?
+
+    if !action_name && saved_change_to_status?
+      action_name = "payment_#{status}"
+    end
+
+    action_name ||= "payment_updated"
+
+    # En creación/eliminación mostramos el snapshot completo del pago
+    # En actualización mostramos solo los campos que cambiaron (antes → después)
+    details = if action_name == "payment_updated"
+      saved_changes
+        .except("updated_at", "reservation_id")
+        .transform_values { |change| change } # [antes, despues]
+        .merge(payment_id: id)
+    else
+      { payment_id: id, amount: amount, method: payment_method, type: transaction_type }
+    end
+
+    reservation.reservation_audits.create!(
+      user_id: Current.user&.id,
+      author_name: audit_author_name || (Current.user ? nil : "Sistema / Externo"),
+      action: action_name,
+      details: details
+    )
   end
 end

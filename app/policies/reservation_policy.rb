@@ -27,6 +27,10 @@ class ReservationPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def view_timeline?
+    user.admin?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       scope.all

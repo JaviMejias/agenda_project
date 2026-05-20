@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   include Pundit::Authorization
 
   before_action :authenticate_user!
+  before_action :set_current_user
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :ensure_non_client_for_admin_area
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
@@ -12,6 +13,10 @@ class ApplicationController < ActionController::Base
   layout :layout_by_resource
 
   private
+
+  def set_current_user
+    Current.user = current_user if defined?(current_user)
+  end
 
   def ensure_non_client_for_admin_area
     return unless user_signed_in? && current_user.client?
