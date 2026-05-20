@@ -48,7 +48,7 @@ class Payment < ApplicationRecord
 
   def clean_operation_data
     if cash? || card?
-      voucher.purge if voucher.attached?
+      voucher.purge_later if voucher.attached?
       self.operation_number = nil
     end
   end

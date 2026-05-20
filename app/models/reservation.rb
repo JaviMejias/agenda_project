@@ -210,7 +210,7 @@ class Reservation < ApplicationRecord
 
     case status
     when "pending"
-      is_public = !!Thread.current[:created_by_public]
+      is_public = !!Current.created_by_public
       ReservationMailer.pending_confirmation(self, created_by_public: is_public).deliver_later
     when "confirmed"
       ReservationMailer.confirmed(self).deliver_later

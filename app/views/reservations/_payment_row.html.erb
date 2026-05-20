@@ -1,0 +1,86 @@
+<tr>
+  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-300">
+    <%= payment.payment_date.strftime("%d/%m/%Y") %>
+  </td>
+  <td class="px-4 py-4 whitespace-nowrap">
+    <% transaction_label = payment.abono? ? 'Abono / Pago' : 'Reembolso' %>
+    <span class="px-2 py-1 text-xs font-bold rounded-full <%= payment.abono? ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400' %>">
+      <%= transaction_label %>
+    </span>
+  </td>
+  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700 shadow-sm">
+      <i class="fa-solid <%= payment_method_icon(payment) %> text-[10px]"></i>
+      <%= payment_method_label(payment) %>
+    </span>
+    <% if payment.operation_number.present? %>
+      <span class="inline-flex items-center gap-1 ml-1 px-2 py-1 rounded-md text-[10px] font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 shadow-sm">
+        <i class="fa-solid fa-hashtag text-[9px]"></i> <%= payment.operation_number %>
+      </span>
+    <% end %>
+    <% if payment.voucher.attached? %>
+      <% if payment.voucher.image? %>
+        <button type="button" 
+                data-controller="lightbox" 
+                data-action="click->lightbox#open" 
+                data-url="<%= url_for(payment.voucher) %>" 
+                class="inline-flex items-center gap-1 ml-1 px-2 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm transition-colors cursor-pointer" 
+                title="Ver Voucher en Pantalla Completa">
+          <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
+        </button>
+      <% else %>
+        <%= link_to url_for(payment.voucher), target: "_blank", class: "inline-flex items-center gap-1 ml-1 px-2 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm transition-colors", title: "Ver PDF" do %>
+          <i class="fa-solid fa-file-pdf text-[9px]"></i>
+        <% end %>
+      <% end %>
+    <% elsif payment.transfer? %>
+      <span class="inline-flex items-center gap-1 ml-1 px-2 py-1 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border border-amber-200/30 dark:border-amber-900/30 shadow-sm" title="Sin Comprobante Adjunto">
+        <i class="fa-solid fa-triangle-exclamation text-[9px]"></i> Sin Comprobante
+      </span>
+    <% end %>
+  </td>
+  <td class="px-4 py-4 whitespace-nowrap">
+    <% if payment.pending? %>
+      <% if reservation.cancelled? %>
+        <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30">
+          Pendiente
+        </span>
+      <% else %>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30">
+            Pendiente
+          </span>
+          <%= button_to approve_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-6 h-6 rounded bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50 transition-colors shadow-sm cursor-pointer", title: "Aprobar Pago" do %>
+            <i class="fa-solid fa-check text-[10px]"></i>
+          <% end %>
+          <%= button_to reject_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-6 h-6 rounded bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-450 dark:hover:bg-rose-900/50 transition-colors shadow-sm cursor-pointer", title: "Rechazar Pago" do %>
+            <i class="fa-solid fa-xmark text-[10px]"></i>
+          <% end %>
+        </div>
+      <% end %>
+    <% elsif payment.approved? %>
+      <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30">
+        Aprobado
+      </span>
+    <% elsif payment.rejected? %>
+      <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-100 dark:bg-rose-950/20 dark:text-rose-450 dark:border-rose-900/30">
+        Rechazado
+      </span>
+    <% end %>
+  </td>
+  <td class="px-4 py-4 whitespace-nowrap text-sm font-bold <%= payment.abono? ? 'text-emerald-600' : 'text-rose-600' %>">
+    <%= payment.abono? ? '+' : '-' %> $<%= number_to_currency(payment.amount, unit: "", separator: ",", delimiter: ".") %>
+  </td>
+  <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+    <% unless reservation.cancelled? %>
+      <div class="flex justify-end gap-2">
+        <%= link_to edit_reservation_payment_path(reservation, payment), class: "flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 transition-colors", title: "Editar" do %>
+          <i class="fa-solid fa-pen text-xs"></i>
+        <% end %>
+        <%= button_to reservation_payment_path(reservation, payment), method: :delete, data: { turbo_confirm: "¿Eliminar transacción?" }, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-900/50 transition-colors", title: "Eliminar" do %>
+          <i class="fa-solid fa-trash-can text-xs"></i>
+        <% end %>
+      </div>
+    <% end %>
+  </td>
+</tr>

@@ -6,7 +6,7 @@ class ReportStatsService
     @company_id = company_id
     @range = @start_date.beginning_of_day..@end_date.end_of_day
 
-    @reservations_in_range = user.reservations.in_range(@range)
+    @reservations_in_range = user.reservations_through_properties.in_range(@range)
     @properties = user.properties
 
     if @company_id.present?
@@ -76,7 +76,7 @@ class ReportStatsService
   def monthly_trend
     six_months_ago = 5.months.ago.beginning_of_month.beginning_of_day
 
-    scope = @user.reservations.confirmed.where("start_time >= ?", six_months_ago)
+    scope = @user.reservations_through_properties.confirmed.where("start_time >= ?", six_months_ago)
     scope = scope.joins(:property).where(properties: { company_id: @company_id }) if @company_id.present?
 
     reservations = scope.select(:id, :start_time, :total_price)
@@ -95,7 +95,7 @@ class ReportStatsService
   end
 
   def monthly_income_scope(range)
-    scope = @user.reservations.confirmed.in_range(range)
+    scope = @user.reservations_through_properties.confirmed.in_range(range)
     @company_id.present? ? scope.joins(:property).where(properties: { company_id: @company_id }) : scope
   end
 

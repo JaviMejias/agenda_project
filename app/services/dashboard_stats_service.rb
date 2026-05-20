@@ -4,7 +4,7 @@ class DashboardStatsService
     @range = range
     @company_id = company_id
 
-    @reservations = user.reservations.in_range(range)
+    @reservations = user.reservations_through_properties.in_range(range)
     @properties = user.properties
 
     if @company_id.present?

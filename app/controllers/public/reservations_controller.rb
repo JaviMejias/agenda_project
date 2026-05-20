@@ -187,9 +187,7 @@ class Public::ReservationsController < ApplicationController
   end
 
   def with_public_flag
-    Thread.current[:created_by_public] = true
+    Current.created_by_public = true
     yield
-  ensure
-    Thread.current[:created_by_public] = nil
   end
 end

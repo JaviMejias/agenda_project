@@ -1,0 +1,83 @@
+<div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 gap-4 transition-all hover:shadow-md">
+  <div class="flex flex-row items-start sm:items-center gap-4">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 <%= payment.abono? ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400' %> shadow-sm">
+      <i class="fa-solid <%= payment.abono? ? 'fa-arrow-down' : 'fa-arrow-up' %> text-lg"></i>
+    </div>
+    <div>
+      <div class="flex flex-wrap items-center gap-2 mb-1">
+        <span class="text-sm font-black text-gray-900 dark:text-white">
+          <%= payment.abono? ? 'Abono / Pago' : 'Reembolso' %>
+        </span>
+        <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-full bg-white dark:bg-slate-700 text-gray-500 dark:text-slate-300 border border-gray-200 dark:border-slate-600 shadow-sm">
+          <%= payment_method_label(payment) %>
+        </span>
+        <% if payment.pending? %>
+          <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-full bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30 shadow-sm">
+            Pendiente
+          </span>
+        <% elsif payment.approved? %>
+          <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30 shadow-sm">
+            Aprobado
+          </span>
+        <% elsif payment.rejected? %>
+          <span class="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-full bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/20 dark:text-rose-450 dark:border-rose-900/30 shadow-sm">
+            Rechazado
+          </span>
+        <% end %>
+        <% if payment.operation_number.present? %>
+          <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded-md border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1">
+            <i class="fa-solid fa-hashtag text-[9px]"></i> <%= payment.operation_number %>
+          </span>
+        <% end %>
+        <% if payment.voucher.attached? %>
+          <% if payment.voucher.image? %>
+            <button type="button" 
+                    data-controller="lightbox" 
+                    data-action="click->lightbox#open" 
+                    data-url="<%= url_for(payment.voucher) %>" 
+                    class="text-[10px] font-bold text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-2 py-1 rounded-md border border-gray-200 dark:border-slate-700 shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 transition-colors cursor-pointer">
+              <i class="fa-solid fa-magnifying-glass text-[9px]"></i> Voucher
+            </button>
+          <% else %>
+            <%= link_to url_for(payment.voucher), target: "_blank", class: "text-[10px] font-bold text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-2 py-1 rounded-md border border-gray-200 dark:border-slate-700 shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 transition-colors" do %>
+              <i class="fa-solid fa-file-pdf text-[9px]"></i> Voucher PDF
+            <% end %>
+          <% end %>
+        <% elsif payment.transfer? %>
+          <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 px-2 py-1 rounded-md border border-amber-200/30 dark:border-amber-900/30 shadow-sm flex items-center gap-1">
+            <i class="fa-solid fa-triangle-exclamation text-[9px]"></i> Sin Voucher
+          </span>
+        <% end %>
+      </div>
+      <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">
+        <%= payment.payment_date.strftime("%d %b, %Y — %H:%M") %>
+      </p>
+      <% if payment.notes.present? %>
+        <p class="text-xs text-gray-500 dark:text-slate-400 mt-2 italic line-clamp-2"><i class="fa-solid fa-comment-dots mr-1 opacity-50"></i> <%= payment.notes %></p>
+      <% end %>
+    </div>
+  </div>
+  <div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 sm:gap-2 pt-4 sm:pt-0 border-t border-gray-200 dark:border-slate-700 sm:border-t-0 mt-2 sm:mt-0">
+    <div class="text-xl font-black <%= payment.abono? ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-450' %>">
+      <%= payment.abono? ? '+' : '-' %> $<%= number_to_currency(payment.amount, unit: "", separator: ",", delimiter: ".") %>
+    </div>
+    <div class="flex justify-end gap-2">
+      <% unless reservation.cancelled? %>
+        <% if payment.pending? %>
+          <%= button_to approve_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30 dark:hover:bg-emerald-900/50 transition-colors shadow-sm cursor-pointer", title: "Aprobar Pago" do %>
+            <i class="fa-solid fa-check text-xs"></i>
+          <% end %>
+          <%= button_to reject_reservation_payment_path(reservation, payment), method: :patch, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-450 dark:border-rose-900/30 dark:hover:bg-rose-900/50 transition-colors shadow-sm cursor-pointer", title: "Rechazar Pago" do %>
+            <i class="fa-solid fa-xmark text-xs"></i>
+          <% end %>
+        <% end %>
+        <%= link_to edit_reservation_payment_path(reservation, payment), class: "flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-gray-200 dark:border-slate-600 hover:border-indigo-200 transition-colors shadow-sm", title: "Editar" do %>
+          <i class="fa-solid fa-pen text-xs"></i>
+        <% end %>
+        <%= button_to reservation_payment_path(reservation, payment), method: :delete, data: { turbo_confirm: "¿Eliminar transacción?" }, class: "flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-gray-400 hover:text-rose-600 dark:hover:text-rose-450 border border-gray-200 dark:border-slate-600 hover:border-rose-200 transition-colors shadow-sm", title: "Eliminar" do %>
+          <i class="fa-solid fa-trash-can text-xs"></i>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
