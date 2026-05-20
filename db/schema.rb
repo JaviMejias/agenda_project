@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_19_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_20_003341) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -129,6 +129,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_19_010000) do
     t.bigint "user_id", null: false
     t.index ["company_id"], name: "index_properties_on_company_id"
     t.index ["user_id"], name: "index_properties_on_user_id"
+  end
+
+  create_table "reservation_audits", force: :cascade do |t|
+    t.string "action"
+    t.string "author_name"
+    t.datetime "created_at", null: false
+    t.jsonb "details"
+    t.bigint "reservation_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["reservation_id"], name: "index_reservation_audits_on_reservation_id"
+    t.index ["user_id"], name: "index_reservation_audits_on_user_id"
   end
 
   create_table "reservations", force: :cascade do |t|
@@ -300,6 +312,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_19_010000) do
   add_foreign_key "payments", "reservations"
   add_foreign_key "properties", "companies"
   add_foreign_key "properties", "users"
+  add_foreign_key "reservation_audits", "reservations"
+  add_foreign_key "reservation_audits", "users"
   add_foreign_key "reservations", "clients"
   add_foreign_key "reservations", "properties"
   add_foreign_key "reservations", "users"
