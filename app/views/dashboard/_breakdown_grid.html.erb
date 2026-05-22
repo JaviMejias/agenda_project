@@ -1,5 +1,5 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-  <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-2xl shadow-indigo-100/5 dark:shadow-none">
+  <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300 dark:shadow-none">
     <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight mb-8">Desglose de Ingresos</h3>
     <div class="space-y-4">
       <% if @revenue_by_property.any? %>
@@ -25,7 +25,7 @@
       <% end %>
     </div>
   </div>
-  <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-2xl shadow-indigo-100/5 dark:shadow-none">
+  <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-300 dark:shadow-none">
     <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight mb-8">Próximos Arriendos</h3>
     <div class="space-y-4">
       <% if @upcoming_arrivals.any? %>
