@@ -42,7 +42,8 @@ export default class extends Controller {
   hide(event) {
     if (event && event.type === "click") {
       if (this.element.contains(event.target)) {
-        if (!event.target.closest('[data-action*="dropdown#hide"]')) return
+        const closestHider = event.target.closest('[data-action*="dropdown#hide"]')
+        if (!closestHider || closestHider === this.element) return
       }
     }
 
