@@ -6,6 +6,11 @@ class User < ApplicationRecord
 
   validates :first_name, presence: true
   validates :last_name, presence: true
+  validates :rut, presence: true
+  validates :phone, presence: true
+
+  include RutValidatable
+  validates_rut :rut
 
   enum :role, { normal: 0, admin: 1, client: 2 }
 
@@ -17,6 +22,8 @@ class User < ApplicationRecord
     end
   }
   scope :ordered, -> { order(created_at: :desc) }
+  scope :internal_team, -> { where.not(role: :client) }
+  scope :by_type, ->(type) { type.to_s == 'client' ? client : internal_team }
 
   has_many :properties, dependent: :destroy
   has_many :companies, dependent: :destroy

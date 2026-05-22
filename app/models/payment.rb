@@ -54,7 +54,6 @@ class Payment < ApplicationRecord
   end
 
   def create_reservation_audit_log
-    # En updates: si no cambió nada relevante, no registrar
     if !id_previously_changed? && !destroyed?
       relevant_changes = saved_changes.except("updated_at")
       return if relevant_changes.empty?
@@ -69,8 +68,6 @@ class Payment < ApplicationRecord
 
     action_name ||= "payment_updated"
 
-    # En creación/eliminación mostramos el snapshot completo del pago
-    # En actualización mostramos solo los campos que cambiaron (antes → después)
     details = if action_name == "payment_updated"
       saved_changes
         .except("updated_at", "reservation_id")

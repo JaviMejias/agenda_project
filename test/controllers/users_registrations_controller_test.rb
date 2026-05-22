@@ -14,7 +14,9 @@ class Users::RegistrationsControllerTest < ActionDispatch::IntegrationTest
           last_name: "Pérez",
           email: "diegoperez@example.com",
           password: "password123",
-          password_confirmation: "password123"
+          password_confirmation: "password123",
+          rut: "12345678-5",
+          phone: "+56912345678"
         }
       }
     end

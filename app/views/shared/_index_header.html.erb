@@ -28,6 +28,19 @@
         <% if local_assigns[:search_url].present? %>
           <%= form_with url: search_url, method: :get, class: "flex items-center gap-2 w-full sm:w-auto", 
               data: { search_target: "form", turbo_frame: local_assigns[:search_frame_id] || "list_frame", turbo_action: "advance" }.merge(local_assigns[:search_data] || {}) do |f| %>
+            <% request.query_parameters.except(:q, :page, :commit).each do |key, value| %>
+              <% if value.is_a?(Array) %>
+                <% value.each do |v| %>
+                  <%= hidden_field_tag "#{key}[]", v %>
+                <% end %>
+              <% elsif value.is_a?(Hash) %>
+                <% value.each do |k, v| %>
+                  <%= hidden_field_tag "#{key}[#{k}]", v %>
+                <% end %>
+              <% else %>
+                <%= hidden_field_tag key, value %>
+              <% end %>
+            <% end %>
             <div class="relative group w-full sm:w-64">
               <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 group-focus-within:text-indigo-600 transition-colors"></i>
               <%= f.text_field :q, value: params[:q], placeholder: local_assigns[:search_placeholder] || "Buscar...", 

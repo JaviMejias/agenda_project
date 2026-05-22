@@ -29,7 +29,20 @@ class SearchController < ApplicationController
       }
     end
 
-    reservations = Reservation.search(query).includes(:property).limit(5)
+    # Search by token (código de reserva) first — shown in a dedicated category
+    token_matches = policy_scope(Reservation).where("token ILIKE ?", "#{query}%").includes(:property).limit(3)
+    token_ids = token_matches.map(&:id)
+    token_matches.each do |r|
+      results << {
+        category: "Código de Reserva",
+        title: "Reserva ##{r.id} — #{r.client_name}",
+        subtitle: "#{r.token} · #{r.property.name}",
+        url: reservation_path(r),
+        icon: "fa-key"
+      }
+    end
+
+    reservations = policy_scope(Reservation).search(query).where.not(id: token_ids).includes(:property).limit(5)
     reservations.each do |r|
       results << {
         category: "Reservas",

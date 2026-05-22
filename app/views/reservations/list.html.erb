@@ -21,7 +21,7 @@
           <div class="flex items-center gap-2">
             <div class="relative flex-grow min-w-[200px]">
               <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 dark:text-slate-500 text-xs"></i>
-              <%= f.text_field :q, value: params[:q], placeholder: "Buscar por cliente...", class: "w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-800 border border-indigo-50 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm", data: { action: "search#submit" } %>
+              <%= f.text_field :q, value: params[:q], placeholder: "Buscar por cliente o código...", class: "w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-800 border border-indigo-50 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm", data: { action: "search#submit" } %>
             </div>
             <%= f.select :status, 
                 Reservation.selectable_statuses.map { |s| [I18n.t("enums.reservation.status.#{s}"), s] }, 

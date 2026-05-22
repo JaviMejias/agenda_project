@@ -26,7 +26,7 @@ class Public::ReservationsControllerTest < ActionDispatch::IntegrationTest
   test "should show reservation with token" do
     get public_reservation_url(token: "token123")
     assert_response :success
-    assert_match "Estado de tu Reserva", response.body
+    assert_match "Reserva N°", response.body
   end
 
   test "should get public receipt PDF" do

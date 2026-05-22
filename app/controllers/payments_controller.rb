@@ -42,7 +42,10 @@ class PaymentsController < ApplicationController
   def approve
     authorize @payment
     if @payment.update(status: :approved)
-      redirect_to reservation_path(@reservation), notice: "El pago de $#{@payment.amount.to_i} fue aprobado exitosamente."
+      respond_to do |format|
+        format.html { redirect_to reservation_path(@reservation), notice: "El pago de $#{@payment.amount.to_i} fue aprobado exitosamente." }
+        format.turbo_stream
+      end
     else
       redirect_to reservation_path(@reservation), alert: "No se pudo aprobar el pago."
     end
@@ -51,7 +54,10 @@ class PaymentsController < ApplicationController
   def reject
     authorize @payment
     if @payment.update(status: :rejected)
-      redirect_to reservation_path(@reservation), notice: "El pago fue rechazado exitosamente."
+      respond_to do |format|
+        format.html { redirect_to reservation_path(@reservation), notice: "El pago fue rechazado exitosamente." }
+        format.turbo_stream
+      end
     else
       redirect_to reservation_path(@reservation), alert: "No se pudo rechazar el pago."
     end
@@ -72,7 +78,7 @@ class PaymentsController < ApplicationController
   end
 
   def set_reservation
-    @reservation = Reservation.find(params[:reservation_id])
+    @reservation = policy_scope(Reservation).find(params[:reservation_id])
   end
 
   def set_payment

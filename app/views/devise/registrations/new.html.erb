@@ -2,6 +2,8 @@
   form_structure = [
     { name: :first_name, label: "Nombre", placeholder: "Juan", type: :text_field, icon: "fa-regular fa-user", required: true, autofocus: true, col_span: "col-span-1" },
     { name: :last_name, label: "Apellido", placeholder: "Pérez", type: :text_field, icon: "fa-regular fa-user", required: true, col_span: "col-span-1" },
+    { name: :rut, label: "RUT", placeholder: "12.345.678-9", type: :text_field, icon: "fa-solid fa-id-card", required: true, col_span: "col-span-1", data: { action: "input->rut#format" } },
+    { name: :phone, label: "Teléfono", placeholder: "+56 9 1234 5678", type: :telephone_field, icon: "fa-solid fa-phone", required: true, col_span: "col-span-1" },
     { name: :email, label: "Correo electrónico", placeholder: "tu@correo.com", type: :email_field, icon: "fa-regular fa-envelope", autocomplete: "email", required: true, col_span: "col-span-2" },
     { name: :password, label: "Contraseña", placeholder: "Crea tu contraseña", type: :password_field, icon: "fa-solid fa-lock", autocomplete: "new-password", required: true, min_length_label: true, col_span: "col-span-2" },
     { name: :password_confirmation, label: "Confirma tu contraseña", placeholder: "Repite tu contraseña", type: :password_field, icon: "fa-solid fa-check-circle", autocomplete: "new-password", required: true, col_span: "col-span-2" }
@@ -19,7 +21,7 @@
         <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Crea tu cuenta</h2>
         <p class="mt-3 text-sm font-bold text-gray-500 dark:text-slate-400">Únete para empezar a gestionar tus reservas</p>
       </div>
-      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6" }) do |f| %>
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6", data: { controller: "rut" } }) do |f| %>
         <%= render "devise/shared/error_messages", resource: resource %>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <% form_structure.each do |field| %>
@@ -39,6 +41,7 @@
                     autocomplete: field[:autocomplete],
                     placeholder: field[:placeholder],
                     required: field[:required],
+                    data: field[:data],
                     class: "block w-full pl-11 pr-4 py-4 border border-gray-200/80 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50/50 dark:bg-slate-800/20 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm"
                 ) %>
               </div>

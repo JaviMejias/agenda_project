@@ -1,5 +1,9 @@
 <%
   form_structure = [
+    { name: :first_name, label: "Nombre", placeholder: "Juan", type: :text_field, icon: "fa-regular fa-user", required: true },
+    { name: :last_name, label: "Apellido", placeholder: "Pérez", type: :text_field, icon: "fa-regular fa-user", required: true },
+    { name: :rut, label: "RUT", placeholder: "12.345.678-9", type: :text_field, icon: "fa-solid fa-id-card", required: true, data: { action: "input->rut#format" } },
+    { name: :phone, label: "Teléfono", placeholder: "+56 9 1234 5678", type: :telephone_field, icon: "fa-solid fa-phone", required: true },
     { name: :email, label: "Correo electrónico", type: :email_field, icon: "fa-regular fa-envelope", autocomplete: "email", required: true },
     { name: :password, label: "Nueva contraseña", placeholder: "Nueva contraseña", type: :password_field, icon: "fa-solid fa-lock", autocomplete: "new-password", required: false, change_label: true },
     { name: :password_confirmation, label: "Confirmar nueva contraseña", placeholder: "Repite nueva contraseña", type: :password_field, icon: "fa-solid fa-check-circle", autocomplete: "new-password", required: false },
@@ -30,7 +34,7 @@
       </div>
     </div>
     <div class="px-6 py-8 sm:px-10">
-      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-6", autocomplete: "off" }) do |f| %>
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-6", autocomplete: "off", data: { controller: "rut" } }) do |f| %>
         <%= render "devise/shared/error_messages", resource: resource %>
         <% form_structure.each do |field| %>
           <div class="space-y-2 <%= 'pt-4 border-t border-gray-100 dark:border-slate-800' if field[:border_t] %>">
@@ -51,6 +55,7 @@
                   autocomplete: field[:autocomplete],
                   placeholder: field[:placeholder],
                   required: field[:required],
+                  data: field[:data],
                   class: "block w-full pl-11 pr-4 py-4 border border-gray-200/80 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm bg-gray-50/50 dark:bg-slate-800/20 focus:bg-white dark:focus:bg-slate-800 text-gray-900 dark:text-white transition-all shadow-sm"
               ) %>
             </div>

@@ -1,6 +1,6 @@
 <% unless reservation.blocked? %>
   <div class="mt-8 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 animate-fade-in-up" style="animation-delay: 0.1s;">
-    <div class="px-6 py-8 sm:px-10 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+    <div id="<%= dom_id(reservation) %>_financial_header" class="px-6 py-8 sm:px-10 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
       <div>
         <h4 class="text-2xl font-black text-gray-900 dark:text-white">Estado Financiero</h4>
         <span class="mt-2 inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border shadow-sm <%= reservation_payment_state_color_classes(reservation.payment_state) %>">

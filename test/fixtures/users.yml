@@ -5,6 +5,8 @@ one:
   encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
   first_name: Juan
   last_name: Perez
+  rut: 12345678-5
+  phone: +56912345678
   role: 0
 
 admin:
@@ -12,4 +14,6 @@ admin:
   encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
   first_name: Admin
   last_name: User
+  rut: 11111111-1
+  phone: +56911112222
   role: 1

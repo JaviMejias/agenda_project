@@ -82,10 +82,53 @@
             </div>
           </dd>
         </div>
+        <% unless @reservation.blocked? %>
+          <div class="sm:col-span-2 p-5 bg-indigo-50/30 dark:bg-indigo-950/10 rounded-2xl border border-indigo-100 dark:border-indigo-900/30">
+            <dt class="text-[9px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-key text-[9px]"></i> Código de Seguimiento del Cliente
+            </dt>
+            <dd class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <button type="button"
+                      data-controller="clipboard"
+                      data-clipboard-text-value="<%= @reservation.token %>"
+                      data-action="click->clipboard#copy"
+                      class="relative flex-grow flex items-center gap-3 bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 rounded-xl p-2 shadow-sm text-left group hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-md active:scale-[0.98] active:bg-gray-50 dark:active:bg-slate-800/80 transition-all duration-200 cursor-pointer overflow-visible"
+                      title="Copiar código de reserva">
+                <span data-clipboard-target="tooltip"
+                      class="copy-msg absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-black uppercase tracking-wider rounded-lg shadow-xl opacity-0 translate-y-1 pointer-events-none transition-all duration-300 ease-out whitespace-nowrap z-30 flex items-center gap-1.5">
+                  <i class="fa-solid fa-check text-emerald-400 dark:text-emerald-500"></i> ¡Copiado!
+                </span>
+                <div class="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500 dark:text-indigo-400 group-hover:-rotate-3 group-hover:scale-110 transition-transform duration-300 shrink-0">
+                  <i class="fa-solid fa-barcode text-sm"></i>
+                </div>
+                <div class="flex-grow min-w-0">
+                  <p class="text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">Token de reserva</p>
+                  <code data-clipboard-target="value"
+                        class="block text-sm font-black tracking-widest text-gray-900 dark:text-slate-100 truncate w-full transition-colors">
+                    <%= @reservation.token %>
+                  </code>
+                </div>
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 dark:bg-slate-900 text-gray-400 group-hover:bg-indigo-500 group-hover:text-white group-active:scale-75 transition-all duration-200 text-xs shrink-0 mr-1">
+                  <i data-clipboard-target="icon" class="fa-solid fa-copy"></i>
+                </span>
+              </button>
+              <%= link_to public_reservation_path(@reservation.token),
+                  target: "_blank",
+                  class: "h-12 px-4 rounded-xl bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white hover:border-transparent transition-all shadow-sm shrink-0",
+                  title: "Abrir vista pública del cliente" do %>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                <span class="hidden sm:inline">Ver como Cliente</span>
+              <% end %>
+            </dd>
+            <p class="text-[9px] font-medium text-indigo-400 dark:text-indigo-600 mt-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-info"></i>
+              Haz click en el código para copiarlo. Compártelo con el cliente o búscalo en el omnibar con <kbd class="px-1 py-0.5 bg-indigo-100 dark:bg-indigo-900/40 rounded text-[8px] font-black">⌘K</kbd>.
+            </p>
+          </div>
+        <% end %>
       </dl>
     </div>
     <div class="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 px-6 py-6 sm:px-10 flex items-center justify-between gap-3">
-      <%# Botón auditoría — solo admins %>
       <% if policy(@reservation).view_timeline? %>
         <button type="button"
                 data-action="click->modal#open"
@@ -93,13 +136,12 @@
           <i class="fa-solid fa-timeline"></i>
           Auditoría
           <span class="ml-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-full px-2 py-0.5 text-[9px] font-black">
-            <%= @reservation.reservation_audits.count %>
+            <%= @reservation.reservation_audits.size %>
           </span>
         </button>
       <% else %>
         <div></div>
       <% end %>
-
       <div class="flex items-center gap-3">
         <% if @reservation.blocked? %>
           <%= button_to reservation_path(@reservation), method: :delete, data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este bloqueo de fecha? La propiedad volverá a estar disponible." }, class: "inline-flex items-center justify-center rounded-xl bg-rose-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg hover:bg-rose-500 transition-all duration-200" do %>
@@ -114,52 +156,5 @@
     </div>
   </div>
   <%= render "reservations/payments_section", reservation: @reservation, payments: @payments %>
-
-  <%# ── Modal de Auditoría (dentro del scope del controller) ── %>
-<% if policy(@reservation).view_timeline? %>
-  <%# El data-controller="modal" está en el div wrapper de la página %>
-  <div data-modal-target="dialog"
-       class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-
-    <%# Overlay / backdrop %>
-    <div data-modal-target="overlay"
-         data-action="click->modal#close"
-         class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
-
-    <%# Contenido del modal %>
-    <div data-modal-target="content"
-         data-action="click->modal#stopPropagation"
-         class="relative z-10 w-full max-w-4xl max-h-[88vh] flex flex-col
-                bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-2xl
-                opacity-0 scale-95 translate-y-4 transition-all duration-300">
-
-      <%# Header %>
-      <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-slate-800 shrink-0">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-            <i class="fa-solid fa-timeline text-sm"></i>
-          </div>
-          <div>
-            <h2 class="text-base font-black text-gray-900 dark:text-white">Línea de Tiempo</h2>
-            <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">
-              Reserva #<%= @reservation.id %> &mdash; <%= @reservation.reservation_audits.count %> evento(s)
-            </p>
-          </div>
-        </div>
-        <button type="button"
-                data-action="click->modal#close"
-                class="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-700 dark:hover:text-slate-200 transition-all">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <%# Cuerpo scrolleable %>
-      <div class="overflow-y-auto flex-1 px-6 py-6 sm:px-8">
-        <%= render "reservations/timeline", reservation: @reservation %>
-      </div>
-
-    </div>
-  </div>
-<% end %>
-
-</div><%# /data-controller="modal" %>
+  <%= render "reservations/timeline_modal", reservation: @reservation %>
+</div>

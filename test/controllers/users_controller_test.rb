@@ -25,7 +25,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         password_confirmation: "password123",
         role: "normal",
         first_name: "Test",
-        last_name: "User"
+        last_name: "User",
+        rut: "12345678-5",
+        phone: "+56912345678"
       } }
     end
 
@@ -49,6 +51,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       password: "password123",
       first_name: "Temp",
       last_name: "Assoc",
+      rut: "11111111-1",
+      phone: "+56911112222",
       role: :normal
     )
     # Create a client associated with this user

@@ -1,4 +1,4 @@
-<div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 gap-4 transition-all hover:shadow-md">
+<div id="<%= dom_id(payment) %>_card" class="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 gap-4 transition-all hover:shadow-md">
   <div class="flex flex-row items-start sm:items-center gap-4">
     <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 <%= payment.abono? ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400' %> shadow-sm">
       <i class="fa-solid <%= payment.abono? ? 'fa-arrow-down' : 'fa-arrow-up' %> text-lg"></i>

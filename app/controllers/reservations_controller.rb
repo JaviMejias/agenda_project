@@ -6,12 +6,12 @@ class ReservationsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        current_month_reservations = Reservation.in_range(Time.zone.now.all_month)
+        current_month_reservations = policy_scope(Reservation).in_range(Time.zone.now.all_month)
         @current_month_count = current_month_reservations.count
         @current_month_earnings = current_month_reservations.confirmed.sum(:total_price)
       end
       format.json {
-        @reservations = Reservation.for_calendar(
+        @reservations = policy_scope(Reservation).for_calendar(
           property_id: params[:property_id],
           start_date_str: params[:start],
           end_date_str: params[:end],
@@ -23,7 +23,7 @@ class ReservationsController < ApplicationController
 
   def list
     authorize Reservation
-    @reservations = Reservation.all.for_list(query: params[:q], status: params[:status])
+    @reservations = policy_scope(Reservation).for_list(query: params[:q], status: params[:status])
     @reservations_count = @reservations.count
     @total_price = @reservations.sum(:total_price)
     @filename = "reservas_#{Time.current.strftime('%Y%m%d_%H%M')}"
@@ -50,7 +50,7 @@ class ReservationsController < ApplicationController
     start_date = Time.zone.parse(params[:start]) rescue nil
     end_date = Time.zone.parse(params[:end]) rescue nil
 
-    @reservations = Reservation.includes(:property).order(start_time: :asc)
+    @reservations = policy_scope(Reservation).includes(:property).order(start_time: :asc)
     if start_date && end_date
       @reservations = @reservations.overlapping_range(start_date, end_date)
     end
@@ -178,7 +178,7 @@ class ReservationsController < ApplicationController
   end
 
   def set_reservation
-    @reservation = Reservation.find(params[:id])
+    @reservation = policy_scope(Reservation).find(params[:id])
   end
 
   def reservation_params

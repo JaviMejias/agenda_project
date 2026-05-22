@@ -49,6 +49,7 @@ Rails.application.routes.draw do
   end
 
   get "dashboard", to: "dashboard#index", as: :dashboard
+  resources :audits, only: [ :index ]
 
   authenticated :user do
     root "home#index", as: :authenticated_root

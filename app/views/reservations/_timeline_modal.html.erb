@@ -1,0 +1,35 @@
+<% if policy(reservation).view_timeline? %>
+  <div data-modal-target="dialog"
+       class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    <div data-modal-target="overlay"
+         data-action="click->modal#close"
+         class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+    <div data-modal-target="content"
+         data-action="click->modal#stopPropagation"
+         class="relative z-10 w-full max-w-4xl max-h-[88vh] flex flex-col
+                bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-2xl
+                opacity-0 scale-95 translate-y-4 transition-all duration-300">
+      <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-slate-800 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+            <i class="fa-solid fa-timeline text-sm"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-black text-gray-900 dark:text-white">Línea de Tiempo</h2>
+            <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">
+              Reserva #<%= reservation.id %> &mdash; <%= reservation.reservation_audits.count %> evento(s)
+            </p>
+          </div>
+        </div>
+        <button type="button"
+                data-action="click->modal#close"
+                class="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-700 dark:hover:text-slate-200 transition-all">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="overflow-y-auto flex-1 px-6 py-6 sm:px-8">
+        <%= render "reservations/timeline", reservation: reservation %>
+      </div>
+    </div>
+  </div>
+<% end %>

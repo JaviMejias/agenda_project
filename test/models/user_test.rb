@@ -6,7 +6,9 @@ class UserTest < ActiveSupport::TestCase
       email: "test_new@example.com",
       password: "password123",
       first_name: "Juan",
-      last_name: "Perez"
+      last_name: "Perez",
+      rut: "12345678-5",
+      phone: "+56912345678"
     )
     assert user.valid?
   end

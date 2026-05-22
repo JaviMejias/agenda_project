@@ -12,7 +12,7 @@ class ReservationPolicy < ApplicationPolicy
   end
 
   def show?
-    true
+    user.admin? || user.normal?
   end
 
   def create?
@@ -20,7 +20,7 @@ class ReservationPolicy < ApplicationPolicy
   end
 
   def update?
-    true
+    user.admin? || user.normal?
   end
 
   def destroy?
@@ -33,7 +33,11 @@ class ReservationPolicy < ApplicationPolicy
 
   class Scope < ApplicationPolicy::Scope
     def resolve
-      scope.all
+      if user.admin? || user.normal?
+        scope.all
+      else
+        scope.none
+      end
     end
   end
 end

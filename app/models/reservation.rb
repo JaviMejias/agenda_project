@@ -37,7 +37,10 @@ class Reservation < ApplicationRecord
 
   scope :search, ->(query) {
     if query.present?
-      joins(:property).where("client_name ILIKE ? OR properties.name ILIKE ?", "%#{query}%", "%#{query}%")
+      joins(:property).where(
+        "client_name ILIKE :q OR properties.name ILIKE :q OR reservations.token ILIKE :q",
+        q: "%#{query}%"
+      )
     else
       joins(:property)
     end
@@ -45,7 +48,7 @@ class Reservation < ApplicationRecord
   scope :ordered, -> { order(start_time: :desc) }
 
   scope :for_list, ->(query: nil, status: nil) {
-    list = includes(:property, :payments).search(query).ordered
+    list = includes(:property, :payments, :user).search(query).ordered
     list = list.where(status: status) if status.present?
     list
   }
@@ -96,7 +99,7 @@ class Reservation < ApplicationRecord
 
 
   def self.for_calendar(property_id: nil, start_date_str: nil, end_date_str: nil, exclude_id: nil)
-    query = Reservation.active_and_valid.joins(:property).includes(:property, :payments)
+    query = all.active_and_valid.joins(:property).includes(:property, :payments)
     query = query.where(property_id: property_id) if property_id.present?
 
     if start_date_str.present? && end_date_str.present?

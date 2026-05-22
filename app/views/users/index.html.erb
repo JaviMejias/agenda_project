@@ -14,7 +14,15 @@
     <% end %>
   <% end %>
   <turbo-frame id="users_frame" class="relative block">
-    <%= render "shared/loading_state", text: "Actualizando equipo..." %>
+    <div class="mb-6 flex gap-6 border-b border-gray-100 dark:border-slate-800">
+      <%= link_to users_path, data: { turbo_action: "advance" }, class: "pb-3 px-2 font-bold text-sm transition-colors border-b-2 #{params[:type] != 'client' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white'}" do %>
+        <i class="fa-solid fa-users-gear mr-2"></i>Equipo Interno
+      <% end %>
+      <%= link_to users_path(type: 'client'), data: { turbo_action: "advance" }, class: "pb-3 px-2 font-bold text-sm transition-colors border-b-2 #{params[:type] == 'client' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white'}" do %>
+        <i class="fa-solid fa-user-tag mr-2"></i>Clientes Registrados
+      <% end %>
+    </div>
+    <%= render "shared/loading_state", text: "Actualizando lista..." %>
     <% if @users.any? %>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% @users.each do |user| %>
@@ -27,6 +35,10 @@
                 <% if user.admin? %>
                   <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900 shadow-sm">
                     <i class="fa-solid fa-shield-halved mr-1.5 text-[8px]"></i> Admin
+                  </span>
+                <% elsif user.client? %>
+                  <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 shadow-sm">
+                    <i class="fa-solid fa-user-tag mr-1.5 text-[8px]"></i> Cliente
                   </span>
                 <% else %>
                   <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest bg-gray-50 dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-100 dark:border-slate-700">

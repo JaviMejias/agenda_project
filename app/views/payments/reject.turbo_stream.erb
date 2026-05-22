@@ -1,0 +1,35 @@
+<%= turbo_stream.replace dom_id(@payment) do %>
+  <%= render partial: "reservations/payment_row", locals: { payment: @payment, reservation: @reservation } %>
+<% end %>
+
+<%= turbo_stream.replace "#{dom_id(@payment)}_card" do %>
+  <%= render partial: "reservations/payment_card", locals: { payment: @payment, reservation: @reservation } %>
+<% end %>
+
+<%= turbo_stream.replace "#{dom_id(@reservation)}_financial_header" do %>
+  <div id="<%= dom_id(@reservation) %>_financial_header" class="px-6 py-8 sm:px-10 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+    <div>
+      <h4 class="text-2xl font-black text-gray-900 dark:text-white">Estado Financiero</h4>
+      <span class="mt-2 inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border shadow-sm <%= reservation_payment_state_color_classes(@reservation.payment_state) %>">
+        <%= @reservation.payment_state %>
+      </span>
+    </div>
+    <div class="sm:text-right bg-gray-50 dark:bg-slate-800/50 p-4 sm:p-0 sm:bg-transparent rounded-xl border border-gray-100 dark:border-slate-700 sm:border-0">
+      <% if @reservation.cancelled? %>
+        <p class="text-[10px] font-black text-rose-400 dark:text-rose-500 uppercase tracking-widest mb-1">Monto Reembolsable / Abonado</p>
+        <p class="text-3xl font-black text-rose-500">
+          $<%= number_to_currency(@reservation.total_paid, unit: "", separator: ",", delimiter: ".") %>
+        </p>
+      <% else %>
+        <p class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">Saldo Pendiente</p>
+        <p class="text-3xl font-black <%= @reservation.pending_balance <= 0 ? 'text-emerald-500' : 'text-amber-500' %>">
+          $<%= number_to_currency(@reservation.pending_balance, unit: "", separator: ",", delimiter: ".") %>
+        </p>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%= turbo_stream.prepend "flash-container" do %>
+  <%= render partial: "shared/flash_message", locals: { type: "notice", message: "El pago fue rechazado exitosamente." } %>
+<% end %>

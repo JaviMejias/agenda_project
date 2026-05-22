@@ -54,8 +54,8 @@
           existing_client = Client.find_by(email: current_user.email)
           client_name = current_user.full_name
           client_email = current_user.email
-          client_phone = existing_client&.phone.presence || "+56 9 1111 1111"
-          client_rut = existing_client&.rut.presence || "1-9"
+          client_phone = existing_client&.phone.presence || current_user.phone.presence || "+56 9 1111 1111"
+          client_rut = existing_client&.rut.presence || current_user.rut.presence || "1-9"
         %>
         <%= hidden_field_tag :client_name, client_name %>
         <%= hidden_field_tag :client_email, client_email %>
