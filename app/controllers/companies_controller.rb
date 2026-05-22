@@ -84,6 +84,7 @@ class CompaniesController < ApplicationController
   def company_params
     params.require(:company).permit(
       :name, :rut, :business_type, :address, :phone, :email, :logo,
+      :webpay_commerce_code, :webpay_api_key, :webpay_active,
       bank_accounts_attributes: [ :id, :bank_name, :account_type, :account_number, :holder_name, :holder_rut, :holder_email, :_destroy ]
     )
   end

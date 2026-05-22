@@ -39,6 +39,37 @@
       </div>
     <% end %>
   </div>
+  
+  <div class="bg-pink-50 dark:bg-pink-950/20 border border-pink-200 dark:border-pink-900 rounded-2xl p-4 sm:p-6 mt-6">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h3 class="text-sm font-black text-pink-700 dark:text-pink-400 flex items-center gap-2">
+          <i class="fa-solid fa-credit-card"></i> Configuración de Pagos Webpay Plus
+        </h3>
+        <p class="text-xs text-pink-600/80 dark:text-pink-500 mt-1">
+          Activa el pago automático online. Si dejas los códigos vacíos en producción, se usarán los credenciales de prueba (Integración) de Transbank.
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <%= f.label :webpay_active, "Activar Pagos", class: "text-xs font-bold text-gray-700 dark:text-slate-300 cursor-pointer" %>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <%= f.check_box :webpay_active, class: "sr-only peer" %>
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 dark:peer-focus:ring-pink-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-pink-600"></div>
+        </label>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="space-y-2">
+        <%= f.label :webpay_commerce_code, "Commerce Code (Código de Comercio)", class: label_class %>
+        <%= f.text_field :webpay_commerce_code, placeholder: "Ej: 597012345678", class: input_class %>
+      </div>
+      <div class="space-y-2">
+        <%= f.label :webpay_api_key, "API Key Secreta", class: label_class %>
+        <%= f.text_field :webpay_api_key, placeholder: "Tu llave secreta de Transbank", class: input_class %>
+      </div>
+    </div>
+  </div>
   <div data-controller="image-preview" class="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 mt-6">
     <%= f.label :logo, class: "block text-sm font-bold text-gray-700 dark:text-slate-300 mb-4" do %>
       <i class="fa-solid fa-image text-indigo-500 mr-1"></i> Logo de la Empresa

@@ -447,6 +447,8 @@ GEM
     thruster (0.1.15-aarch64-linux)
     thruster (0.1.15-x86_64-linux)
     timeout (0.6.1)
+    transbank-sdk (5.1.0)
+      json (~> 2.6)
     tsort (0.2.0)
     turbo-rails (2.0.17)
       actionpack (>= 7.1.0)
@@ -533,6 +535,7 @@ DEPENDENCIES
   sqlite3 (>= 2.1)
   stimulus-rails
   thruster
+  transbank-sdk (~> 5.1)
   turbo-rails
   tzinfo-data
   vite_rails

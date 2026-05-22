@@ -3,7 +3,7 @@ class Public::ReservationsController < ApplicationController
   layout "public"
 
   around_action :with_public_flag, only: [ :create ]
-  before_action :set_reservation, only: [ :show, :confirm, :reject, :receipt, :add_payment, :delete_payment, :upload_voucher ]
+  before_action :set_reservation, only: [ :show, :confirm, :reject, :receipt, :add_payment, :delete_payment, :upload_voucher, :webpay_init, :webpay_return ]
 
   def search
     if params[:token].present?
@@ -64,6 +64,75 @@ class Public::ReservationsController < ApplicationController
                formats: [ :html ],
                disposition: "inline"
       end
+    end
+  end
+
+  def webpay_init
+    if @reservation.cancelled?
+      redirect_to public_reservation_path(@reservation.token), alert: "No se puede pagar una reserva cancelada."
+      return
+    end
+
+    if @reservation.pending_balance <= 0
+      redirect_to public_reservation_path(@reservation.token), alert: "Esta reserva ya se encuentra totalmente pagada."
+      return
+    end
+
+    amount = @reservation.pending_balance.to_i
+    buy_order = "RES-#{@reservation.id}-#{Time.now.to_i}"
+    session_id = "SESSION-#{@reservation.token}"
+    return_url = webpay_return_public_reservation_url(@reservation.token)
+
+    begin
+      tx = WebpayService.transaction_for(@reservation.property.company)
+      response = tx.create(buy_order, session_id, amount, return_url)
+      
+      # Redirigir a Webpay
+      redirect_to response["url"] + "?token_ws=" + response["token"], allow_other_host: true
+    rescue => e
+      Rails.logger.error "Error al iniciar Webpay: #{e.message}"
+      redirect_to public_reservation_path(@reservation.token), alert: "Hubo un problema al contactar a Webpay. Por favor intenta más tarde."
+    end
+  end
+
+  def webpay_return
+    token_ws = params[:token_ws]
+    
+    if token_ws.blank?
+      # Webpay cancelado por el usuario
+      redirect_to public_reservation_path(@reservation.token), alert: "El pago fue cancelado."
+      return
+    end
+
+    begin
+      tx = WebpayService.transaction_for(@reservation.property.company)
+      response = tx.commit(token_ws)
+
+      if response["status"] == "AUTHORIZED" || response["status"] == "CAPTURED"
+        # Crear el pago
+        Payment.transaction do
+          payment = @reservation.payments.create!(
+            amount: response["amount"],
+            payment_date: Time.current,
+            payment_method: :card,
+            transaction_type: :abono,
+            operation_number: response["authorization_code"],
+            status: :approved,
+            notes: "Pagado vía Webpay Plus. Tarjeta finaliza en #{response.dig("card_detail", "card_number")}. Orden: #{response["buy_order"]}"
+          )
+          
+          if @reservation.pending?
+            Reservations::ConfirmService.call(@reservation)
+          end
+        end
+
+        redirect_to public_reservation_path(@reservation.token), notice: "¡Pago exitoso! Tu reserva ha sido confirmada automáticamente."
+      else
+        redirect_to public_reservation_path(@reservation.token), alert: "El pago fue rechazado o no se pudo autorizar."
+      end
+    rescue => e
+      Rails.logger.error "Error al confirmar Webpay: #{e.message}"
+      redirect_to public_reservation_path(@reservation.token), alert: "Ocurrió un error al procesar la confirmación del pago."
     end
   end
 
@@ -161,7 +230,7 @@ class Public::ReservationsController < ApplicationController
   end
 
   def set_reservation
-    @reservation = Reservation.includes(property: { company: :bank_accounts }).find_by!(token: params[:token])
+    @reservation = Reservation.includes(property: :company).find_by!(token: params[:token])
 
     if Time.zone.now > @reservation.end_time.end_of_day
       render "public/reservations/expired", status: :gone

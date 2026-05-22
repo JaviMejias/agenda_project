@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_21_233000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_22_010504) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -76,6 +76,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_21_233000) do
     t.string "rut"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.boolean "webpay_active", default: false
+    t.string "webpay_api_key"
+    t.string "webpay_commerce_code"
     t.index ["user_id"], name: "index_companies_on_user_id"
   end
 

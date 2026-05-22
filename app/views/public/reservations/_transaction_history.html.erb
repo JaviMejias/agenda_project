@@ -7,11 +7,29 @@
           <div>
             <p class="text-xs font-bold text-gray-500 dark:text-slate-400"><%= I18n.l(payment.payment_date, format: "%d de %B, %Y") %></p>
             <p class="text-sm font-black text-gray-950 dark:text-white mt-0.5">$<%= number_with_delimiter(payment.amount.to_i, delimiter: ".") %></p>
-            <div class="flex flex-wrap items-center gap-1.5 mt-1">
-              <% if payment.operation_number.present? %>
-                <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded border border-indigo-100/50 dark:border-indigo-900/50 inline-block">Nº: <%= payment.operation_number %></span>
-              <% end %>
-              <% unless payment.voucher.attached? %>
+              <div class="flex items-center gap-2 mt-1">
+                <% method_colors = {
+                  "transfer" => "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-100/50 dark:border-blue-900/50",
+                  "cash" => "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-900/50",
+                  "card" => "bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 border-pink-100/50 dark:border-pink-900/50"
+                }
+                method_names = {
+                  "transfer" => "Transferencia",
+                  "cash" => "Efectivo",
+                  "card" => "Webpay"
+                }
+                color_class = method_colors[payment.payment_method] || "bg-gray-50 text-gray-600"
+                name_text = method_names[payment.payment_method] || payment.payment_method.titleize
+                %>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded border inline-block flex-shrink-0 <%= color_class %>">
+                  <%= name_text %>
+                </span>
+              </div>
+              <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
+                <% if payment.operation_number.present? %>
+                  <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded border border-indigo-100/50 dark:border-indigo-900/50 inline-block">Nº: <%= payment.operation_number %></span>
+                <% end %>
+              <% unless payment.voucher.attached? || payment.card? %>
                 <span class="text-[10px] text-amber-600 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/20 px-2 py-0.5 rounded border border-amber-100/30 dark:border-amber-900/30 inline-block flex-shrink-0">
                   <i class="fa-solid fa-triangle-exclamation mr-1"></i> Sin Comprobante
                 </span>
@@ -23,15 +41,19 @@
               <%= link_to url_for(payment.voucher), target: "_blank", class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-indigo-600 transition-colors shadow-sm", title: "Ver Comprobante" do %>
                 <i class="fa-solid fa-file-image"></i>
               <% end %>
-            <% else %>
+            <% elsif !payment.card? %>
               <%= form_with(model: payment, url: upload_voucher_public_reservation_path(reservation.token, payment_id: payment.id), method: :post, local: true, class: "flex items-center") do |f| %>
                 <label class="w-10 h-10 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/20 dark:hover:bg-amber-950/40 border border-amber-200/50 dark:border-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400 transition-colors shadow-sm cursor-pointer" title="Subir Comprobante Faltante">
                   <i class="fa-solid fa-cloud-arrow-up text-sm animate-bounce"></i>
                   <%= f.file_field :voucher, accept: "image/*,application/pdf", class: "hidden", onchange: "this.form.submit();" %>
                 </label>
               <% end %>
+            <% else %>
+              <div class="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-900/20 border border-pink-100 dark:border-pink-900/40 flex items-center justify-center text-pink-500 shadow-sm" title="Pago Online Verificado">
+                <i class="fa-solid fa-check-double"></i>
+              </div>
             <% end %>
-            <% if reservation.pending? %>
+            <% if reservation.pending? && !payment.card? %>
               <%= button_to delete_payment_public_reservation_path(reservation.token, payment_id: payment.id), method: :delete, class: "w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex items-center justify-center text-gray-400 hover:text-red-600 transition-colors shadow-sm cursor-pointer", title: "Eliminar Transacción", data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este registro de pago?" } do %>
                 <i class="fa-solid fa-trash-can"></i>
               <% end %>

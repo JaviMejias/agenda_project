@@ -1,4 +1,4 @@
-<div data-mobile-menu-target="menu" class="sm:hidden hidden border-t border-gray-100/50 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl transition-all duration-300">
+<div data-mobile-menu-target="menu" class="lg:hidden hidden border-t border-gray-100/50 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl transition-all duration-300">
   <div class="space-y-1.5 px-4 py-6">
     <div class="px-5 mb-2">
       <span class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Navegación</span>
@@ -23,17 +23,17 @@
     <div class="px-5 mt-6 mb-2">
       <span class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Apariencia</span>
     </div>
-    <div data-controller="theme" class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/80 mx-5 p-1.5 rounded-2xl border border-gray-100 dark:border-slate-700">
-      <button data-action="click->theme#setTheme" data-theme-value="light" class="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all hover:bg-white dark:hover:bg-slate-750 text-gray-500 dark:text-slate-400">
-        <i class="fa-solid fa-sun text-sm"></i>
+    <div data-controller="theme" class="flex items-center gap-1 bg-gray-100/80 dark:bg-slate-900/60 mx-5 p-1.5 rounded-xl border border-gray-200/50 dark:border-slate-700/50 shadow-inner">
+      <button data-action="click->theme#setTheme" data-theme-value="light" class="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-lg transition-all hover:bg-white dark:hover:bg-slate-800 text-gray-500 dark:text-slate-400 group">
+        <i class="fa-solid fa-sun text-sm group-hover:scale-110 transition-transform"></i>
         <span class="text-[9px] font-black uppercase tracking-tighter">Claro</span>
       </button>
-      <button data-action="click->theme#setTheme" data-theme-value="system" class="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all hover:bg-white dark:hover:bg-slate-750 text-gray-500 dark:text-slate-400">
-        <i class="fa-solid fa-desktop text-sm"></i>
-        <span class="text-[9px] font-black uppercase tracking-tighter">Sistema</span>
+      <button data-action="click->theme#setTheme" data-theme-value="system" class="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-lg transition-all hover:bg-white dark:hover:bg-slate-800 text-gray-500 dark:text-slate-400 group">
+        <i class="fa-solid fa-desktop text-sm group-hover:scale-110 transition-transform"></i>
+        <span class="text-[9px] font-black uppercase tracking-tighter">Auto</span>
       </button>
-      <button data-action="click->theme#setTheme" data-theme-value="dark" class="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all hover:bg-white dark:hover:bg-slate-750 text-gray-500 dark:text-slate-400">
-        <i class="fa-solid fa-moon text-sm"></i>
+      <button data-action="click->theme#setTheme" data-theme-value="dark" class="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-lg transition-all hover:bg-white dark:hover:bg-slate-800 text-gray-500 dark:text-slate-400 group">
+        <i class="fa-solid fa-moon text-sm group-hover:scale-110 transition-transform"></i>
         <span class="text-[9px] font-black uppercase tracking-tighter">Oscuro</span>
       </button>
     </div>
@@ -45,7 +45,7 @@
               <%= current_user.email[0].upcase %>
             </div>
             <div class="flex flex-col">
-              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Mi Cuenta</span>
+              <span class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Mi Cuenta</span>
               <span class="text-sm font-bold text-gray-700 dark:text-slate-300 truncate max-w-[180px]"><%= current_user.email %></span>
             </div>
           </div>

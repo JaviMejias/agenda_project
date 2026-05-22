@@ -116,7 +116,6 @@
           <th style="padding: 12px 15px; text-align: left; font-size: 10px; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0;">Fecha</th>
           <th style="padding: 12px 15px; text-align: left; font-size: 10px; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0;">Tipo</th>
           <th style="padding: 12px 15px; text-align: left; font-size: 10px; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0;">Método</th>
-          <th style="padding: 12px 15px; text-align: left; font-size: 10px; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0;">Notas</th>
           <th style="padding: 12px 15px; text-align: right; font-size: 10px; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0;">Monto</th>
         </tr>
       </thead>
@@ -136,7 +135,6 @@
                 <span style="font-size: 10px; color: #64748b; font-weight: bold;">N° <%= payment.operation_number %></span>
               <% end %>
             </td>
-            <td style="padding: 12px 15px; font-size: 12px; color: #64748b; border-bottom: 1px solid #f1f5f9; font-style: italic;"><%= payment.notes.presence || "-" %></td>
             <td style="padding: 12px 15px; text-align: right; font-weight: 900; font-size: 13px; border-bottom: 1px solid #f1f5f9; color: <%= payment.abono? ? '#059669' : '#e11d48' %>;">
               <%= payment.abono? ? '+' : '-' %> $<%= number_with_delimiter(payment.amount.to_i, delimiter: ".") %>
             </td>

@@ -8,20 +8,20 @@
   <div class="mx-auto max-w-2xl transform divide-y divide-gray-100 dark:divide-slate-800 overflow-hidden rounded-2xl bg-white/90 dark:bg-slate-900/90 shadow-2xl ring-1 ring-black/5 backdrop-blur-2xl transition-all opacity-0 scale-95 duration-200"
        data-omnibar-target="container">
     <div class="relative">
-      <i class="fa-solid fa-magnifying-glass absolute left-6 top-5 text-indigo-500 dark:text-indigo-400"></i>
+      <i class="fa-solid fa-magnifying-glass absolute left-4 sm:left-6 top-5 text-indigo-500 dark:text-indigo-400 text-lg"></i>
       <input type="text" 
-             class="h-16 w-full border-0 bg-transparent pl-14 pr-4 text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-0 sm:text-base font-bold" 
-             placeholder="¿Qué estás buscando? Clientes, propiedades, reservas o código... (↑↓ navegar)"
+             class="h-16 w-full border-0 bg-transparent pl-12 sm:pl-14 pr-4 text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-0 text-sm sm:text-base font-bold" 
+             placeholder="Buscar clientes, reservas, propiedades..."
              data-omnibar-target="input"
              data-action="input->omnibar#search">
-      <div class="absolute right-4 top-4 flex items-center gap-2">
-        <kbd class="hidden sm:flex h-7 items-center rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 font-sans text-[10px] font-black text-gray-400 uppercase tracking-widest shadow-sm">
+      <div class="absolute right-4 top-4 hidden sm:flex items-center gap-2">
+        <kbd class="flex h-7 items-center rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 font-sans text-[10px] font-black text-gray-400 uppercase tracking-widest shadow-sm">
           Esc
         </kbd>
       </div>
     </div>
-    <div class="max-h-[60vh] scroll-py-2 overflow-y-auto pb-2" data-omnibar-target="results"></div>
-    <div class="flex items-center justify-between bg-gray-50/50 dark:bg-slate-800/30 px-6 py-3">
+    <div class="max-h-[60vh] sm:max-h-[50vh] scroll-py-2 overflow-y-auto pb-2" data-omnibar-target="results"></div>
+    <div class="hidden sm:flex items-center justify-between bg-gray-50/50 dark:bg-slate-800/30 px-6 py-3">
       <div class="flex gap-4">
         <div class="flex items-center gap-1">
           <kbd class="flex h-5 w-5 items-center justify-center rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-sans text-[10px] font-black text-gray-400 shadow-sm">

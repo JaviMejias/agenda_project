@@ -18,11 +18,49 @@
         <%= render "public/reservations/transaction_history", payments: @payments, reservation: @reservation %>
       </div>
       <div class="md:pl-8">
-        <h3 class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-6">Subir Comprobante de Pago</h3>
-        <% unless @reservation.cancelled? || @reservation.pending_balance <= 0 %>
-          <%= render "public/reservations/bank_accounts", reservation: @reservation %>
+        <% if @reservation.cancelled? || @reservation.pending_balance <= 0 %>
+          <h3 class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Estado del Pago</h3>
+          <%= render "public/reservations/payment_form", reservation: @reservation, new_payment: @new_payment %>
+        <% else %>
+          <div data-controller="payment-tabs">
+            <h3 class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Realizar Pago</h3>
+            
+            <% if @reservation.property.company&.webpay_active? %>
+              <div class="flex gap-2 mb-6">
+                <button type="button" data-payment-tabs-target="tab" data-target="panel-webpay" data-action="click->payment-tabs#switch" class="flex-1 py-2.5 px-4 rounded-xl border text-[10px] sm:text-xs font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-credit-card"></i> Pagar Online
+                </button>
+                <button type="button" data-payment-tabs-target="tab" data-target="panel-manual" data-action="click->payment-tabs#switch" class="flex-1 py-2.5 px-4 rounded-xl border text-[10px] sm:text-xs font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-building-columns"></i> Transferencia
+                </button>
+              </div>
+            <% else %>
+              <div data-payment-tabs-target="tab" data-target="panel-manual" class="hidden"></div>
+            <% end %>
+
+            <div data-payment-tabs-target="panel" id="panel-webpay" class="<%= @reservation.property.company&.webpay_active? ? '' : 'hidden' %>">
+              <% if @reservation.property.company&.webpay_active? %>
+                <div class="mb-4 text-center">
+                  <p class="text-xs text-gray-500 dark:text-slate-400 font-semibold mb-6">Paga de forma rápida y segura con tarjeta de crédito o débito. La reserva se confirmará automáticamente.</p>
+                  <%= form_with(url: webpay_init_public_reservation_path(@reservation.token), method: :post, data: { turbo: false }) do |f| %>
+                    <button type="submit" class="w-full relative overflow-hidden group py-5 px-6 bg-pink-600 hover:bg-pink-700 text-white rounded-2xl shadow-xl shadow-pink-500/20 hover:shadow-pink-500/30 transition-all hover:-translate-y-1 active:scale-95 flex flex-col items-center justify-center">
+                      <div class="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-20deg] group-hover:animate-shimmer hidden sm:block"></div>
+                      <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-credit-card text-2xl"></i>
+                        <span class="font-black tracking-widest uppercase text-sm">Pagar con Webpay Plus</span>
+                      </div>
+                    </button>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+
+            <div data-payment-tabs-target="panel" id="panel-manual" class="<%= @reservation.property.company&.webpay_active? ? 'hidden' : '' %>">
+              <%= render "public/reservations/bank_accounts", reservation: @reservation %>
+              <%= render "public/reservations/payment_form", reservation: @reservation, new_payment: @new_payment %>
+            </div>
+          </div>
         <% end %>
-        <%= render "public/reservations/payment_form", reservation: @reservation, new_payment: @new_payment %>
       </div>
     </div>
   </div>
