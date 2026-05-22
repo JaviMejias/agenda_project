@@ -121,6 +121,27 @@ class Public::ReservationsController < ApplicationController
             notes: "Pago con Tarjeta (Terminada en #{response.dig("card_detail", "card_number")}) - Cód: #{response["authorization_code"]}"
           )
 
+          # Transbank: VD (Débito) / VN, VC, SI, etc (Crédito) / VP (Prepago)
+          payment_type = response["payment_type_code"].to_s
+
+          # Estimación de comisión Transbank Webpay Plus (Tarifa estándar + IVA)
+          # Débito/Prepago: 1.49% + IVA = 1.77%
+          # Crédito: 2.95% + IVA = 3.51%
+          commission_rate = [ "VD", "VP" ].include?(payment_type) ? 0.0177 : 0.0351
+          commission_amount = (response["amount"].to_f * commission_rate).round
+
+          if commission_amount > 0
+            card_type_name = [ "VD", "VP" ].include?(payment_type) ? "Débito/Prepago" : "Crédito"
+
+            Expense.create!(
+              property: @reservation.property,
+              amount: commission_amount,
+              category: "other",
+              expense_date: Time.current.to_date,
+              description: "Comisión Webpay #{card_type_name} (Reserva ##{@reservation.id})"
+            )
+          end
+
           if @reservation.pending?
             Reservations::ConfirmService.call(@reservation)
           end
