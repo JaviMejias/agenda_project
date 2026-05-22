@@ -118,7 +118,7 @@ class Public::ReservationsController < ApplicationController
             transaction_type: :abono,
             operation_number: response["authorization_code"],
             status: :approved,
-            notes: "Pagado vía Webpay Plus. Tarjeta finaliza en #{response.dig("card_detail", "card_number")}. Orden: #{response["buy_order"]}"
+            notes: "Pago con Tarjeta (Terminada en #{response.dig("card_detail", "card_number")}) - Cód: #{response["authorization_code"]}"
           )
 
           if @reservation.pending?

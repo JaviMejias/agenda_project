@@ -8,26 +8,16 @@
             <p class="text-xs font-bold text-gray-500 dark:text-slate-400"><%= I18n.l(payment.payment_date, format: "%d de %B, %Y") %></p>
             <p class="text-sm font-black text-gray-950 dark:text-white mt-0.5">$<%= number_with_delimiter(payment.amount.to_i, delimiter: ".") %></p>
               <div class="flex items-center gap-2 mt-1">
-                <% method_colors = {
-                  "transfer" => "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-100/50 dark:border-blue-900/50",
-                  "cash" => "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-100/50 dark:border-emerald-900/50",
-                  "card" => "bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 border-pink-100/50 dark:border-pink-900/50"
-                }
-                method_names = {
-                  "transfer" => "Transferencia",
-                  "cash" => "Efectivo",
-                  "card" => "Webpay"
-                }
-                color_class = method_colors[payment.payment_method] || "bg-gray-50 text-gray-600"
-                name_text = method_names[payment.payment_method] || payment.payment_method.titleize
-                %>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded border inline-block flex-shrink-0 <%= color_class %>">
-                  <%= name_text %>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded border inline-block flex-shrink-0 <%= payment_method_color_classes(payment) %>">
+                  <i class="fa-solid <%= payment_method_icon(payment) %> text-[9px] mr-1"></i><%= payment_method_label(payment) %>
                 </span>
               </div>
               <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
                 <% if payment.operation_number.present? %>
                   <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded border border-indigo-100/50 dark:border-indigo-900/50 inline-block">Nº: <%= payment.operation_number %></span>
+                <% end %>
+                <% if payment.notes.present? %>
+                  <span class="text-[10px] text-gray-500 dark:text-slate-400 italic max-w-[200px] truncate" title="<%= payment.notes %>"><%= payment.notes %></span>
                 <% end %>
               <% unless payment.voucher.attached? || payment.card? %>
                 <span class="text-[10px] text-amber-600 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/20 px-2 py-0.5 rounded border border-amber-100/30 dark:border-amber-900/30 inline-block flex-shrink-0">

@@ -127,8 +127,17 @@ module ReservationsHelper
     case payment.payment_method
     when "transfer" then "Transferencia"
     when "cash" then "Efectivo"
-    when "card" then "Tarjeta"
+    when "card" then "Webpay"
     else "Depósito / Otro"
+    end
+  end
+
+  def payment_method_color_classes(payment)
+    case payment.payment_method
+    when "transfer" then "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900/50"
+    when "cash" then "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-900/50"
+    when "card" then "bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-900/30 dark:text-pink-400 dark:border-pink-900/50"
+    else "bg-gray-50 text-gray-600 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
     end
   end
 

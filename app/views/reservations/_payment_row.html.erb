@@ -9,7 +9,7 @@
     </span>
   </td>
   <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-slate-400">
-    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700 shadow-sm">
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border shadow-sm <%= payment_method_color_classes(payment) %>">
       <i class="fa-solid <%= payment_method_icon(payment) %> text-[10px]"></i>
       <%= payment_method_label(payment) %>
     </span>
@@ -17,6 +17,11 @@
       <span class="inline-flex items-center gap-1 ml-1 px-2 py-1 rounded-md text-[10px] font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 shadow-sm">
         <i class="fa-solid fa-hashtag text-[9px]"></i> <%= payment.operation_number %>
       </span>
+    <% end %>
+    <% if payment.notes.present? %>
+      <div class="mt-1 text-[10px] text-gray-400 dark:text-slate-500 italic max-w-[200px] truncate" title="<%= payment.notes %>">
+        <%= payment.notes %>
+      </div>
     <% end %>
     <% if payment.voucher.attached? %>
       <% if payment.voucher.image? %>
