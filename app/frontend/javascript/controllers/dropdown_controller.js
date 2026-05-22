@@ -8,8 +8,6 @@ export default class extends Controller {
   }
 
   toggle(event) {
-    if (event) event.stopPropagation()
-
     if (this.menuTarget.classList.contains("hidden")) {
       this.show()
     } else {
