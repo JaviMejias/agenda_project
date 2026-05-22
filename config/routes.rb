@@ -74,7 +74,7 @@ Rails.application.routes.draw do
         delete "delete_payment/:payment_id", to: "reservations#delete_payment", as: :delete_payment
         post "upload_voucher/:payment_id", to: "reservations#upload_voucher", as: :upload_voucher
         post :webpay_init
-        match :webpay_return, via: [:get, :post]
+        match :webpay_return, via: [ :get, :post ]
       end
     end
     get "buscar-reserva", to: "reservations#search", as: :search_public_reservations

@@ -49,7 +49,7 @@
             <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-64 origin-top-right rounded-2xl bg-white dark:bg-slate-800 shadow-2xl shadow-indigo-100/50 dark:shadow-none ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden z-50 border border-gray-100 dark:border-slate-700 transition-all duration-200 ease-out opacity-0 scale-95">
               <div class="px-5 py-4 border-b border-gray-50 dark:border-slate-700/50 bg-gray-50/30 dark:bg-slate-800/30">
                 <p class="text-xs font-black text-gray-900 dark:text-white truncate"><%= current_user.email %></p>
-                <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 mt-0.5"><%= current_user.admin? ? 'Administrador' : (current_user.employee? ? 'Empleado' : 'Cliente') %></p>
+                <p class="text-[10px] font-bold text-gray-400 dark:text-slate-500 mt-0.5"><%= current_user.admin? ? 'Administrador' : (current_user.normal? ? 'Empleado' : 'Cliente') %></p>
               </div>
               <div class="p-3">
                 <div class="px-2 mb-2">

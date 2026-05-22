@@ -37,7 +37,7 @@ class UsersController < ApplicationController
     authorize @user
 
     if @user.update(user_params_for_update)
-      redirect_to users_path(type: @user.client? ? 'client' : nil), notice: "Usuario actualizado exitosamente."
+      redirect_to users_path(type: @user.client? ? "client" : nil), notice: "Usuario actualizado exitosamente."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -46,10 +46,10 @@ class UsersController < ApplicationController
   def destroy
     authorize @user
     if @user == current_user
-      redirect_to users_path(type: @user.client? ? 'client' : nil), alert: "No puedes eliminarte a ti mismo."
+      redirect_to users_path(type: @user.client? ? "client" : nil), alert: "No puedes eliminarte a ti mismo."
     else
       @user.destroy
-      redirect_to users_path(type: @user.client? ? 'client' : nil), notice: "Usuario eliminado exitosamente."
+      redirect_to users_path(type: @user.client? ? "client" : nil), notice: "Usuario eliminado exitosamente."
     end
   end
 

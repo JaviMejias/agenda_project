@@ -86,7 +86,7 @@ class Public::ReservationsController < ApplicationController
     begin
       tx = WebpayService.transaction_for(@reservation.property.company)
       response = tx.create(buy_order, session_id, amount, return_url)
-      
+
       # Redirigir a Webpay
       redirect_to response["url"] + "?token_ws=" + response["token"], allow_other_host: true
     rescue => e
@@ -97,7 +97,7 @@ class Public::ReservationsController < ApplicationController
 
   def webpay_return
     token_ws = params[:token_ws]
-    
+
     if token_ws.blank?
       # Webpay cancelado por el usuario
       redirect_to public_reservation_path(@reservation.token), alert: "El pago fue cancelado."
@@ -120,7 +120,7 @@ class Public::ReservationsController < ApplicationController
             status: :approved,
             notes: "Pagado vía Webpay Plus. Tarjeta finaliza en #{response.dig("card_detail", "card_number")}. Orden: #{response["buy_order"]}"
           )
-          
+
           if @reservation.pending?
             Reservations::ConfirmService.call(@reservation)
           end

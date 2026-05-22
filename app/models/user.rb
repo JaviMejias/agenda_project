@@ -23,7 +23,7 @@ class User < ApplicationRecord
   }
   scope :ordered, -> { order(created_at: :desc) }
   scope :internal_team, -> { where.not(role: :client) }
-  scope :by_type, ->(type) { type.to_s == 'client' ? client : internal_team }
+  scope :by_type, ->(type) { type.to_s == "client" ? client : internal_team }
 
   has_many :properties, dependent: :destroy
   has_many :companies, dependent: :destroy
