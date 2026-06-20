@@ -3,6 +3,7 @@ class Property < ApplicationRecord
   belongs_to :company, optional: true
   has_many :reservations, dependent: :restrict_with_error
   has_many :expenses, dependent: :destroy
+  has_many :incidents, dependent: :destroy
   has_many_attached :images
 
   enum :pricing_model, { per_day: 0, per_hour: 1 }

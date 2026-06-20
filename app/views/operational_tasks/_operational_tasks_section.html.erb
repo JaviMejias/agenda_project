@@ -1,0 +1,33 @@
+<div class="bg-white dark:bg-slate-900 shadow-2xl overflow-hidden rounded-[2.5rem] border border-gray-100 dark:border-slate-800 animate-fade-in-up" style="animation-delay: 0.1s;">
+  <div class="px-6 py-6 sm:px-10 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h3 class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+        <i class="fa-solid fa-list-check text-indigo-600 dark:text-indigo-400"></i> Checklist Operativo
+      </h3>
+      <p class="text-xs font-bold text-gray-500 dark:text-slate-400 mt-1 uppercase tracking-widest">Lista de tareas a realizar antes, durante o después de la estadía</p>
+    </div>
+  </div>
+  <div class="p-6 sm:p-10">
+    <%= turbo_stream_from "reservation_#{reservation.id}_tasks" %>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div class="lg:col-span-2">
+        <div id="operational_tasks_list" class="space-y-3">
+          <% if reservation.operational_tasks.any? %>
+            <%= render partial: "operational_tasks/operational_task", collection: reservation.operational_tasks.order(created_at: :asc), as: :task %>
+          <% else %>
+            <div class="text-center py-10 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-gray-300 dark:border-slate-700">
+              <i class="fa-solid fa-clipboard-check text-4xl text-gray-300 dark:text-slate-600 mb-3"></i>
+              <p class="text-sm font-bold text-gray-500 dark:text-slate-400">No hay tareas pendientes.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="lg:col-span-1">
+        <div class="bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl p-6 border border-gray-100 dark:border-slate-800">
+          <h4 class="text-[10px] font-black text-gray-500 dark:text-slate-400 uppercase tracking-widest mb-4">Nueva Tarea</h4>
+          <%= render "operational_tasks/form", reservation: reservation, task: OperationalTask.new %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

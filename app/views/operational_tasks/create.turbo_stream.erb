@@ -1,0 +1,5 @@
+<%= turbo_stream.prepend "flash-container" do %>
+  <%= render partial: "shared/flash_message", locals: { type: "notice", message: "Tarea creada correctamente." } %>
+<% end %>
+
+<%= turbo_stream.replace "new_operational_task_form", partial: "operational_tasks/form", locals: { reservation: @reservation, task: OperationalTask.new } %>

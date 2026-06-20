@@ -9,7 +9,7 @@ class ClientsController < ApplicationController
 
   def show
     authorize @client
-    @reservations = @client.reservations.ordered
+    @reservations = @client.reservations.ordered.includes(:property)
     @pagy, @reservations = pagy(@reservations, limit: 5)
   end
 
@@ -69,6 +69,6 @@ class ClientsController < ApplicationController
   end
 
   def client_params
-    params.require(:client).permit(:name, :rut, :phone, :email)
+    params.require(:client).permit(:name, :rut, :phone, :email, :private_notes, :tag)
   end
 end

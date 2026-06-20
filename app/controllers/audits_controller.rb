@@ -2,7 +2,6 @@ class AuditsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    # Scope audits according to the user role and properties (IDOR protection)
     base_scope = ReservationAudit.includes(:user, reservation: :property)
     @properties = Property.all
 

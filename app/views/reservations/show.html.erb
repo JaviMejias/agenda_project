@@ -128,11 +128,11 @@
         <% end %>
       </dl>
     </div>
-    <div class="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 px-6 py-6 sm:px-10 flex items-center justify-between gap-3">
+    <div class="bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 px-6 py-6 sm:px-10 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
       <% if policy(@reservation).view_timeline? %>
         <button type="button"
                 data-action="click->modal#open"
-                class="inline-flex items-center gap-2 rounded-xl border border-purple-200 dark:border-purple-900 bg-purple-50 dark:bg-purple-950/30 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-all duration-200">
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-purple-200 dark:border-purple-900 bg-purple-50 dark:bg-purple-950/30 px-4 py-3 sm:py-2.5 text-xs font-black uppercase tracking-widest text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-all duration-200 w-full sm:w-auto">
           <i class="fa-solid fa-timeline"></i>
           Auditoría
           <span class="ml-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-full px-2 py-0.5 text-[9px] font-black">
@@ -140,21 +140,43 @@
           </span>
         </button>
       <% else %>
-        <div></div>
+        <div class="hidden sm:block"></div>
       <% end %>
-      <div class="flex items-center gap-3">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
         <% if @reservation.blocked? %>
-          <%= button_to reservation_path(@reservation), method: :delete, data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este bloqueo de fecha? La propiedad volverá a estar disponible." }, class: "inline-flex items-center justify-center rounded-xl bg-rose-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg hover:bg-rose-500 transition-all duration-200" do %>
+          <%= button_to reservation_path(@reservation), method: :delete, data: { turbo_confirm: "¿Estás seguro de que deseas eliminar este bloqueo de fecha? La propiedad volverá a estar disponible." }, class: "inline-flex items-center justify-center w-full sm:w-auto rounded-xl bg-rose-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg hover:bg-rose-500 transition-all duration-200" do %>
             <i class="fa-solid fa-unlock mr-2"></i> Eliminar Bloqueo
           <% end %>
         <% else %>
-          <%= link_to edit_reservation_path(@reservation, from: params[:from]), class: "inline-flex items-center justify-center rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 py-3 text-xs font-black uppercase tracking-widest text-gray-700 dark:text-slate-200 shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200" do %>
+          <%= link_to edit_reservation_path(@reservation, from: params[:from]), class: "inline-flex items-center justify-center w-full sm:w-auto rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 py-3 text-xs font-black uppercase tracking-widest text-gray-700 dark:text-slate-200 shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200" do %>
             <i class="fa-solid fa-pen-to-square mr-2"></i> Editar Reserva
           <% end %>
         <% end %>
       </div>
     </div>
   </div>
-  <%= render "reservations/payments_section", reservation: @reservation, payments: @payments %>
+  <div data-controller="tabs" class="mt-8 space-y-4">
+    <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 p-1.5 bg-gray-100 dark:bg-slate-800/80 rounded-2xl w-full sm:w-fit mx-auto">
+      <% unless @reservation.blocked? %>
+        <button type="button" data-tabs-target="tab" data-tab="payments" data-action="click->tabs#switch" class="flex-1 px-6 py-3 sm:py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer text-center text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/40 dark:hover:bg-slate-700/30">
+          <i class="fa-solid fa-wallet mr-1.5"></i> Pagos
+        </button>
+      <% end %>
+      <button type="button" data-tabs-target="tab" data-tab="tasks" data-action="click->tabs#switch" class="flex-1 px-6 py-3 sm:py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer text-center text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/40 dark:hover:bg-slate-700/30">
+        <i class="fa-solid fa-list-check mr-1.5"></i> Tareas
+      </button>
+    </div>
+
+    <% unless @reservation.blocked? %>
+      <div data-tabs-target="panel" data-panel="payments" class="hidden animate-fade-in">
+        <%= render "reservations/payments_section", reservation: @reservation, payments: @payments %>
+      </div>
+    <% end %>
+    
+    <div data-tabs-target="panel" data-panel="tasks" class="hidden animate-fade-in">
+      <%= render "operational_tasks/operational_tasks_section", reservation: @reservation %>
+    </div>
+  </div>
+
   <%= render "reservations/timeline_modal", reservation: @reservation %>
 </div>

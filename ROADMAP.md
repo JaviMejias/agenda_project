@@ -18,9 +18,10 @@ Este documento detalla el progreso actual del proyecto y los próximos pasos.
 
 ### 🎨 Experiencia de Usuario & Aesthetica (¡NUEVO!)
 - **Temas de 3 Estados:** Selector dinámico (Claro, Oscuro o Sistema) con detección en tiempo real de las preferencias del sistema operativo.
+- **UI Premium:** Refactorización de barras de navegación, corrección de contrastes en modo claro, sombras dinámicas y mejoras responsivas.
 - **Feedback Auditivo:** Sistema de sonidos sintetizados diferenciados (Éxito vs Alerta) que mejora la percepción de las acciones del usuario.
 - **App Feel:** Optimización de Viewport para móviles (bloqueo de zoom y scroll horizontal) para sensación de app nativa.
-- **Micro-interacciones:** Animaciones suaves en modales, transiciones de temas y barras de progreso de Turbo.
+- **Micro-interacciones:** Animaciones suaves en modales, transiciones de temas, menúes desplegables y barras de progreso de Turbo.
 
 ### 📅 Agenda Profesional (Dashboard Rediseñado)
 - **Split-Screen Layout:** Diseño de dos columnas (Calendario + Lista lateral) para una visión 360°.
@@ -46,6 +47,7 @@ Este documento detalla el progreso actual del proyecto y los próximos pasos.
 
 ### 🏢 Portal de Clientes & Autogestión (¡NUEVO!)
 - **Usuarios Tipo Cliente:** Creación de rol externo que permite a los clientes gestionar sus propias reservas.
+- **Registro Extendido:** Incorporación de RUT y teléfono en el registro de usuarios con validaciones nativas.
 - **Reservas Públicas:** Flujo para crear reservas tanto para usuarios logueados como visitantes anónimos.
 - **Portal de Pagos:** Interfaz dedicada para que los clientes adjunten y envíen sus comprobantes (vouchers) de transferencia.
 - **Validación Administrativa:** Sistema financiero para que los administradores revisen, aprueben o rechacen los comprobantes subidos por los clientes.
@@ -59,7 +61,16 @@ Este documento detalla el progreso actual del proyecto y los próximos pasos.
 ### 💰 Gestión Financiera & Facturación (¡NUEVO!)
 - **Recibos PDF:** Generación automática de comprobantes de pago (vouchers en PDF) actualizados en tiempo real según el estado de la reserva.
 - **Control de Abonos:** Registro de pagos parciales, saldos pendientes y validación de transacciones (aprobadas/rechazadas).
+- **Pasarela de Pagos Webpay:** Integración oficial con Transbank para pagos en línea y automatización de comisiones como gastos operativos.
 - **Gastos Operativos:** Registro de facturas de luz, agua, mantenimiento y otros (tabla `expenses`) vinculados a cada propiedad para cálculo de rentabilidad.
+
+### 📋 Trazabilidad & Gestión Operativa (¡NUEVO!)
+- **Auditoría (Timeline):** Registro histórico de cambios (quién cambió el estado de la reserva y cuándo) para tener trazabilidad completa.
+
+### 👤 CRM & Fidelización (¡NUEVO!)
+- **Perfil 360° del Cliente:** Historial de estancias e ingresos totales generados (LTV) implementados en el dashboard del cliente.
+- **Etiquetado Inteligente:** Segmentación de clientes mediante tags visuales (VIP, Recurrente, Conflictivo) integrados con traducciones I18n.
+- **Notas Privadas:** Área segura para registro de comportamientos y preferencias internas.
 
 ---
 
@@ -67,15 +78,10 @@ Este documento detalla el progreso actual del proyecto y los próximos pasos.
 
 1. **🔧 Gestión Operativa & Checklists**:
    - **Checklists de Entrada/Salida:** Listas de tareas dinámicas (Limpieza, Llaves, Inventario) vinculadas al flujo de la reserva.
-   - **Auditoría (Timeline):** Registro histórico de cambios ("X cambió el estado de la reserva a Confirmada hace 2 horas").
    - **Gestión de Incidencias:** Reporte de roturas o problemas técnicos encontrados durante la estancia.
 
-2. **👤 CRM & Fidelización**:
-   - **Perfil 360° del Cliente:** Historial de estancias, ingresos totales generados (LTV) y notas privadas de comportamiento.
-   - **Etiquetado Inteligente:** Segmentación de clientes (VIP, Recurrente, Conflictivo).
-
-3. **📑 Gestión Documental**:
+2. **📑 Gestión Documental**:
    - **Almacenamiento Seguro:** Subida de fotos de contratos firmados, documentos de identidad o fotos del estado de la propiedad antes/después.
 
 ---
-*Última actualización: 19 de Mayo, 2026 - 20:25 (Implementación de Portal de Clientes y Refactorización Arquitectónica)*
+*Última actualización: 23 de Mayo, 2026 - Actualización de Webpay, Timeline y Mejoras de UI*

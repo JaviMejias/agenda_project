@@ -43,7 +43,6 @@ class ReportStatsService
   private
 
   def properties_data
-    # Una sola query con CASE WHEN en lugar de N queries individuales
     aggregated = @properties
       .left_joins(:reservations)
       .merge(Reservation.in_range(@range))
@@ -56,7 +55,6 @@ class ReportStatsService
         "SUM(CASE WHEN reservations.status = 3 THEN reservations.total_price ELSE 0 END) AS loss"
       )
 
-    # Ocupación requiere datos por reserva; cargamos aparte solo las activas
     active_reservations = @reservations_in_range.active
     reservations_by_property = active_reservations.group_by(&:property_id)
 

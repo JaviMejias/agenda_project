@@ -1,0 +1,45 @@
+<%= form_with(model: [property, incident], class: "space-y-4") do |f| %>
+  <div class="space-y-2">
+    <%= f.label :title, "Problema / Título", class: "block text-xs font-bold text-gray-700 dark:text-slate-300" %>
+    <%= f.text_field :title, required: true, placeholder: "Ej: Llave de agua rota", class: "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-rose-500 focus:ring-rose-500 text-sm px-3 py-2.5 border bg-white dark:bg-slate-900 transition-colors dark:text-white" %>
+  </div>
+  <div class="space-y-2">
+    <%= f.label :description, "Descripción Detallada", class: "block text-xs font-bold text-gray-700 dark:text-slate-300" %>
+    <%= f.text_area :description, rows: 3, required: true, placeholder: "Describe el daño o la incidencia...", class: "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-rose-500 focus:ring-rose-500 text-sm px-3 py-2.5 border bg-white dark:bg-slate-900 transition-colors dark:text-white" %>
+  </div>
+  <div class="grid grid-cols-2 gap-4">
+    <div class="space-y-2">
+      <%= f.label :severity, "Gravedad", class: "block text-xs font-bold text-gray-700 dark:text-slate-300" %>
+      <div class="relative">
+        <%= f.select :severity,
+            options_for_select(incident_select_options(Incident, :severities, :severity), incident.severity || "low"),
+            {},
+            class: "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-rose-500 focus:ring-rose-500 text-sm px-3 py-2.5 border bg-white dark:bg-slate-900 transition-colors dark:text-white appearance-none cursor-pointer" %>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+          <i class="fa-solid fa-chevron-down text-[10px]"></i>
+        </div>
+      </div>
+    </div>
+    <div class="space-y-2">
+      <%= f.label :status, "Estado", class: "block text-xs font-bold text-gray-700 dark:text-slate-300" %>
+      <div class="relative">
+        <%= f.select :status,
+            options_for_select(incident_select_options(Incident, :statuses, :status), incident.status || "pending"),
+            {},
+            class: "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-rose-500 focus:ring-rose-500 text-sm px-3 py-2.5 border bg-white dark:bg-slate-900 transition-colors dark:text-white appearance-none cursor-pointer" %>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+          <i class="fa-solid fa-chevron-down text-[10px]"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="space-y-2">
+    <%= f.label :photo, "Foto (Opcional)", class: "block text-xs font-bold text-gray-700 dark:text-slate-300" %>
+    <%= f.file_field :photo, accept: "image/*", class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-slate-800 dark:file:text-slate-300 dark:hover:file:bg-slate-700 cursor-pointer" %>
+  </div>
+  <div class="pt-2">
+    <%= f.button type: "submit", class: "w-full inline-flex items-center justify-center rounded-xl bg-rose-600 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-white shadow-md hover:bg-rose-500 transition-all duration-200" do %>
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i> Guardar Incidencia
+    <% end %>
+  </div>
+<% end %>

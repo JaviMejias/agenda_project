@@ -72,7 +72,32 @@ es:
         cancelled: "Cancelada"
         rejected: "Rechazado"
         blocked: "Bloqueado"
+  incidents:
+    actions:
+      start_repair: "Iniciar Reparación"
+      mark_resolved: "Marcar Resuelto"
   enums:
+    operational_task:
+      task_type:
+        other: "Otra tarea"
+        check_in: "Check-in (Entrada)"
+        check_out: "Check-out (Salida)"
+        cleaning: "Limpieza General"
+    incident:
+      status:
+        pending: "Pendiente"
+        in_progress: "En Progreso"
+        resolved: "Resuelto"
+      severity:
+        low: "Baja (Normal)"
+        medium: "Media (Importante)"
+        high: "Alta (Urgente)"
+    client:
+      tag:
+        unassigned: "Sin Etiqueta"
+        vip: "VIP"
+        recurrent: "Recurrente"
+        conflictive: "Conflictivo"
     user:
       role:
         normal: "Colaborador"

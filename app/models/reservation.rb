@@ -4,15 +4,14 @@ class Reservation < ApplicationRecord
   belongs_to :client, optional: true
   has_many :payments, dependent: :destroy
   has_many :reservation_audits, dependent: :destroy
+  has_many :operational_tasks, dependent: :destroy
+  has_many :incidents, dependent: :nullify
 
   attr_accessor :skip_notifications, :audit_author_name
 
   enum :status, { pending: 0, confirmed: 1, cancelled: 2, blocked: 3 }
 
   has_secure_token :token
-  def self.selectable_statuses
-    statuses.keys.reject { |s| s == "blocked" }
-  end
 
   scope :in_range, ->(range) { where(start_time: range) }
   scope :completed, -> { confirmed.where("end_time <= ?", Time.zone.now) }
@@ -62,6 +61,10 @@ class Reservation < ApplicationRecord
   after_commit :schedule_reminder_job, on: [ :create, :update ]
   after_commit :create_audit_log, on: [ :create, :update ]
 
+  def self.selectable_statuses
+    statuses.keys.reject { |s| s == "blocked" }
+  end
+
   def destroyable?
     blocked?
   end
@@ -97,7 +100,6 @@ class Reservation < ApplicationRecord
     end
   end
 
-
   def self.for_calendar(property_id: nil, start_date_str: nil, end_date_str: nil, exclude_id: nil)
     query = all.active_and_valid.joins(:property).includes(:property, :payments)
     query = query.where(property_id: property_id) if property_id.present?
@@ -113,7 +115,6 @@ class Reservation < ApplicationRecord
     query = query.where.not(id: exclude_id) if exclude_id.present?
     query.order(start_time: :asc)
   end
-
 
   private
 
@@ -239,7 +240,6 @@ class Reservation < ApplicationRecord
       action_name = status
     end
 
-    # Evitamos registrar duplicados si el servicio ya registró
     return if @audit_manually_created
 
     reservation_audits.create!(

@@ -141,7 +141,9 @@ export default class extends Controller {
       editable: false,
       longPressDelay: 100,
       eventOverlap: false,
-      selectOverlap: false,
+      selectOverlap: (event) => {
+        return event.id === 'ghost-reservation'
+      },
       slotMinTime: '08:00:00',
       slotMaxTime: '22:00:00',
       allDaySlot: false,
@@ -180,6 +182,10 @@ export default class extends Controller {
           })
       },
       eventClick: (info) => {
+        if (initialStart && initialEnd) {
+          info.jsEvent.preventDefault()
+          return
+        }
         if (info.event.url) {
           info.jsEvent.preventDefault()
           const Turbo = window.Turbo

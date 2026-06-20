@@ -1,0 +1,27 @@
+<%= form_with(model: [reservation, task], id: "new_operational_task_form", class: "space-y-4", data: { turbo: true }) do |f| %>
+  <div class="space-y-2">
+    <%= f.label :task_type, class: "block text-xs font-bold text-gray-700 dark:text-slate-300" do %>
+      Tipo de Tarea
+    <% end %>
+    <div class="relative">
+      <%= f.select :task_type,
+          options_for_select(task_type_options, task.task_type),
+          {},
+          class: "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2.5 border bg-white dark:bg-slate-900 transition-colors dark:text-white appearance-none cursor-pointer" %>
+      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+      </div>
+    </div>
+  </div>
+  <div class="space-y-2">
+    <%= f.label :name, class: "block text-xs font-bold text-gray-700 dark:text-slate-300" do %>
+      Descripción de la tarea
+    <% end %>
+    <%= f.text_field :name, required: true, placeholder: "Ej: Entregar llaves, Revisar toallas, etc.", class: "block w-full rounded-xl border-gray-300 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2.5 border bg-white dark:bg-slate-900 transition-colors dark:text-white" %>
+  </div>
+  <div class="pt-2">
+    <%= f.button type: "submit", class: "w-full inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-white shadow-md hover:bg-indigo-500 transition-all duration-200" do %>
+      <i class="fa-solid fa-plus mr-2"></i> Añadir Tarea
+    <% end %>
+  </div>
+<% end %>

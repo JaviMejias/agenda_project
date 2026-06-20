@@ -94,6 +94,7 @@ module ReservationsHelper
     case from_param
     when "list" then list_reservations_path
     when "property" then property_path(reservation.property_id)
+    when "client" then reservation.client_id ? client_path(reservation.client_id) : clients_path
     else reservations_path
     end
   end
@@ -102,6 +103,7 @@ module ReservationsHelper
     case from_param
     when "list" then "al listado"
     when "property" then "a #{reservation.property.name}"
+    when "client" then "a la ficha del cliente"
     else "a la agenda"
     end
   end

@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     get :list, on: :collection
     resources :reservations, only: [ :new, :create ]
     resources :expenses
+    resources :incidents, only: [ :create, :update, :destroy, :edit ]
     member do
       get :gallery
       delete "images/:image_id", to: "properties#destroy_image", as: :image
@@ -33,6 +34,7 @@ Rails.application.routes.draw do
         patch :reject
       end
     end
+    resources :operational_tasks, only: [ :create, :update, :destroy ]
     member do
       get :receipt
     end

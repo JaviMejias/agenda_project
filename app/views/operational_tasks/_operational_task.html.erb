@@ -1,0 +1,20 @@
+<div id="<%= dom_id(task) %>" class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-sm hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors group">
+  <div class="flex items-center gap-3 flex-grow">
+    <%= form_with(model: [task.reservation, task], class: "flex items-center", data: { controller: "autosave", action: "change->autosave#save" }) do |f| %>
+      <div class="relative flex items-center">
+        <%= f.check_box :is_completed, class: "peer h-5 w-5 cursor-pointer rounded border-gray-300 text-emerald-600 focus:ring-emerald-600 dark:border-slate-600 dark:bg-slate-800 transition-all", onchange: "this.form.requestSubmit()" %>
+      </div>
+    <% end %>
+    <div class="flex flex-col">
+      <span class="text-sm font-bold <%= task_name_classes(task) %> transition-colors">
+        <%= task.name %>
+      </span>
+      <span class="text-[9px] font-black uppercase tracking-widest text-indigo-400 dark:text-indigo-600">
+        <%= I18n.t("enums.operational_task.task_type.#{task.task_type}") %>
+      </span>
+    </div>
+  </div>
+  <%= button_to reservation_operational_task_path(task.reservation, task), method: :delete, data: { turbo_confirm: "¿Eliminar esta tarea?" }, class: "opacity-0 group-hover:opacity-100 p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-all" do %>
+    <i class="fa-solid fa-trash-can"></i>
+  <% end %>
+</div>

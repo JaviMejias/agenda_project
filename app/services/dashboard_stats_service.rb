@@ -39,7 +39,6 @@ class DashboardStatsService
 
     labels = active_dates.map { |d| d.to_date.strftime("%d %b") }
 
-    # Una sola query agrupa ingresos por propiedad y fecha
     revenue_by_property_date = @reservations.confirmed
                                             .group(:property_id, "DATE(start_time)")
                                             .sum(:total_price)

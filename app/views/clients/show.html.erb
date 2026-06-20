@@ -6,6 +6,7 @@
     <div class="px-6 py-10 sm:px-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
       <%= render "clients/contact_info", client: @client %>
       <%= render "clients/reservations_history", client: @client, reservations: @reservations %>
+      <%= render "clients/crm_notes", client: @client %>
     </div>
   </div>
 </div>

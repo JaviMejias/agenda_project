@@ -6,7 +6,6 @@ class GeneratePropertyImagesJob < ApplicationJob
     return unless property
 
     property.images.each do |image|
-      # Trigger generation of all variants used in the app
       property.carousel_variant(image).processed
       property.gallery_variant(image).processed
       property.thumbnail(image).processed

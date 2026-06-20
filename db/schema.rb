@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_22_010504) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_23_155337) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -60,7 +60,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_22_010504) do
     t.string "email"
     t.string "name"
     t.string "phone"
+    t.text "private_notes"
     t.string "rut"
+    t.integer "tag"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_clients_on_user_id"
@@ -93,6 +95,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_22_010504) do
     t.index ["property_id"], name: "index_expenses_on_property_id"
   end
 
+  create_table "incidents", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.bigint "property_id", null: false
+    t.bigint "reservation_id"
+    t.integer "severity"
+    t.integer "status"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.index ["property_id"], name: "index_incidents_on_property_id"
+    t.index ["reservation_id"], name: "index_incidents_on_reservation_id"
+  end
+
   create_table "notifications", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "message"
@@ -103,6 +118,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_22_010504) do
     t.bigint "user_id", null: false
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "operational_tasks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "is_completed"
+    t.string "name"
+    t.bigint "reservation_id", null: false
+    t.integer "task_type"
+    t.datetime "updated_at", null: false
+    t.index ["reservation_id"], name: "index_operational_tasks_on_reservation_id"
   end
 
   create_table "payments", force: :cascade do |t|
@@ -313,7 +338,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_22_010504) do
   add_foreign_key "clients", "users"
   add_foreign_key "companies", "users"
   add_foreign_key "expenses", "properties"
+  add_foreign_key "incidents", "properties"
+  add_foreign_key "incidents", "reservations"
   add_foreign_key "notifications", "users"
+  add_foreign_key "operational_tasks", "reservations"
   add_foreign_key "payments", "reservations"
   add_foreign_key "properties", "companies"
   add_foreign_key "properties", "users"
