@@ -3,6 +3,8 @@ admin.update!(
   first_name: "Admin",
   last_name: "Soporte",
   password: "password123",
+  rut: "12345678-5",
+  phone: "+56911111111",
   role: :admin
 )
 
@@ -11,5 +13,7 @@ normal.update!(
   first_name: "Normal",
   last_name: "Soporte",
   password: "password123",
+  rut: "11111111-1",
+  phone: "+56922222222",
   role: :normal
 )
