@@ -39,7 +39,7 @@
         <div class="lg:w-5/12">
           <div class="sticky top-6">
             <%= render "reservations/booking_form", property: @property, reservation: @reservation || @property.reservations.build %>
-            <%= render "properties/pricing_card", property: @property %>
+
             <%= render "properties/gallery", property: @property %>
           </div>
         </div>
