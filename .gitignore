@@ -43,3 +43,7 @@ node_modules
 # Project tracking
 # /ROADMAP.md
 
+
+# Ignore key files for decrypting credentials and more.
+/config/*.key
+
