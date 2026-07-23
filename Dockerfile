@@ -17,6 +17,7 @@ WORKDIR /rails
 # Install base packages
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client imagemagick libfontconfig1 libxrender1 libxext6 libfreetype6 && \
+    ln -s /usr/lib/x86_64-linux-gnu/libjpeg.so.62 /usr/lib/x86_64-linux-gnu/libjpeg.so.8 && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     npm install -g yarn && \
@@ -56,7 +57,7 @@ COPY . .
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile || echo "Assets precompile failed, but continuing for development"
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 
 
